@@ -34,7 +34,7 @@ SOFTWARE.
 
 #include <ArduinoJson.h>
 
-#include <Log.hpp>
+#include <log.hpp>
 #include <main.hpp>
 
 enum VictronDeviceType {

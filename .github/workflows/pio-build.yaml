@@ -1,0 +1,48 @@
+name: PlatformIO CI
+
+on: 
+  pull_request:
+  push:
+    branches: 
+      - dev
+      - master
+
+jobs:
+  pio-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v4
+
+      - name: Checkout UI
+        run: |
+          echo "Checkout UI"
+          git clone https://github.com/mp-se/victron-receiver-ui victron-receiver-ui 
+          cp victron-receiver-ui/dist/css/app.css.gz html/
+          cp victron-receiver-ui/dist/js/app.js.gz html/
+          cp victron-receiver-ui/dist/index.html html/
+
+      - name: Setup PlatformIO
+        uses: n-vr/setup-platformio-action@v1.0.1    
+
+      - name: PlatformIO Run
+        uses: karniv00l/platformio-run-action@v1
+        with:
+          environments: "victron-receiver"
+          #targets: ""
+          #project-dir: "./some_dir"
+          #project-conf: "./some_dir/custom.ini"
+          jobs: 6
+          silent: false
+          verbose: true
+          disable-auto-clean: false
+    
+      - uses: EndBug/add-and-commit@v9 # You can change this to use a specific version. https://github.com/marketplace/actions/add-commit
+        with:
+          add: 'bin html'
+          author_name: GitHub Action
+          author_email: mp-se@noreply.github.com
+          default_author: github_actor
+          message: 'GitHub Action Build'
+          pathspec_error_handling: ignore

@@ -35,7 +35,7 @@ Currently I use VSCode and PlatformIO to build and flash the device. Pre-built b
 
 # Software Setup
 
-All the configuration is done using a web interface running on the device but after flashing there is a need to setup the wifi support. After installation the device will create an SSID called Victron with the password 'instant'. Join this network and then navigate to http://192.168.4.1 to open up the user interface. Under WIFI you can scan for existing networks, select the one you want and enter the SSID. Once the wifi is settings is saved you can reset the device and it should connect to the network. If you have an display the IP adress is shown on the bottom of the screen.
+All the configuration is done using a web interface running on the device but after flashing there is a need to setup the wifi support. After installation the device will create an SSID called Victron with the password 'instant1'. Join this network and then navigate to http://192.168.4.1 to open up the user interface. Under WIFI you can scan for existing networks, select the one you want and enter the SSID. Once the wifi is settings is saved you can reset the device and it should connect to the network. If you have an display the IP adress is shown on the bottom of the screen.
 
 Next you need to add your victron devices under the Device -> Security section. The mac adress and encryption key can be found under the settings for the device. Press the 3 dots in the upper corner and select Product Info. If the device can be found and data decrypted it will show up in the user interface on the home screen. 
 

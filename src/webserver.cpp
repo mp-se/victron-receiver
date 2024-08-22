@@ -121,6 +121,8 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
   obj[PARAM_PLATFORM] = "esp32s3";
 #elif defined(ESP32C3)
   obj[PARAM_PLATFORM] = "esp32c3";
+#elif defined(ESP32)
+  obj[PARAM_PLATFORM] = "esp32";
 #else
 #error "Unsupported platform"
 #endif

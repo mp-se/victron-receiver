@@ -21,6 +21,26 @@ def after_build(source, target, env):
         source = dir + "/.pio/build/" + name + "/partitions.bin"
         print( "Copy file : " + source + " -> " + target )
         shutil.copyfile( source, target )
+    elif name == "victron-lolin" :
+        target = dir + "/bin/firmware32.bin"
+        source = dir + "/.pio/build/" + name + "/firmware.bin"
+        print( "Copy file : " + source + " -> " + target )
+        shutil.copyfile( source, target )
+
+        target = dir + "/bin/partitions32.bin"
+        source = dir + "/.pio/build/" + name + "/partitions.bin"
+        print( "Copy file : " + source + " -> " + target )
+        shutil.copyfile( source, target )
+    elif name == "victron-s3-lolin" :
+        target = dir + "/bin/firmware32s3.bin"
+        source = dir + "/.pio/build/" + name + "/firmware.bin"
+        print( "Copy file : " + source + " -> " + target )
+        shutil.copyfile( source, target )
+
+        target = dir + "/bin/partitions32s3.bin"
+        source = dir + "/.pio/build/" + name + "/partitions.bin"
+        print( "Copy file : " + source + " -> " + target )
+        shutil.copyfile( source, target )
 
 print( "Adding custom build step (copy firmware): ")
 env.AddPostAction("buildprog", after_build)

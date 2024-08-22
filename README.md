@@ -23,7 +23,11 @@ Support for other devices can be done on request with a sample of the data (can 
 
 Currently I'm using the following development board for running my instance but on request I can add support for more. A display is optional so basically you only need an ESP32s3 or ESP32c3 board with BLE5 support. 
 
-https://www.waveshare.com/product/mcu-tools/development-boards/esp32/esp32-s3-touch-lcd-2.8.htm
+* Waveshare ESP32 S3 with TFT (https://www.waveshare.com/product/mcu-tools/development-boards/esp32/esp32-s3-touch-lcd-2.8.htm)
+
+Other options are:
+* Lolin ESP32 PRO with Lolin TFT
+* Lolin ESP32 S3 PRO with Lolin TFT
 
 # Flashing
 

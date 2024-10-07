@@ -1,3 +1,8 @@
+![download](https://img.shields.io/github/downloads/mp-se/victron-receiver/total) 
+![release](https://img.shields.io/github/v/release/mp-se/victron-receiver?label=latest%20release)
+![issues](https://img.shields.io/github/issues/mp-se/victron-receiver)
+![pr](https://img.shields.io/github/issues-pr/mp-se/victron-receiver)
+
 # Overview
 
 This is a project for reading Victron Instant Readouts over Bluetooth and pushing this into Home Assistant using an ESP32 board, WiFi and MQTT.

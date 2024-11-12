@@ -21,6 +21,7 @@ Currently there is support for the following Victron Devices mainly since these 
 
 * Smart Battery Monitor
 * Orion Smart DC-DC Charger
+* Blue Smart IP65 Charger 
 
 Support for other devices can be done on request with a sample of the data (can be recored in the software). You need to add the encryption key so the device is registered, then it will show up as an unknown device in the web interface. Open an issue in github and provide the captured data as well as what the actual readings is in the app so I can validate the result.
 
@@ -37,6 +38,14 @@ Other options are:
 # Flashing
 
 Currently I use VSCode and PlatformIO to build and flash the device. Pre-built binaries are available and can be flashed using esptool. On request more options can be added. 
+
+An option is to use python and esptool for flashing. Run the commands from the root directory for this project.
+
+- Install python3 from python.org
+- run> pip install esptool
+- run> python3 flash.py target port
+
+Example: python3 flash.py esp32s3w COM10
 
 # Software Setup
 

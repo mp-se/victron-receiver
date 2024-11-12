@@ -21,23 +21,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_MAIN_HPP_
-#define SRC_MAIN_HPP_
+#ifndef SRC_TESTDATA_HPP_
+#define SRC_TESTDATA_HPP_
 
-#include <stdlib.h>
+#include <blescanner.hpp>
 
-#include <espframework.hpp>
+class VictronBleSimulationData {
+    String _name;
+    String _json;
 
-enum RunMode {
-  receiverMode = 0,
-  wifiSetupMode = 1,
+ public:
+    VictronBleSimulationData(String name, String json) {
+        _name = name;
+        _json = json;
+    }
+
+    String getName() { return _name; }
+    String getJson() { return _json; }
 };
-extern RunMode runMode;
 
-#define ENABLE_BLE
+int getNoTestData();
+VictronBleSimulationData createDeviceFromTestData(int idx);
 
-constexpr auto DECIMALS_TEMP = 2;
-constexpr auto DECIMALS_VOLTAGE = 2;
-constexpr auto DECIMALS_CURRENT = 2;
-
-#endif  // SRC_MAIN_HPP_
+#endif  // SRC_TESTDATA_HPP_

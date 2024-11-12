@@ -24,7 +24,7 @@ SOFTWARE.
 #include <Wire.h>
 #include <esp_int_wdt.h>
 #include <esp_task_wdt.h>
-
+#include <testdata.hpp>
 #include <blescanner.hpp>
 #include <config.hpp>
 #include <helper.hpp>
@@ -151,6 +151,18 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
       n[PARAM_PUSH_TIME] = vbd.getPushAge();
     }
   }
+
+#if defined(ENABLE_SIMULATION)
+  for (int i = 0; i < getNoTestData(); i++) {
+    VictronBleSimulationData vbd = createDeviceFromTestData(i);
+    JsonObject n = devices.createNestedObject();
+    n[PARAM_NAME] = vbd.getName();
+    n[PARAM_DATA] = vbd.getJson();
+    n[PARAM_MAC] = "00:00:00:00:00";
+    n[PARAM_UPDATE_TIME] = 0;
+    n[PARAM_PUSH_TIME] = 0;
+  }
+#endif
 
   response->setLength();
   request->send(response);

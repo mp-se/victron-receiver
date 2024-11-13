@@ -34,6 +34,7 @@ Display::Display() {
 }
 
 void Display::setup() {
+#if defined(ENABLE_TFT)
   if (!_tft) return;
 
   _tft->init();
@@ -41,9 +42,11 @@ void Display::setup() {
   _tft->setRotation(1);  // TODO: Allow rotation to be set in configuration
   clear();
   setFont(FontSize::FONT_9);
+#endif
 }
 
 void Display::setFont(FontSize f) {
+#if defined(ENABLE_TFT)
   if (!_tft) return;
 
   switch (f) {
@@ -61,30 +64,37 @@ void Display::setFont(FontSize f) {
       _tft->setFreeFont(FF20);
       break;
   }
+#endif
 }
 
 void Display::printLine(int l, const String& text) {
+#if defined(ENABLE_TFT)
   if (!_tft) return;
 
   uint16_t h = _tft->fontHeight();
   _tft->fillRect(0, l * h, _tft->width(), h, TFT_BLACK);
   _tft->drawString(text.c_str(), 0, l * h, GFXFF);
+#endif
 }
 
 void Display::printLineCentered(int l, const String& text) {
+#if defined(ENABLE_TFT)
   if (!_tft) return;
 
   uint16_t h = _tft->fontHeight();
   uint16_t w = _tft->textWidth(text);
   _tft->fillRect(0, l * h, _tft->width(), h, TFT_BLACK);
   _tft->drawString(text.c_str(), (_tft->width() - w) / 2, l * h, GFXFF);
+#endif
 }
 
 void Display::clear() {
+#if defined(ENABLE_TFT)
   if (!_tft) return;
 
   _tft->fillScreen(TFT_BLACK);
   delay(1);
+#endif
 }
 
 // EOF

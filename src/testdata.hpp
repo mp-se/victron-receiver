@@ -40,6 +40,13 @@ class VictronBleSimulationData {
     String getJson() { return _json; }
 };
 
+struct VictronTestData {
+  char name[30];
+  uint16_t model;
+  uint8_t recordType;
+  uint8_t decrypted[21];
+};
+
 int getNoTestData();
 VictronBleSimulationData createDeviceFromTestData(int idx);
 

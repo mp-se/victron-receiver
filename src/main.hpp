@@ -39,5 +39,6 @@ extern RunMode runMode;
 constexpr auto DECIMALS_TEMP = 2;
 constexpr auto DECIMALS_VOLTAGE = 2;
 constexpr auto DECIMALS_CURRENT = 2;
+constexpr auto DECIMALS_POWER = 2;
 
 #endif  // SRC_MAIN_HPP_

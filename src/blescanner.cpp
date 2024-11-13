@@ -161,7 +161,7 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
       case VictronDeviceType::AcCharger: {
         // if (vicData->model == 0xA339 ) {
         // }
-        VictronBlueSmartIP65Charger vbm(&decrypted[0], vicData->model);
+        VictronSmartAcCharger vbm(&decrypted[0], vicData->model);
         vbm.toJson(obj);
       } break;
 

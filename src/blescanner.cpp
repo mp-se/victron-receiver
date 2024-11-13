@@ -159,16 +159,15 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
       } break;
 
       case VictronDeviceType::AcCharger: {
-        // if (vicData->model == 0xA339 ) {
-        // }
         VictronSmartAcCharger vbm(&decrypted[0], vicData->model);
         vbm.toJson(obj);
       } break;
 
-      /*case VictronDeviceType::BatteryMonitor: {
-        VictronSmartShunt vbm(&decrypted[0], vicData->model);
+      case VictronDeviceType::SolarCharger: {
+        VictronSolarCharger vbm(&decrypted[0], vicData->model);
         vbm.toJson(obj);
-      } break;*/
+      } break;
+
 
       default: {
         Log.notice(

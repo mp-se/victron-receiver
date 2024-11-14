@@ -168,7 +168,6 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
         vbm.toJson(obj);
       } break;
 
-
       default: {
         Log.notice(
             F("VIC : Unknown device found. Creating dump of data for analysis "

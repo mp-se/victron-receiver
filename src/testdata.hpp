@@ -27,17 +27,17 @@ SOFTWARE.
 #include <blescanner.hpp>
 
 class VictronBleSimulationData {
-    String _name;
-    String _json;
+  String _name;
+  String _json;
 
  public:
-    VictronBleSimulationData(String name, String json) {
-        _name = name;
-        _json = json;
-    }
+  VictronBleSimulationData(String name, String json) {
+    _name = name;
+    _json = json;
+  }
 
-    String getName() { return _name; }
-    String getJson() { return _json; }
+  String getName() { return _name; }
+  String getJson() { return _json; }
 };
 
 struct VictronTestData {

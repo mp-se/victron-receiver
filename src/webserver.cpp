@@ -24,7 +24,7 @@ SOFTWARE.
 #include <Wire.h>
 #include <esp_int_wdt.h>
 #include <esp_task_wdt.h>
-#include <testdata.hpp>
+
 #include <blescanner.hpp>
 #include <config.hpp>
 #include <helper.hpp>
@@ -32,6 +32,7 @@ SOFTWARE.
 #include <pushtarget.hpp>
 #include <resources.hpp>
 #include <templating.hpp>
+#include <testdata.hpp>
 #include <uptime.hpp>
 #include <webserver.hpp>
 

@@ -32,15 +32,15 @@ SOFTWARE.
 #ifndef SRC_VICTRON_AC_HPP_
 #define SRC_VICTRON_AC_HPP_
 
-#include <victron_common.hpp>
 #include <log.hpp>
 #include <main.hpp>
+#include <victron_common.hpp>
 
 class VictronSmartAcCharger : public VictronDevice {
   /*
    * Used for the following model numbers:
    * 0xA339: "Blue Smart IP65 Charger",
-   * 
+   *
    * TODO: Add other models that this should support...
    */
  private:
@@ -72,41 +72,61 @@ class VictronSmartAcCharger : public VictronDevice {
     _state = _data->state != 0xFF ? _data->state : 0;
     _error = _data->error != 0xFF ? _data->error : 0;
 
-  // 0x06,0x00,
-  // 0x2C,0x05,0x00
-  // 0xFF,0xFF,0xFF
-  // 0xFF,0xFF,0xFF
-  // 0xFF,0xFF
-  // 0x00,0x00,0x00,0x86,0xCA,0x00,0x00,0x00 }
+    // 0x06,0x00,
+    // 0x2C,0x05,0x00
+    // 0xFF,0xFF,0xFF
+    // 0xFF,0xFF,0xFF
+    // 0xFF,0xFF
+    // 0x00,0x00,0x00,0x86,0xCA,0x00,0x00,0x00 }
 
-    uint32_t ch1 = static_cast<uint32_t>(_data->channel1[0]) | static_cast<uint32_t>(_data->channel1[1])<<8 | static_cast<uint32_t>(_data->channel1[2])<<16;
+    uint32_t ch1 = static_cast<uint32_t>(_data->channel1[0]) |
+                   static_cast<uint32_t>(_data->channel1[1]) << 8 |
+                   static_cast<uint32_t>(_data->channel1[2]) << 16;
     uint16_t ch1V = ch1 & 0x1FFF;
-    uint16_t ch1A = ch1>>13 & 0x7FF;
+    uint16_t ch1A = ch1 >> 13 & 0x7FF;
 
-    _voltage1 = (ch1V) != 0x1FFF ? static_cast<float>(ch1V) / 100 : 0; // 10 mV increments
-    _current1 = (ch1A) != 0x7FF ? static_cast<float>(ch1A) / 10 : 0; // 10 mV increments
+    _voltage1 = (ch1V) != 0x1FFF ? static_cast<float>(ch1V) / 100
+                                 : 0;  // 10 mV increments
+    _current1 = (ch1A) != 0x7FF ? static_cast<float>(ch1A) / 10
+                                : 0;  // 10 mV increments
 
-    uint32_t ch2 = static_cast<uint32_t>(_data->channel2[0]) | static_cast<uint32_t>(_data->channel2[1])<<8 | static_cast<uint32_t>(_data->channel2[2])<<16;
+    uint32_t ch2 = static_cast<uint32_t>(_data->channel2[0]) |
+                   static_cast<uint32_t>(_data->channel2[1]) << 8 |
+                   static_cast<uint32_t>(_data->channel2[2]) << 16;
     uint16_t ch2V = ch2 & 0x1FFF;
-    uint16_t ch2A = ch2>>13 & 0x7FF;
+    uint16_t ch2A = ch2 >> 13 & 0x7FF;
 
-    _voltage2 = (ch2V) != 0x1FFF ? static_cast<float>(ch2V) / 100 : 0; // 10 mV increments
-    _current2 = (ch2A) != 0x7FF ? static_cast<float>(ch2A) / 10 : 0; // 10 mV increments
+    _voltage2 = (ch2V) != 0x1FFF ? static_cast<float>(ch2V) / 100
+                                 : 0;  // 10 mV increments
+    _current2 = (ch2A) != 0x7FF ? static_cast<float>(ch2A) / 10
+                                : 0;  // 10 mV increments
 
-    uint32_t ch3 = static_cast<uint32_t>(_data->channel3[0]) | static_cast<uint32_t>(_data->channel3[1])<<8 | static_cast<uint32_t>(_data->channel3[2])<<16;
+    uint32_t ch3 = static_cast<uint32_t>(_data->channel3[0]) |
+                   static_cast<uint32_t>(_data->channel3[1]) << 8 |
+                   static_cast<uint32_t>(_data->channel3[2]) << 16;
     uint16_t ch3V = ch3 & 0x1FFF;
-    uint16_t ch3A = ch3>>13 & 0x7FF;
+    uint16_t ch3A = ch3 >> 13 & 0x7FF;
 
-    _voltage3 = (ch3V) != 0x1FFF ? static_cast<float>(ch3V) / 100 : 0; // 10 mV increments
-    _current3 = (ch3A) != 0x7FF ? static_cast<float>(ch3A) / 10 : 0; // 10 mV increments
+    _voltage3 = (ch3V) != 0x1FFF ? static_cast<float>(ch3V) / 100
+                                 : 0;  // 10 mV increments
+    _current3 = (ch3A) != 0x7FF ? static_cast<float>(ch3A) / 10
+                                : 0;  // 10 mV increments
 
-    _temperatureC = (_data->temperature&0x7F) != 0x7F ? _data->temperature&0x7F - 40 : 0;
+    _temperatureC = (_data->temperature & 0x7F) != 0x7F
+                        ? _data->temperature & 0x7F - 40
+                        : 0;
 
-    uint16_t cur = static_cast<uint16_t>(_data->temperature&0x01) | static_cast<uint16_t>(_data->currentAC)<<1; // Borrow one unit from tempC
-    _currentAC = (cur&0x1FF) != 0x1FF ? cur : 0;
+    uint16_t cur = static_cast<uint16_t>(_data->temperature & 0x01) |
+                   static_cast<uint16_t>(_data->currentAC)
+                       << 1;  // Borrow one unit from tempC
+    _currentAC = (cur & 0x1FF) != 0x1FF ? cur : 0;
 
-    Log.notice(F("VIC : Victron %s (%x) battVolt1=%F V battCurr1=%F battVolt2=%F V battCurr2=%F battVolt3=%F V battCurr3=%F temp=%F acCurrent=%F" CR),
-               getDeviceName().c_str(), getModelNo(), getVoltage1(), getCurrent1(), getVoltage2(), getCurrent2(), getVoltage3(), getCurrent3(), getTemperature(), getCurrentAC());
+    Log.notice(
+        F("VIC : Victron %s (%x) battVolt1=%F V battCurr1=%F battVolt2=%F V "
+          "battCurr2=%F battVolt3=%F V battCurr3=%F temp=%F acCurrent=%F" CR),
+        getDeviceName().c_str(), getModelNo(), getVoltage1(), getCurrent1(),
+        getVoltage2(), getCurrent2(), getVoltage3(), getCurrent3(),
+        getTemperature(), getCurrentAC());
   }
 
   uint8_t getState() { return _state; }
@@ -139,10 +159,8 @@ class VictronSmartAcCharger : public VictronDevice {
         serialized(String(getVoltage3(), DECIMALS_VOLTAGE));
     doc["battery_current3"] =
         serialized(String(getCurrent3(), DECIMALS_CURRENT));
-    doc["temperature"] =
-        serialized(String(getTemperature(), DECIMALS_CURRENT));
-    doc["ac_current"] =
-        serialized(String(getCurrentAC(), DECIMALS_CURRENT));
+    doc["temperature"] = serialized(String(getTemperature(), DECIMALS_CURRENT));
+    doc["ac_current"] = serialized(String(getCurrentAC(), DECIMALS_CURRENT));
   }
 };
 

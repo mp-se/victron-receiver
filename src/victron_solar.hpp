@@ -32,16 +32,15 @@ SOFTWARE.
 #ifndef SRC_VICTRON_SOLAR_HPP_
 #define SRC_VICTRON_SOLAR_HPP_
 
-#include <victron_common.hpp>
 #include <log.hpp>
 #include <main.hpp>
-
+#include <victron_common.hpp>
 
 class VictronSolarCharger : public VictronDevice {
   /*
    * Used for the following model numbers:
    * 0xA042: "BlueSolar MPPT 75|15"
-   * 
+   *
    * TODO: Add other models that this should support...
    */
  private:
@@ -49,10 +48,10 @@ class VictronSolarCharger : public VictronDevice {
     uint8_t state;
     uint8_t error;
     uint16_t batteryVoltage;
-    uint16_t batteryCurrent; 
-    uint16_t yieldToday; 
-    uint16_t pvPower; 
-    uint16_t loadCurrent; 
+    uint16_t batteryCurrent;
+    uint16_t yieldToday;
+    uint16_t pvPower;
+    uint16_t loadCurrent;
     uint8_t unused[9];
   } __attribute__((packed)) VictronData;
 
@@ -71,14 +70,27 @@ class VictronSolarCharger : public VictronDevice {
     _state = _data->state != 0xFF ? _data->state : 0;
     _error = _data->error != 0xFF ? _data->error : 0;
 
-    _batteryVoltage = (_data->batteryVoltage&0x7FFF) != 0x7FFF ? static_cast<float>(_data->batteryVoltage&0x7FFF) / 100 : 0; // 10 mV increments
-    _batteryCurrent = (_data->batteryCurrent&0x7FFF) != 0x7FFF ? static_cast<float>(_data->batteryCurrent&0x7FFF) / 10 : 0; // 0.1 A increments
-    _yieldToday = _data->yieldToday != 0xFFFF ? static_cast<float>(_data->yieldToday) / 100 : 0; // 10 mV increments
-    _pvPower = _data->pvPower != 0xFFFF ? static_cast<float>(_data->pvPower) : 0; // W
-    _loadCurrent = (_data->loadCurrent&0x1FF) != 0x1FF ? static_cast<float>(_data->loadCurrent&0x1FF) / 10 : 0; // 0.1 A increments
+    _batteryVoltage =
+        (_data->batteryVoltage & 0x7FFF) != 0x7FFF
+            ? static_cast<float>(_data->batteryVoltage & 0x7FFF) / 100
+            : 0;  // 10 mV increments
+    _batteryCurrent =
+        (_data->batteryCurrent & 0x7FFF) != 0x7FFF
+            ? static_cast<float>(_data->batteryCurrent & 0x7FFF) / 10
+            : 0;  // 0.1 A increments
+    _yieldToday = _data->yieldToday != 0xFFFF
+                      ? static_cast<float>(_data->yieldToday) / 100
+                      : 0;  // 10 mV increments
+    _pvPower =
+        _data->pvPower != 0xFFFF ? static_cast<float>(_data->pvPower) : 0;  // W
+    _loadCurrent = (_data->loadCurrent & 0x1FF) != 0x1FF
+                       ? static_cast<float>(_data->loadCurrent & 0x1FF) / 10
+                       : 0;  // 0.1 A increments
 
-    Log.notice(F("VIC : Victron %s (%x) battVolt=%F V battCurrent=%F yield=%F load=%F" CR),
-               getDeviceName().c_str(), getModelNo(), getBatteryVoltage(), getBatteryCurrent(), getYieldToday(), getLoadCurrent());
+    Log.notice(F("VIC : Victron %s (%x) battVolt=%F V battCurrent=%F yield=%F "
+                 "load=%F" CR),
+               getDeviceName().c_str(), getModelNo(), getBatteryVoltage(),
+               getBatteryCurrent(), getYieldToday(), getLoadCurrent());
   }
 
   uint8_t getState() { return _state; }
@@ -101,8 +113,7 @@ class VictronSolarCharger : public VictronDevice {
         serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
     doc["battery_current"] =
         serialized(String(getBatteryCurrent(), DECIMALS_CURRENT));
-    doc["pv_power"] =
-        serialized(String(getPvPower(), DECIMALS_POWER));
+    doc["pv_power"] = serialized(String(getPvPower(), DECIMALS_POWER));
     doc["load_current"] =
         serialized(String(getLoadCurrent(), DECIMALS_CURRENT));
   }

@@ -32,9 +32,9 @@ SOFTWARE.
 #ifndef SRC_VICTRON_SHUNT_HPP_
 #define SRC_VICTRON_SHUNT_HPP_
 
-#include <victron_common.hpp>
 #include <log.hpp>
 #include <main.hpp>
+#include <victron_common.hpp>
 
 class VictronSmartShunt : public VictronDevice {
   /*
@@ -48,21 +48,21 @@ class VictronSmartShunt : public VictronDevice {
     uint16_t remainingMins;
     uint16_t batteryVoltage;
     uint16_t alarm;
-    uint16_t aux; 
-    uint8_t batteryCurrent[3]; // 24 bits 
-    uint16_t consumedAh; // 20 bits, 4 bits from soc needed
-    uint8_t soc[2]; // 10 bits
+    uint16_t aux;
+    uint8_t batteryCurrent[3];  // 24 bits
+    uint16_t consumedAh;        // 20 bits, 4 bits from soc needed
+    uint8_t soc[2];             // 10 bits
     uint8_t unused[6];
   } __attribute__((packed)) VictronData;
 
   uint16_t _remaningMins;
-  uint16_t _alarm;  
+  uint16_t _alarm;
   float _batteryVoltage;
   float _aux;
-  uint8_t _auxMode;  
+  uint8_t _auxMode;
   float _batteryCurrent;
-  float _consumedAh;  
-  float _soc;  
+  float _consumedAh;
+  float _soc;
 
  public:
   VictronSmartShunt(const uint8_t* data, uint16_t model) {
@@ -72,24 +72,41 @@ class VictronSmartShunt : public VictronDevice {
     setBaseData("Smart Shunt", model, data);
 
     _remaningMins = _data->remainingMins != 0xFFFF ? _data->remainingMins : 0;
-    _batteryVoltage = (_data->batteryVoltage&0x7FFF) != 0x7FFF ? static_cast<float>(_data->batteryVoltage&0x7FFF) / 100 : 0; // 10 mV increments
+    _batteryVoltage =
+        (_data->batteryVoltage & 0x7FFF) != 0x7FFF
+            ? static_cast<float>(_data->batteryVoltage & 0x7FFF) / 100
+            : 0;  // 10 mV increments
     _alarm = _data->alarm != 0xFFFF ? _data->alarm : 0;
-    _aux = static_cast<float>(_data->aux&0x7FFF) / 100;  // 10 mV increments (TODO: Could also be Temperature in K) 
+    _aux = static_cast<float>(_data->aux & 0x7FFF) /
+           100;  // 10 mV increments (TODO: Could also be Temperature in K)
 
-    uint32_t bc = static_cast<uint32_t>(_data->batteryCurrent[0]) | static_cast<uint32_t>(_data->batteryCurrent[1])<<8 | static_cast<uint32_t>(_data->batteryCurrent[2])<<16;
-    _auxMode = bc & 0x03; // 0 = StarterVoltage, 1 = MidPointVoltage, 2 = Temperature, 3 = Off
+    uint32_t bc = static_cast<uint32_t>(_data->batteryCurrent[0]) |
+                  static_cast<uint32_t>(_data->batteryCurrent[1]) << 8 |
+                  static_cast<uint32_t>(_data->batteryCurrent[2]) << 16;
+    _auxMode = bc & 0x03;  // 0 = StarterVoltage, 1 = MidPointVoltage, 2 =
+                           // Temperature, 3 = Off
 
-    bc = bc>>2;
-    _batteryCurrent = (bc&0x3FFFFF) != 0x3FFFFF ? static_cast<float>(bc&0x3FFFFF)/1000 : 0;
-    
-    uint32_t ca = static_cast<uint32_t>(_data->consumedAh) | static_cast<uint32_t>(_data->soc[0] & 0x0F)<<16; // Borrow 4 bits from soc as
-    _consumedAh = ca != 0xFFFFF ? -(static_cast<float>(ca)/10) : 0;
+    bc = bc >> 2;
+    _batteryCurrent = (bc & 0x3FFFFF) != 0x3FFFFF
+                          ? static_cast<float>(bc & 0x3FFFFF) / 1000
+                          : 0;
 
-    uint16_t soc = static_cast<uint16_t>(_data->soc[0] & 0x03) | static_cast<uint16_t>(_data->soc[1])<<2;
-    _soc = (soc&0x3FF) != 0x3FF ? static_cast<float>(soc&0x3FF) / 10 : 0; // 0.1% increments
+    uint32_t ca = static_cast<uint32_t>(_data->consumedAh) |
+                  static_cast<uint32_t>(_data->soc[0] & 0x0F)
+                      << 16;  // Borrow 4 bits from soc as
+    _consumedAh = ca != 0xFFFFF ? -(static_cast<float>(ca) / 10) : 0;
 
-    Log.notice(F("VIC : Victron %s (%x) remaningMins=%d V battVoltage=%F alarm=%d aux=%F consumedAh=%F auxMode=%d battCurrent=%F soc=%F" CR),
-               getDeviceName().c_str(), getModelNo(), getRemaningMins(), getBatteryVoltage(), getAlarm(), getAux(), getConsumedAh(), getAuxMode(), getBatteryCurrent(), getSoc());
+    uint16_t soc = static_cast<uint16_t>(_data->soc[0] & 0x03) |
+                   static_cast<uint16_t>(_data->soc[1]) << 2;
+    _soc = (soc & 0x3FF) != 0x3FF ? static_cast<float>(soc & 0x3FF) / 10
+                                  : 0;  // 0.1% increments
+
+    Log.notice(
+        F("VIC : Victron %s (%x) remaningMins=%d V battVoltage=%F alarm=%d "
+          "aux=%F consumedAh=%F auxMode=%d battCurrent=%F soc=%F" CR),
+        getDeviceName().c_str(), getModelNo(), getRemaningMins(),
+        getBatteryVoltage(), getAlarm(), getAux(), getConsumedAh(),
+        getAuxMode(), getBatteryCurrent(), getSoc());
   }
 
   uint16_t getRemaningMins() { return _remaningMins; }
@@ -108,25 +125,25 @@ class VictronSmartShunt : public VictronDevice {
     doc["alarm"] = getAlarm();
     doc["battery_voltage"] =
         serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
-    doc["battery_current"] =
-        serialized(String(getBatteryCurrent(), 3)); // Higher resolution than others.
+    doc["battery_current"] = serialized(
+        String(getBatteryCurrent(), 3));  // Higher resolution than others.
     doc["consumed_ah"] = getConsumedAh();
-    doc["soc"] = serialized(String(getSoc(), 1)); 
+    doc["soc"] = serialized(String(getSoc(), 1));
     doc["remaning_mins"] = getRemaningMins();
 
-    switch(getAuxMode()) {
+    switch (getAuxMode()) {
       case 0:
         doc["aux_voltage"] = serialized(String(getAux(), DECIMALS_VOLTAGE));
-      break;
+        break;
       case 1:
         doc["mid_voltage"] = serialized(String(getAux(), DECIMALS_VOLTAGE));
-      break;
+        break;
       case 2:
         doc["temperature"] = serialized(String(getAux(), DECIMALS_TEMP));
-      break;
+        break;
       case 3:
         // Disabled
-      break;
+        break;
     }
   }
 };

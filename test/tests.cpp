@@ -50,9 +50,9 @@ void setup() {
   delay(4000);
   Printer::setPrinter(&EspSerial);
 
-  TestRunner::exclude("dcdc_*");
-  TestRunner::exclude("battmon_*");
-  TestRunner::exclude("shunt_*");
+  // TestRunner::exclude("dcdc_*");
+  // TestRunner::exclude("battmon_*");
+  // TestRunner::exclude("shunt_*");
   // TestRunner::exclude("ac_*");
 }
 

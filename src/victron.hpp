@@ -32,10 +32,10 @@ SOFTWARE.
 #ifndef SRC_VICTRON_HPP_
 #define SRC_VICTRON_HPP_
 
-#include <victron_common.hpp>
-#include <victron_dcdc.hpp>
 #include <victron_ac.hpp>
 #include <victron_battmon.hpp>
+#include <victron_common.hpp>
+#include <victron_dcdc.hpp>
 #include <victron_shunt.hpp>
 #include <victron_solar.hpp>
 

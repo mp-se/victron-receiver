@@ -32,9 +32,9 @@ SOFTWARE.
 #ifndef SRC_VICTRON_DCDC_HPP_
 #define SRC_VICTRON_DCDC_HPP_
 
-#include <victron_common.hpp>
 #include <log.hpp>
 #include <main.hpp>
+#include <victron_common.hpp>
 
 class VictronSmartDcDcCharger : public VictronDevice {
   /*

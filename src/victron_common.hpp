@@ -39,14 +39,14 @@ SOFTWARE.
 
 enum VictronDeviceType {
   Test = 0x00,
-  SolarCharger = 0x01,
-  BatteryMonitor = 0x02,
+  SolarCharger = 0x01,    // Supported
+  BatteryMonitor = 0x02,  // Supported
   Inverter = 0x03,
-  DcDcConverter = 0x04,
+  DcDcConverter = 0x04,  // Supported
   SmartLithium = 0x05,
   InverterRS = 0x06,
   GxDevice = 0x07,
-  AcCharger = 0x08,
+  AcCharger = 0x08,  // Supported
   SmartBatteryProtect = 0x09,
   LynxSmartBMS = 0x0a,
   MultiRS = 0x0b,

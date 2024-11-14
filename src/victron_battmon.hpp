@@ -36,7 +36,7 @@ SOFTWARE.
 #include <main.hpp>
 #include <victron_common.hpp>
 
-class VictronSmartBatteryMonitor : public VictronDevice {
+class VictronBatteryMonitor : public VictronDevice {
   /*
    * Used for the following model numbers:
    * 0xA3A4: "Smart Battery Sense",
@@ -55,9 +55,9 @@ class VictronSmartBatteryMonitor : public VictronDevice {
   float _temperatureC;
 
  public:
-  VictronSmartBatteryMonitor(const uint8_t* data, uint16_t model) {
-    VictronSmartBatteryMonitor::VictronData* _data =
-        (VictronSmartBatteryMonitor::VictronData*)data;
+  VictronBatteryMonitor(const uint8_t* data, uint16_t model) {
+    VictronBatteryMonitor::VictronData* _data =
+        (VictronBatteryMonitor::VictronData*)data;
     uint32_t v;
 
     setBaseData("Smart Battery Monitor", model, data);

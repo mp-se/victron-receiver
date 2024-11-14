@@ -24,12 +24,12 @@ SOFTWARE.
 #include <AUnit.h>
 #include <Arduino.h>
 
-#include <victron.hpp>
+#include <victron_battmon.hpp>
 #include <testdata.hpp>
 
 test(battmon_test1) {
     VictronTestData testData = { "Smart Battery Monitor", 0xA3A5, BatteryMonitor, { 0xFF,0xFF,0x45,0x04,0x00,0x00,0xFA,0x73,0xFE,0xFF,0x7F,0xFF,0xFF,0xFF,0xFF,0x00,0x24,0x68,0x00,0x00,0x00 } };
-    VictronSmartBatteryMonitor v(&testData.decrypted[0], testData.model);
+    VictronBatteryMonitor v(&testData.decrypted[0], testData.model);
     uint16_t data;
 
     assertEqual(v.getDeviceName(), "Smart Battery Monitor");

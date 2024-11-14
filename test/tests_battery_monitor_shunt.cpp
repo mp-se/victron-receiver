@@ -24,12 +24,12 @@ SOFTWARE.
 #include <AUnit.h>
 #include <Arduino.h>
 
-#include <victron.hpp>
+#include <victron_battmon_shunt.hpp>
 #include <testdata.hpp>
 
 test(shunt_test1) {
     VictronTestData testData = { "Smart Shunt", 0xA339, BatteryMonitor, { 0xff,0xff,0xe5,0x04,0x00,0x00,0x00,0x00,0x03,0x00,0x00,0xf4,0x01,0x40,0xdf,0x03,0x00,0x00,0x00,0x00,0x00 } };
-    VictronSmartShunt v(&testData.decrypted[0], testData.model);
+    VictronShunt v(&testData.decrypted[0], testData.model);
     uint16_t data;
 
     assertEqual(v.getDeviceName(), "Smart Shunt");

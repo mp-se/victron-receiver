@@ -33,10 +33,11 @@ SOFTWARE.
 #define SRC_VICTRON_HPP_
 
 #include <victron_ac.hpp>
-#include <victron_battmon.hpp>
 #include <victron_common.hpp>
-#include <victron_dcdc.hpp>
-#include <victron_shunt.hpp>
-#include <victron_solar.hpp>
+#include <victron_battmon.hpp> // Smart BatteryMon (Subset of data)
+#include <victron_battmon_shunt.hpp>  // BatteryMon (Complete)
+#include <victron_dcdc.hpp> // DC-DC Charger
+#include <victron_ac.hpp> // AC Charger
+#include <victron_solar.hpp> // Solar Charger
 
 #endif  // SRC_VICTRON_HPP_

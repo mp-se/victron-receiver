@@ -36,7 +36,7 @@ SOFTWARE.
 #include <main.hpp>
 #include <victron_common.hpp>
 
-class VictronSmartShunt : public VictronDevice {
+class VictronShunt : public VictronDevice {
   /*
    * Used for the following model numbers:
    * 0xA389: "SmartShunt 500A/50mV"
@@ -65,9 +65,9 @@ class VictronSmartShunt : public VictronDevice {
   float _soc;
 
  public:
-  VictronSmartShunt(const uint8_t* data, uint16_t model) {
-    VictronSmartShunt::VictronData* _data =
-        (VictronSmartShunt::VictronData*)data;
+  VictronShunt(const uint8_t* data, uint16_t model) {
+    VictronShunt::VictronData* _data =
+        (VictronShunt::VictronData*)data;
 
     setBaseData("Smart Shunt", model, data);
 

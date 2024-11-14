@@ -36,7 +36,7 @@ SOFTWARE.
 #include <main.hpp>
 #include <victron_common.hpp>
 
-class VictronSmartAcCharger : public VictronDevice {
+class VictronAcCharger : public VictronDevice {
   /*
    * Used for the following model numbers:
    * 0xA339: "Blue Smart IP65 Charger",
@@ -63,21 +63,14 @@ class VictronSmartAcCharger : public VictronDevice {
   float _currentAC;
 
  public:
-  VictronSmartAcCharger(const uint8_t* data, uint16_t model) {
-    VictronSmartAcCharger::VictronData* _data =
-        (VictronSmartAcCharger::VictronData*)data;
+  VictronAcCharger(const uint8_t* data, uint16_t model) {
+    VictronAcCharger::VictronData* _data =
+        (VictronAcCharger::VictronData*)data;
 
     setBaseData("Smart AC Charger", model, data);
 
     _state = _data->state != 0xFF ? _data->state : 0;
     _error = _data->error != 0xFF ? _data->error : 0;
-
-    // 0x06,0x00,
-    // 0x2C,0x05,0x00
-    // 0xFF,0xFF,0xFF
-    // 0xFF,0xFF,0xFF
-    // 0xFF,0xFF
-    // 0x00,0x00,0x00,0x86,0xCA,0x00,0x00,0x00 }
 
     uint32_t ch1 = static_cast<uint32_t>(_data->channel1[0]) |
                    static_cast<uint32_t>(_data->channel1[1]) << 8 |

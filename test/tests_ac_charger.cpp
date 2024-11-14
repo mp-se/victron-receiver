@@ -24,12 +24,12 @@ SOFTWARE.
 #include <AUnit.h>
 #include <Arduino.h>
 
-#include <victron.hpp>
+#include <victron_ac.hpp>
 #include <testdata.hpp>
 
 test(ac_test1) {
     VictronTestData testData = { "Smart AC Charger", 0xA339, AcCharger, { 0x06,0x00,0x2C,0x05,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00,0x86,0xCA,0x00,0x00,0x00 } };
-    VictronSmartAcCharger v(&testData.decrypted[0], testData.model);
+    VictronAcCharger v(&testData.decrypted[0], testData.model);
     uint16_t data;
 
     assertEqual(v.getDeviceName(), "Smart AC Charger");
@@ -56,7 +56,7 @@ test(ac_test1) {
 
 test(ac_test2) {
     VictronTestData testData = { "Smart AC Charger", 0xA339, AcCharger, { 0x04,0x00,0xA0,0x25,0x04,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x3F,0x7C,0x00,0x00,0x00,0x00 } };
-    VictronSmartAcCharger v(&testData.decrypted[0], testData.model);
+    VictronAcCharger v(&testData.decrypted[0], testData.model);
     uint16_t data;
 
     assertEqual(v.getDeviceName(), "Smart AC Charger");

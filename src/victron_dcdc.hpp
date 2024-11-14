@@ -36,7 +36,7 @@ SOFTWARE.
 #include <main.hpp>
 #include <victron_common.hpp>
 
-class VictronSmartDcDcCharger : public VictronDevice {
+class VictronDcDcCharger : public VictronDevice {
   /*
    * Used for the following model numbers:
    * 0xA3C0: "Orion Smart 12V|12V-18A Isolated DC-DC Charger",
@@ -76,9 +76,9 @@ class VictronSmartDcDcCharger : public VictronDevice {
   uint32_t _offReason;
 
  public:
-  VictronSmartDcDcCharger(const uint8_t* data, uint16_t model) {
-    VictronSmartDcDcCharger::VictronData* _data =
-        (VictronSmartDcDcCharger::VictronData*)data;
+  VictronDcDcCharger(const uint8_t* data, uint16_t model) {
+    VictronDcDcCharger::VictronData* _data =
+        (VictronDcDcCharger::VictronData*)data;
     uint32_t v;
 
     setBaseData("Smart DC-DC Charger", model, data);

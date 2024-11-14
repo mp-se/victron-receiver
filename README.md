@@ -19,11 +19,24 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 Currently there is support for the following Victron Devices mainly since these are the onces I'm using. But there is a feature to capture data from any Victron Device that support the Instant Readout and then I can add support for those.
 
-* Smart Battery Monitor
-* Orion Smart DC-DC Charger
-* Blue Smart IP65 Charger 
+* Battery Monitor: Smart Battery Monitor + SmartShunt
+* DC-DC Charger: Orion Smart DC-DC Charger
+* AC Charger: Blue Smart IP65 Charger
+* Solar Charger: BlueSolar MPPT
 
-Support for other devices can be done on request with a sample of the data (can be recored in the software). You need to add the encryption key so the device is registered, then it will show up as an unknown device in the web interface. Open an issue in github and provide the captured data as well as what the actual readings is in the app so I can validate the result.
+The following types are **NOT** yet supported due to lack of test data.
+
+* Inverter
+* SmartLithium
+* InverterRS
+* GxDevice
+* SmartBatteryProtect
+* LynxSmartBMS
+* MultiRS
+* VeBus
+* DcEnergyMeter
+
+Support for other devices can be done on request with a sample of the data (can be recorded in the software). You need to add the encryption key so the device is registered, then it will show up as an unknown device in the web interface. Open an issue in github and provide the captured data as well as what the actual readings is in the app so I can validate the result.
 
 # Hardware
 

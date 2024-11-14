@@ -52,7 +52,6 @@ class VictronSolarCharger : public VictronDevice {
     uint16_t yieldToday;
     uint16_t pvPower;
     uint16_t loadCurrent;
-    uint8_t unused[9];
   } __attribute__((packed)) VictronData;
 
   uint8_t _state;

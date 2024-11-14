@@ -29,59 +29,86 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#ifndef SRC_VICTRON_BATTMON_HPP_
-#define SRC_VICTRON_BATTMON_HPP_
+#ifndef SRC_VICTRON_INVERTER_HPP_
+#define SRC_VICTRON_INVERTER_HPP_
 
 #include <log.hpp>
 #include <main.hpp>
 #include <victron_common.hpp>
 
-class VictronBatteryMonitor : public VictronDevice {
+class VictronInverter : public VictronDevice {
   /*
    * Used for the following model numbers:
-   * 0xA3A4: "Smart Battery Sense",
-   * 0xA3A5: "Smart Battery Sense",
+   *
+   * This is not yet tested, lack data to test with
    */
  private:
   typedef struct {
-    uint16_t unused;
-    int16_t batteryVoltage;
+    uint8_t state;
     uint16_t alarm;
-    uint16_t temperature;
+    int16_t batteryVoltage;
+    uint16_t acPower;
+    uint16_t acVoltage;
+    uint16_t acCurrent;
   } __attribute__((packed)) VictronData;
 
+  uint8_t _state;
+  uint16_t _alarm;
   float _batteryVoltage;
-  float _temperatureC;
+  float _acPower;
+  float _acVoltage;
+  float _acCurrent;
 
  public:
-  VictronBatteryMonitor(const uint8_t* data, uint16_t model) {
-    VictronBatteryMonitor::VictronData* _data =
-        (VictronBatteryMonitor::VictronData*)data;
+  VictronInverter(const uint8_t* data, uint16_t model) {
+    VictronInverter::VictronData* _data =
+        (VictronInverter::VictronData*)data;
     uint32_t v;
 
-    setBaseData("Smart Battery Monitor", model, data);
+    setBaseData("Inverter", model, data);
 
-    _batteryVoltage = _data->batteryVoltage != 0x7FFF
-                          ? static_cast<float>(_data->batteryVoltage) / 100
-                          : 0;  // 10 mV increments
-    _temperatureC = (static_cast<float>(_data->temperature) / 100) -
-                    273.15;  // Value of the temperature (K)
+    _state = _data->state != 0xFF ? _data->state : 0;
+    _alarm = _data->alarm != 0xFFFF ? _data->alarm : 0;
 
-    Log.notice(F("VIC : Victron %s (%x) volt=%F V temp=%F C" CR),
-               getDeviceName().c_str(), getModelNo(), getBatteryVoltage(),
-               getTemperatureC());
+    _batteryVoltage = (_data->batteryVoltage & 0x7FFF) != 0x7FFF
+            ? static_cast<float>(_data->batteryVoltage & 0x7FFF) / 100
+            : 0;  // 10 mV increments
+    _acPower = _data->acPower != 0xFFFF
+            ? static_cast<float>(_data->acPower)
+            : 0;
+    _acVoltage = (_data->acVoltage & 0x7FFF) != 0x7FFF
+            ? static_cast<float>(_data->acVoltage & 0x7FFF) / 100
+            : 0;  // 10 mV increments
+    _acCurrent = (_data->acCurrent & 0x7FF) != 0x7FF
+            ? static_cast<float>(_data->acCurrent & 0x7FF) / 10
+            : 0; 
   }
 
   float getBatteryVoltage() { return _batteryVoltage; }
-  float getTemperatureC() { return _temperatureC; }
+  float getAcPower() { return _acPower; }
+  float getAcVoltage() { return _acVoltage; }
+  float getAcCurrent() { return _acCurrent; }
+
+  uint8_t getState() { return _state; }
+  uint8_t getAlarm() { return _alarm; }
 
   void toJson(JsonObject& doc) {
     VictronDevice::toJson(doc);
 
+    doc["state"] = getState();
+    doc["state_message"] = deviceStateToString(getState());
+    doc["alarm"] = getAlarm();
+
     doc["battery_voltage"] =
         serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
-    doc["temperature"] = serialized(String(getTemperatureC(), DECIMALS_TEMP));
+
+    doc["ac_power"] =
+        serialized(String(getAcPower(), DECIMALS_POWER));
+    doc["ac_voltage"] =
+        serialized(String(getAcVoltage(), DECIMALS_VOLTAGE));
+    doc["ac_current"] =
+        serialized(String(getAcCurrent(), DECIMALS_CURRENT));
   }
 };
 
-#endif  // SRC_VICTRON_BATTMON_HPP_
+#endif  // SRC_VICTRON_INVERTER_HPP_

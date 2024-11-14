@@ -29,59 +29,72 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#ifndef SRC_VICTRON_BATTMON_HPP_
-#define SRC_VICTRON_BATTMON_HPP_
+#ifndef SRC_VICTRON_LITHIUM_HPP_
+#define SRC_VICTRON_LITHIUM_HPP_
 
 #include <log.hpp>
 #include <main.hpp>
 #include <victron_common.hpp>
 
-class VictronBatteryMonitor : public VictronDevice {
+class VictronLithium : public VictronDevice {
   /*
    * Used for the following model numbers:
-   * 0xA3A4: "Smart Battery Sense",
-   * 0xA3A5: "Smart Battery Sense",
+   *
+   * This is not yet tested, lack data to test with
    */
  private:
   typedef struct {
-    uint16_t unused;
-    int16_t batteryVoltage;
+    uint32_t bmsFlags;
     uint16_t alarm;
-    uint16_t temperature;
+    uint8_t cell[8];
+    uint16_t batteryVoltage; // Also inclucde status
+    uint16_t batteryTemperature;
   } __attribute__((packed)) VictronData;
 
+  uint32_t _bmsFlags;
+  uint16_t _alarm;
+  float _cells[8];
   float _batteryVoltage;
-  float _temperatureC;
+  uint8_t _batteryStatus;
+  float _batteryTemperature;
 
  public:
-  VictronBatteryMonitor(const uint8_t* data, uint16_t model) {
-    VictronBatteryMonitor::VictronData* _data =
-        (VictronBatteryMonitor::VictronData*)data;
+  VictronLithium(const uint8_t* data, uint16_t model) {
+    VictronLithium::VictronData* _data =
+        (VictronLithium::VictronData*)data;
     uint32_t v;
 
-    setBaseData("Smart Battery Monitor", model, data);
+    setBaseData("Lithium", model, data);
 
-    _batteryVoltage = _data->batteryVoltage != 0x7FFF
-                          ? static_cast<float>(_data->batteryVoltage) / 100
-                          : 0;  // 10 mV increments
-    _temperatureC = (static_cast<float>(_data->temperature) / 100) -
-                    273.15;  // Value of the temperature (K)
+    _bmsFlags = _data->bmsFlags;
+    _alarm = _data->alarm;
 
-    Log.notice(F("VIC : Victron %s (%x) volt=%F V temp=%F C" CR),
-               getDeviceName().c_str(), getModelNo(), getBatteryVoltage(),
-               getTemperatureC());
+    // TODO: Parse rest of the data, need data to test with.
   }
 
   float getBatteryVoltage() { return _batteryVoltage; }
-  float getTemperatureC() { return _temperatureC; }
+  float getBatteryTemperature() { return _batteryTemperature; }
+  float getCell(int i) { return _cells[i]; }
+
+  uint32_t getBmsFlags() { return _bmsFlags; }
+  uint8_t getBatteryStatus() { return _batteryStatus; }
+  uint16_t getAlarm() { return _alarm; }
+  uint8_t getCellCount() { return 8; }
 
   void toJson(JsonObject& doc) {
     VictronDevice::toJson(doc);
 
+    doc["bms_flags"] = getBmsFlags();
+    doc["alarm"] = getAlarm();
+
     doc["battery_voltage"] =
         serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
-    doc["temperature"] = serialized(String(getTemperatureC(), DECIMALS_TEMP));
+    doc["battery_temperature"] =
+        serialized(String(getBatteryTemperature(), DECIMALS_TEMP));
+    doc["battery_status"] = getBatteryStatus();
+
+    // TODO: Add list with cells
   }
 };
 
-#endif  // SRC_VICTRON_BATTMON_HPP_
+#endif  // SRC_VICTRON_LITHIUM_HPP_

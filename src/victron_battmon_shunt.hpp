@@ -52,7 +52,6 @@ class VictronShunt : public VictronDevice {
     uint8_t batteryCurrent[3];  // 24 bits
     uint16_t consumedAh;        // 20 bits, 4 bits from soc needed
     uint8_t soc[2];             // 10 bits
-    uint8_t unused[6];
   } __attribute__((packed)) VictronData;
 
   uint16_t _remaningMins;

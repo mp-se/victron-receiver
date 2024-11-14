@@ -35,8 +35,6 @@ SOFTWARE.
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-// #define BLE_VICTRON_DEBUG
-
 enum VictronDeviceType {
   Test = 0x00,
   SolarCharger = 0x01,    // Supported
@@ -187,7 +185,6 @@ class VictronDevice {
     snprintf(&buf[0], sizeof(buf), "0x%04X", _modelNo);
     doc["model"] = buf;
 
-#if defined(BLE_VICTRON_DEBUG)
     String s;
 
     for (int i = 0; i < sizeof(_data); i++) {
@@ -198,7 +195,6 @@ class VictronDevice {
         s += String(buf);
     }
     doc["decrypted_data"] = s;
-#endif
   }
 };
 

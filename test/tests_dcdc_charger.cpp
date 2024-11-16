@@ -34,16 +34,12 @@ test(dcdc_test1) {
 
     assertEqual(v.getDeviceName(), "DC-DC Charger");
     assertEqual(v.getModelNo(), 0xA3C0);
-
     assertEqual(v.getError(), 0);
     assertEqual(v.getState(), 0);
-
     data = v.getOffReasons();
     assertEqual(data, 128);
-
     data = v.getInputVoltage() * 100;
     assertEqual(data, 1271);
-
     assertEqual(isnan(v.getOutputVoltage()), true);
 }
 

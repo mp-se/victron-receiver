@@ -54,6 +54,7 @@ void setup() {
   // TestRunner::exclude("battmon_*");
   // TestRunner::exclude("shunt_*");
   // TestRunner::exclude("ac_*");
+  // TestRunner::exclude("solar_*");
 }
 
 void loop() {

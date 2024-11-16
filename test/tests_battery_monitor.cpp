@@ -34,10 +34,8 @@ test(battmon_test1) {
 
     assertEqual(v.getDeviceName(), "Battery Monitor");
     assertEqual(v.getModelNo(), 0xA3A5);
-
     data = v.getBatteryVoltage() * 100;
     assertEqual(data, 1093);
-
     data = v.getTemperatureC() * 100;
     assertEqual(data, 2374);
 }

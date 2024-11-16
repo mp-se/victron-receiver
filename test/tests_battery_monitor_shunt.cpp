@@ -34,23 +34,17 @@ test(shunt_test1) {
 
     assertEqual(v.getDeviceName(), "Shunt");
     assertEqual(v.getModelNo(), 0xA339);
-
     assertEqual(v.getAlarm(), 0);
     assertEqual(v.getAuxMode(), 3);
     assertEqual(v.getRemaningMins(), 0);
-
     data = v.getSoc() * 10;
     assertEqual(data, 892); // TODO: Not sure this is the correct value. Example states 500...
-
     data = v.getBatteryCurrent() * 1000;
     assertEqual(data, 0);
-
     data = v.getBatteryVoltage() * 100;
     assertEqual(data, 1253);
-
     data = v.getAux() * 100;
     assertEqual(data, 0);
-
     data = -v.getConsumedAh() * 10;
     assertEqual(data, 500);
 }

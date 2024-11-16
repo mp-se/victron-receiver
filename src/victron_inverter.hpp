@@ -72,15 +72,15 @@ class VictronInverter : public VictronDevice {
     _batteryVoltage =
         (_data->batteryVoltage & 0x7FFF) != 0x7FFF
             ? static_cast<float>(_data->batteryVoltage & 0x7FFF) / 100
-            : 0;  // 10 mV increments
+            : NAN;  // 10 mV increments
     _acPower =
-        _data->acPower != 0xFFFF ? static_cast<float>(_data->acPower) : 0;
+        _data->acPower != 0xFFFF ? static_cast<float>(_data->acPower) : NAN;
     _acVoltage = (_data->acVoltage & 0x7FFF) != 0x7FFF
                      ? static_cast<float>(_data->acVoltage & 0x7FFF) / 100
-                     : 0;  // 10 mV increments
+                     : NAN;  // 10 mV increments
     _acCurrent = (_data->acCurrent & 0x7FF) != 0x7FF
                      ? static_cast<float>(_data->acCurrent & 0x7FF) / 10
-                     : 0;
+                     : NAN;
   }
 
   float getBatteryVoltage() { return _batteryVoltage; }
@@ -98,12 +98,18 @@ class VictronInverter : public VictronDevice {
     doc["state_message"] = deviceStateToString(getState());
     doc["alarm"] = getAlarm();
 
-    doc["battery_voltage"] =
-        serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
+    if (!isnan(getBatteryVoltage()))
+      doc["battery_voltage"] =
+          serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
 
-    doc["ac_power"] = serialized(String(getAcPower(), DECIMALS_POWER));
-    doc["ac_voltage"] = serialized(String(getAcVoltage(), DECIMALS_VOLTAGE));
-    doc["ac_current"] = serialized(String(getAcCurrent(), DECIMALS_CURRENT));
+    if (!isnan(getAcPower()))
+      doc["ac_power"] = serialized(String(getAcPower(), DECIMALS_POWER));
+
+    if (!isnan(getAcVoltage()))
+      doc["ac_voltage"] = serialized(String(getAcVoltage(), DECIMALS_VOLTAGE));
+
+    if (!isnan(getAcCurrent()))
+      doc["ac_current"] = serialized(String(getAcCurrent(), DECIMALS_CURRENT));
   }
 };
 

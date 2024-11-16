@@ -72,24 +72,26 @@ class VictronSolarCharger : public VictronDevice {
     _batteryVoltage =
         (_data->batteryVoltage & 0x7FFF) != 0x7FFF
             ? static_cast<float>(_data->batteryVoltage & 0x7FFF) / 100
-            : 0;  // 10 mV increments
+            : NAN;  // 10 mV increments
     _batteryCurrent =
         (_data->batteryCurrent & 0x7FFF) != 0x7FFF
             ? static_cast<float>(_data->batteryCurrent & 0x7FFF) / 10
-            : 0;  // 0.1 A increments
+            : NAN;  // 0.1 A increments
     _yieldToday = _data->yieldToday != 0xFFFF
                       ? static_cast<float>(_data->yieldToday) / 100
-                      : 0;  // 10 mV increments
-    _pvPower =
-        _data->pvPower != 0xFFFF ? static_cast<float>(_data->pvPower) : 0;  // W
+                      : NAN;  // 10 mV increments
+    _pvPower = _data->pvPower != 0xFFFF ? static_cast<float>(_data->pvPower)
+                                        : NAN;  // W
     _loadCurrent = (_data->loadCurrent & 0x1FF) != 0x1FF
                        ? static_cast<float>(_data->loadCurrent & 0x1FF) / 10
-                       : 0;  // 0.1 A increments
+                       : NAN;  // 0.1 A increments
 
-    Log.notice(F("VIC : Victron %s (%x) battVolt=%F V battCurrent=%F yield=%F "
-                 "load=%F" CR),
-               getDeviceName().c_str(), getModelNo(), getBatteryVoltage(),
-               getBatteryCurrent(), getYieldToday(), getLoadCurrent());
+    Log.notice(F("VIC : Victron %s (%x) state=%d error=%d battVolt=%F V "
+                 "battCurrent=%F yieldToday=%F "
+                 "load=%F pvPower=%F" CR),
+               getDeviceName().c_str(), getState(), getError(), getModelNo(),
+               getBatteryVoltage(), getBatteryCurrent(), getYieldToday(),
+               getLoadCurrent(), getPvPower());
   }
 
   uint8_t getState() { return _state; }
@@ -108,13 +110,21 @@ class VictronSolarCharger : public VictronDevice {
     doc["state_message"] = deviceStateToString(getState());
     doc["error"] = getError();
     doc["error_message"] = deviceChargerErrorToString(getError());
-    doc["battery_voltage"] =
-        serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
-    doc["battery_current"] =
-        serialized(String(getBatteryCurrent(), DECIMALS_CURRENT));
-    doc["pv_power"] = serialized(String(getPvPower(), DECIMALS_POWER));
-    doc["load_current"] =
-        serialized(String(getLoadCurrent(), DECIMALS_CURRENT));
+
+    if (!isnan(getBatteryVoltage()))
+      doc["battery_voltage"] =
+          serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
+
+    if (!isnan(getBatteryCurrent()))
+      doc["battery_current"] =
+          serialized(String(getBatteryCurrent(), DECIMALS_CURRENT));
+
+    if (!isnan(getPvPower()))
+      doc["pv_power"] = serialized(String(getPvPower(), DECIMALS_POWER));
+
+    if (!isnan(getLoadCurrent()))
+      doc["load_current"] =
+          serialized(String(getLoadCurrent(), DECIMALS_CURRENT));
   }
 };
 

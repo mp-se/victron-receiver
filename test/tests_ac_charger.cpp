@@ -28,11 +28,11 @@ SOFTWARE.
 #include <testdata.hpp>
 
 test(ac_test1) {
-    VictronTestData testData = { "Smart AC Charger", 0xA339, AcCharger, { 0x06,0x00,0x2C,0x05,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00,0x86,0xCA,0x00,0x00,0x00 } };
+    VictronTestData testData = { "AC Charger", 0xA339, AcCharger, { 0x06,0x00,0x2C,0x05,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00,0x86,0xCA,0x00,0x00,0x00 } };
     VictronAcCharger v(&testData.decrypted[0], testData.model);
     uint16_t data;
 
-    assertEqual(v.getDeviceName(), "Smart AC Charger");
+    assertEqual(v.getDeviceName(), "AC Charger");
     assertEqual(v.getModelNo(), 0xA339);
     assertEqual(v.getError(), 0);
     assertEqual(v.getState(), 6);
@@ -40,26 +40,22 @@ test(ac_test1) {
     assertEqual(data, 1324);
     data = v.getCurrent1() * 100;
     assertEqual(data, 0);
-    data = v.getVoltage2() * 100;
-    assertEqual(data, 0);
-    data = v.getCurrent2() * 100;
-    assertEqual(data, 0);
-    data = v.getVoltage3() * 100;
-    assertEqual(data, 0);
-    data = v.getCurrent3() * 100;
-    assertEqual(data, 0);
-    data = v.getTemperature() * 100;
-    assertEqual(data, 0);
-    data = v.getCurrentAC() * 100;
-    assertEqual(data, 0);
+
+    assertEqual(isnan(v.getVoltage2()), true);
+    assertEqual(isnan(v.getCurrent2()), true);
+    assertEqual(isnan(v.getVoltage3()), true);
+    assertEqual(isnan(v.getCurrent3()), true);
+
+    assertEqual(isnan(v.getTemperature()), true);
+    assertEqual(isnan(v.getCurrentAC()), true);
 }
 
 test(ac_test2) {
-    VictronTestData testData = { "Smart AC Charger", 0xA339, AcCharger, { 0x04,0x00,0xA0,0x25,0x04,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x3F,0x7C,0x00,0x00,0x00,0x00 } };
+    VictronTestData testData = { "AC Charger", 0xA339, AcCharger, { 0x04,0x00,0xA0,0x25,0x04,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x3F,0x7C,0x00,0x00,0x00,0x00 } };
     VictronAcCharger v(&testData.decrypted[0], testData.model);
     uint16_t data;
 
-    assertEqual(v.getDeviceName(), "Smart AC Charger");
+    assertEqual(v.getDeviceName(), "AC Charger");
     assertEqual(v.getModelNo(), 0xA339);
     assertEqual(v.getError(), 0);
     assertEqual(v.getState(), 4);
@@ -67,18 +63,14 @@ test(ac_test2) {
     assertEqual(data, 1440);
     data = v.getCurrent1() * 100;
     assertEqual(data, 330);
-    data = v.getVoltage2() * 100;
-    assertEqual(data, 0);
-    data = v.getCurrent2() * 100;
-    assertEqual(data, 0);
-    data = v.getVoltage3() * 100;
-    assertEqual(data, 0);
-    data = v.getCurrent3() * 100;
-    assertEqual(data, 0);
-    data = v.getTemperature() * 100;
-    assertEqual(data, 0);
-    data = v.getCurrentAC() * 100;
-    assertEqual(data, 0);
+
+    assertEqual(isnan(v.getVoltage2()), true);
+    assertEqual(isnan(v.getCurrent2()), true);
+    assertEqual(isnan(v.getVoltage3()), true);
+    assertEqual(isnan(v.getCurrent3()), true);
+
+    assertEqual(isnan(v.getTemperature()), true);
+    assertEqual(isnan(v.getCurrentAC()), true);
 }
 
 // EOF

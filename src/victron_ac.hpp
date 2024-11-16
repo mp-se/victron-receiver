@@ -66,7 +66,7 @@ class VictronAcCharger : public VictronDevice {
   VictronAcCharger(const uint8_t* data, uint16_t model) {
     VictronAcCharger::VictronData* _data = (VictronAcCharger::VictronData*)data;
 
-    setBaseData("Smart AC Charger", model, data);
+    setBaseData("AC Charger", model, data);
 
     _state = _data->state != 0xFF ? _data->state : 0;
     _error = _data->error != 0xFF ? _data->error : 0;
@@ -78,9 +78,9 @@ class VictronAcCharger : public VictronDevice {
     uint16_t ch1A = ch1 >> 13 & 0x7FF;
 
     _voltage1 = (ch1V) != 0x1FFF ? static_cast<float>(ch1V) / 100
-                                 : 0;  // 10 mV increments
+                                 : NAN;  // 10 mV increments
     _current1 = (ch1A) != 0x7FF ? static_cast<float>(ch1A) / 10
-                                : 0;  // 10 mV increments
+                                : NAN;  // 10 mV increments
 
     uint32_t ch2 = static_cast<uint32_t>(_data->channel2[0]) |
                    static_cast<uint32_t>(_data->channel2[1]) << 8 |
@@ -89,9 +89,9 @@ class VictronAcCharger : public VictronDevice {
     uint16_t ch2A = ch2 >> 13 & 0x7FF;
 
     _voltage2 = (ch2V) != 0x1FFF ? static_cast<float>(ch2V) / 100
-                                 : 0;  // 10 mV increments
+                                 : NAN;  // 10 mV increments
     _current2 = (ch2A) != 0x7FF ? static_cast<float>(ch2A) / 10
-                                : 0;  // 10 mV increments
+                                : NAN;  // 10 mV increments
 
     uint32_t ch3 = static_cast<uint32_t>(_data->channel3[0]) |
                    static_cast<uint32_t>(_data->channel3[1]) << 8 |
@@ -100,18 +100,18 @@ class VictronAcCharger : public VictronDevice {
     uint16_t ch3A = ch3 >> 13 & 0x7FF;
 
     _voltage3 = (ch3V) != 0x1FFF ? static_cast<float>(ch3V) / 100
-                                 : 0;  // 10 mV increments
+                                 : NAN;  // 10 mV increments
     _current3 = (ch3A) != 0x7FF ? static_cast<float>(ch3A) / 10
-                                : 0;  // 10 mV increments
+                                : NAN;  // 10 mV increments
 
     _temperatureC = (_data->temperature & 0x7F) != 0x7F
                         ? _data->temperature & 0x7F - 40
-                        : 0;
+                        : NAN;
 
     uint16_t cur = static_cast<uint16_t>(_data->temperature & 0x01) |
                    static_cast<uint16_t>(_data->currentAC)
                        << 1;  // Borrow one unit from tempC
-    _currentAC = (cur & 0x1FF) != 0x1FF ? cur : 0;
+    _currentAC = (cur & 0x1FF) != 0x1FF ? cur : NAN;
 
     Log.notice(
         F("VIC : Victron %s (%x) battVolt1=%F V battCurr1=%F battVolt2=%F V "
@@ -139,20 +139,37 @@ class VictronAcCharger : public VictronDevice {
     doc["state_message"] = deviceStateToString(getState());
     doc["error"] = getError();
     doc["error_message"] = deviceChargerErrorToString(getError());
-    doc["battery_voltage1"] =
-        serialized(String(getVoltage1(), DECIMALS_VOLTAGE));
-    doc["battery_current1"] =
-        serialized(String(getCurrent1(), DECIMALS_CURRENT));
-    doc["battery_voltage2"] =
-        serialized(String(getVoltage2(), DECIMALS_VOLTAGE));
-    doc["battery_current2"] =
-        serialized(String(getCurrent2(), DECIMALS_CURRENT));
-    doc["battery_voltage3"] =
-        serialized(String(getVoltage3(), DECIMALS_VOLTAGE));
-    doc["battery_current3"] =
-        serialized(String(getCurrent3(), DECIMALS_CURRENT));
-    doc["temperature"] = serialized(String(getTemperature(), DECIMALS_CURRENT));
-    doc["ac_current"] = serialized(String(getCurrentAC(), DECIMALS_CURRENT));
+
+    if (!isnan(getVoltage1()))
+      doc["battery_voltage1"] =
+          serialized(String(getVoltage1(), DECIMALS_VOLTAGE));
+
+    if (!isnan(getCurrent1()))
+      doc["battery_current1"] =
+          serialized(String(getCurrent1(), DECIMALS_CURRENT));
+
+    if (!isnan(getVoltage2()))
+      doc["battery_voltage2"] =
+          serialized(String(getVoltage2(), DECIMALS_VOLTAGE));
+
+    if (!isnan(getCurrent2()))
+      doc["battery_current2"] =
+          serialized(String(getCurrent2(), DECIMALS_CURRENT));
+
+    if (!isnan(getVoltage3()))
+      doc["battery_voltage3"] =
+          serialized(String(getVoltage3(), DECIMALS_VOLTAGE));
+
+    if (!isnan(getCurrent3()))
+      doc["battery_current3"] =
+          serialized(String(getCurrent3(), DECIMALS_CURRENT));
+
+    if (!isnan(getTemperature()))
+      doc["temperature"] =
+          serialized(String(getTemperature(), DECIMALS_CURRENT));
+
+    if (!isnan(getCurrentAC()))
+      doc["ac_current"] = serialized(String(getCurrentAC(), DECIMALS_CURRENT));
   }
 };
 

@@ -59,11 +59,11 @@ class VictronBatteryMonitor : public VictronDevice {
         (VictronBatteryMonitor::VictronData*)data;
     uint32_t v;
 
-    setBaseData("Smart Battery Monitor", model, data);
+    setBaseData("Battery Monitor", model, data);
 
     _batteryVoltage = _data->batteryVoltage != 0x7FFF
                           ? static_cast<float>(_data->batteryVoltage) / 100
-                          : 0;  // 10 mV increments
+                          : NAN;  // 10 mV increments
     _temperatureC = (static_cast<float>(_data->temperature) / 100) -
                     273.15;  // Value of the temperature (K)
 
@@ -78,8 +78,10 @@ class VictronBatteryMonitor : public VictronDevice {
   void toJson(JsonObject& doc) {
     VictronDevice::toJson(doc);
 
-    doc["battery_voltage"] =
-        serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
+    if (!isnan(getBatteryVoltage()))
+      doc["battery_voltage"] =
+          serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
+
     doc["temperature"] = serialized(String(getTemperatureC(), DECIMALS_TEMP));
   }
 };

@@ -28,11 +28,11 @@ SOFTWARE.
 #include <testdata.hpp>
 
 test(dcdc_test1) {
-    VictronTestData testData = { "Smart DC-DC Charger", 0xA3C0, DcDcConverter, { 0x00,0x00,0xF7,0x04,0xFF,0x7F,0x80,0x00,0x00,0x00,0x37,0x40,0x23,0x09,0x06,0x00,0x42,0x10,0x00,0x00,0x00 } };
+    VictronTestData testData = { "DC-DC Charger", 0xA3C0, DcDcConverter, { 0x00,0x00,0xF7,0x04,0xFF,0x7F,0x80,0x00,0x00,0x00,0x37,0x40,0x23,0x09,0x06,0x00,0x42,0x10,0x00,0x00,0x00 } };
     VictronDcDcCharger v(&testData.decrypted[0], testData.model);
     uint16_t data;
 
-    assertEqual(v.getDeviceName(), "Smart DC-DC Charger");
+    assertEqual(v.getDeviceName(), "DC-DC Charger");
     assertEqual(v.getModelNo(), 0xA3C0);
 
     assertEqual(v.getError(), 0);
@@ -44,8 +44,7 @@ test(dcdc_test1) {
     data = v.getInputVoltage() * 100;
     assertEqual(data, 1271);
 
-    data = v.getOutputVoltage() * 100;
-    assertEqual(data, 0);
+    assertEqual(isnan(v.getOutputVoltage()), true);
 }
 
 // EOF

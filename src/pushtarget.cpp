@@ -102,14 +102,13 @@ void VictronReceiverPush::sendAll(String name, String mac, JsonObject& doc) {
       char buf[200];
       char url[200];
 
-      if (key != "decrypted_data" && key != "model" &&
-          key != "vendor_id" &&
+      if (key != "decrypted_data" && key != "model" && key != "vendor_id" &&
           key != "victron_record_type") {  // These are for internal use, skip
                                            // them if they
                                            // exist.
 
         Log.info(F("PUSH: Sending data to REST API for device %s and %s" CR),
-             name.c_str(), key.c_str());
+                 name.c_str(), key.c_str());
 
         snprintf(url, sizeof(url), "%sapi/states/sensor.%s_%s",
                  myConfig.getTargetHttpPost(), name.c_str(), key.c_str());

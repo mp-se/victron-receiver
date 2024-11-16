@@ -81,14 +81,14 @@ class VictronDcDcCharger : public VictronDevice {
         (VictronDcDcCharger::VictronData*)data;
     uint32_t v;
 
-    setBaseData("Smart DC-DC Charger", model, data);
+    setBaseData("DC-DC Charger", model, data);
 
     _inputVoltage = _data->inputVoltage != 0xFFFF
                         ? static_cast<float>(_data->inputVoltage) / 100
-                        : 0;  // 10 mV increments
+                        : NAN;  // 10 mV increments
     _outputVoltage = _data->outputVoltage != 0X7FFF
                          ? static_cast<float>(_data->outputVoltage) / 100
-                         : 0;  // 10 mV increments
+                         : NAN;  // 10 mV increments
     _state = _data->state != 0xFF ? _data->state : 0;
     _error = _data->error != 0xFF ? _data->error : 0;
     _offReason = _data->offReason != 0xFFFFFFFF ? _data->offReason : 0;
@@ -116,10 +116,14 @@ class VictronDcDcCharger : public VictronDevice {
     doc["error_message"] = deviceChargerErrorToString(getError());
     doc["off_reason"] = getOffReasons();
     doc["off_reason_message"] = offReasonToString(getOffReasons());
-    doc["input_voltage"] =
-        serialized(String(getInputVoltage(), DECIMALS_VOLTAGE));
-    doc["output_voltage"] =
-        serialized(String(getOutputVoltage(), DECIMALS_VOLTAGE));
+
+    if (!isnan(getInputVoltage()))
+      doc["input_voltage"] =
+          serialized(String(getInputVoltage(), DECIMALS_VOLTAGE));
+
+    if (!isnan(getOutputVoltage()))
+      doc["output_voltage"] =
+          serialized(String(getOutputVoltage(), DECIMALS_VOLTAGE));
   }
 };
 

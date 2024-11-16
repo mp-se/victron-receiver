@@ -67,13 +67,13 @@ class VictronShunt : public VictronDevice {
   VictronShunt(const uint8_t* data, uint16_t model) {
     VictronShunt::VictronData* _data = (VictronShunt::VictronData*)data;
 
-    setBaseData("Smart Shunt", model, data);
+    setBaseData("Shunt", model, data);
 
     _remaningMins = _data->remainingMins != 0xFFFF ? _data->remainingMins : 0;
     _batteryVoltage =
         (_data->batteryVoltage & 0x7FFF) != 0x7FFF
             ? static_cast<float>(_data->batteryVoltage & 0x7FFF) / 100
-            : 0;  // 10 mV increments
+            : NAN;  // 10 mV increments
     _alarm = _data->alarm != 0xFFFF ? _data->alarm : 0;
     _aux = static_cast<float>(_data->aux & 0x7FFF) /
            100;  // 10 mV increments (TODO: Could also be Temperature in K)
@@ -87,17 +87,17 @@ class VictronShunt : public VictronDevice {
     bc = bc >> 2;
     _batteryCurrent = (bc & 0x3FFFFF) != 0x3FFFFF
                           ? static_cast<float>(bc & 0x3FFFFF) / 1000
-                          : 0;
+                          : NAN;
 
     uint32_t ca = static_cast<uint32_t>(_data->consumedAh) |
                   static_cast<uint32_t>(_data->soc[0] & 0x0F)
                       << 16;  // Borrow 4 bits from soc as
-    _consumedAh = ca != 0xFFFFF ? -(static_cast<float>(ca) / 10) : 0;
+    _consumedAh = ca != 0xFFFFF ? -(static_cast<float>(ca) / 10) : NAN;
 
     uint16_t soc = static_cast<uint16_t>(_data->soc[0] & 0x03) |
                    static_cast<uint16_t>(_data->soc[1]) << 2;
     _soc = (soc & 0x3FF) != 0x3FF ? static_cast<float>(soc & 0x3FF) / 10
-                                  : 0;  // 0.1% increments
+                                  : NAN;  // 0.1% increments
 
     Log.notice(
         F("VIC : Victron %s (%x) remaningMins=%d V battVoltage=%F alarm=%d "
@@ -121,12 +121,19 @@ class VictronShunt : public VictronDevice {
     VictronDevice::toJson(doc);
 
     doc["alarm"] = getAlarm();
-    doc["battery_voltage"] =
-        serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
-    doc["battery_current"] = serialized(
-        String(getBatteryCurrent(), 3));  // Higher resolution than others.
-    doc["consumed_ah"] = getConsumedAh();
-    doc["soc"] = serialized(String(getSoc(), 1));
+
+    if (!isnan(getBatteryVoltage()))
+      doc["battery_voltage"] =
+          serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
+
+    if (!isnan(getBatteryCurrent()))
+      doc["battery_current"] = serialized(
+          String(getBatteryCurrent(), 3));  // Higher resolution than others.
+
+    if (!isnan(getConsumedAh())) doc["consumed_ah"] = getConsumedAh();
+
+    if (!isnan(getSoc())) doc["soc"] = serialized(String(getSoc(), 1));
+
     doc["remaning_mins"] = getRemaningMins();
 
     switch (getAuxMode()) {

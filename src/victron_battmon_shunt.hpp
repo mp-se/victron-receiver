@@ -29,8 +29,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#ifndef SRC_VICTRON_SHUNT_HPP_
-#define SRC_VICTRON_SHUNT_HPP_
+#ifndef SRC_VICTRON_BATTMON_SHUNT_HPP_
+#define SRC_VICTRON_BATTMON_SHUNT_HPP_
 
 #include <log.hpp>
 #include <main.hpp>
@@ -65,8 +65,7 @@ class VictronShunt : public VictronDevice {
 
  public:
   VictronShunt(const uint8_t* data, uint16_t model) {
-    VictronShunt::VictronData* _data =
-        (VictronShunt::VictronData*)data;
+    VictronShunt::VictronData* _data = (VictronShunt::VictronData*)data;
 
     setBaseData("Smart Shunt", model, data);
 
@@ -147,4 +146,4 @@ class VictronShunt : public VictronDevice {
   }
 };
 
-#endif  // SRC_VICTRON_SHUNT_HPP_
+#endif  // SRC_VICTRON_BATTMON_SHUNT_HPP_

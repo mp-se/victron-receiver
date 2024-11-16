@@ -47,7 +47,7 @@ class VictronLithium : public VictronDevice {
     uint32_t bmsFlags;
     uint16_t alarm;
     uint8_t cell[8];
-    uint16_t batteryVoltage; // Also inclucde status
+    uint16_t batteryVoltage;  // Also inclucde status
     uint16_t batteryTemperature;
   } __attribute__((packed)) VictronData;
 
@@ -60,8 +60,7 @@ class VictronLithium : public VictronDevice {
 
  public:
   VictronLithium(const uint8_t* data, uint16_t model) {
-    VictronLithium::VictronData* _data =
-        (VictronLithium::VictronData*)data;
+    VictronLithium::VictronData* _data = (VictronLithium::VictronData*)data;
     uint32_t v;
 
     setBaseData("Lithium", model, data);

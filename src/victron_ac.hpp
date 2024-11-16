@@ -64,8 +64,7 @@ class VictronAcCharger : public VictronDevice {
 
  public:
   VictronAcCharger(const uint8_t* data, uint16_t model) {
-    VictronAcCharger::VictronData* _data =
-        (VictronAcCharger::VictronData*)data;
+    VictronAcCharger::VictronData* _data = (VictronAcCharger::VictronData*)data;
 
     setBaseData("Smart AC Charger", model, data);
 

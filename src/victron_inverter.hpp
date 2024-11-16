@@ -61,8 +61,7 @@ class VictronInverter : public VictronDevice {
 
  public:
   VictronInverter(const uint8_t* data, uint16_t model) {
-    VictronInverter::VictronData* _data =
-        (VictronInverter::VictronData*)data;
+    VictronInverter::VictronData* _data = (VictronInverter::VictronData*)data;
     uint32_t v;
 
     setBaseData("Inverter", model, data);
@@ -70,18 +69,18 @@ class VictronInverter : public VictronDevice {
     _state = _data->state != 0xFF ? _data->state : 0;
     _alarm = _data->alarm != 0xFFFF ? _data->alarm : 0;
 
-    _batteryVoltage = (_data->batteryVoltage & 0x7FFF) != 0x7FFF
+    _batteryVoltage =
+        (_data->batteryVoltage & 0x7FFF) != 0x7FFF
             ? static_cast<float>(_data->batteryVoltage & 0x7FFF) / 100
             : 0;  // 10 mV increments
-    _acPower = _data->acPower != 0xFFFF
-            ? static_cast<float>(_data->acPower)
-            : 0;
+    _acPower =
+        _data->acPower != 0xFFFF ? static_cast<float>(_data->acPower) : 0;
     _acVoltage = (_data->acVoltage & 0x7FFF) != 0x7FFF
-            ? static_cast<float>(_data->acVoltage & 0x7FFF) / 100
-            : 0;  // 10 mV increments
+                     ? static_cast<float>(_data->acVoltage & 0x7FFF) / 100
+                     : 0;  // 10 mV increments
     _acCurrent = (_data->acCurrent & 0x7FF) != 0x7FF
-            ? static_cast<float>(_data->acCurrent & 0x7FF) / 10
-            : 0; 
+                     ? static_cast<float>(_data->acCurrent & 0x7FF) / 10
+                     : 0;
   }
 
   float getBatteryVoltage() { return _batteryVoltage; }
@@ -102,12 +101,9 @@ class VictronInverter : public VictronDevice {
     doc["battery_voltage"] =
         serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
 
-    doc["ac_power"] =
-        serialized(String(getAcPower(), DECIMALS_POWER));
-    doc["ac_voltage"] =
-        serialized(String(getAcVoltage(), DECIMALS_VOLTAGE));
-    doc["ac_current"] =
-        serialized(String(getAcCurrent(), DECIMALS_CURRENT));
+    doc["ac_power"] = serialized(String(getAcPower(), DECIMALS_POWER));
+    doc["ac_voltage"] = serialized(String(getAcVoltage(), DECIMALS_VOLTAGE));
+    doc["ac_current"] = serialized(String(getAcCurrent(), DECIMALS_CURRENT));
   }
 };
 

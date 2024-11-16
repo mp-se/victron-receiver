@@ -176,7 +176,7 @@ bool VictronReceiverWebServer::setupWebServer() {
   MDNS.addService("victron-receiver", "tcp", 80);
 
   // Static content
-  Log.notice(F("WEB : Setting up handlers for gravmon gateway web server." CR));
+  Log.notice(F("WEB : Setting up handlers for victron receiver web server." CR));
 
   AsyncCallbackJsonWebHandler *handler;
   handler = new AsyncCallbackJsonWebHandler(

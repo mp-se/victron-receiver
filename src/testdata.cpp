@@ -64,7 +64,7 @@ VictronBleSimulationData createDeviceFromTestData(int idx) {
       // Smart Battery is handled separately from other battery monitors
       if (testData[idx].model == 0xA3A4 || testData[idx].model == 0xA3A5) {
         VictronBatteryMonitor vbm(&testData[idx].decrypted[0],
-                                       testData[idx].model);
+                                  testData[idx].model);
         vbm.toJson(obj);
       } else {
         VictronShunt vbm(&testData[idx].decrypted[0], testData[idx].model);
@@ -73,14 +73,12 @@ VictronBleSimulationData createDeviceFromTestData(int idx) {
     } break;
 
     case VictronDeviceType::DcDcConverter: {
-      VictronDcDcCharger vdc(&testData[idx].decrypted[0],
-                                  testData[idx].model);
+      VictronDcDcCharger vdc(&testData[idx].decrypted[0], testData[idx].model);
       vdc.toJson(obj);
     } break;
 
     case VictronDeviceType::AcCharger: {
-      VictronAcCharger vbm(&testData[idx].decrypted[0],
-                                testData[idx].model);
+      VictronAcCharger vbm(&testData[idx].decrypted[0], testData[idx].model);
       vbm.toJson(obj);
     } break;
 

@@ -51,9 +51,10 @@ void VictronReceiverPush::sendAll(String name, String mac, JsonObject& doc) {
       String key = kv.key().c_str();
       char buf[200];
 
-      if (key != "decrypted_data" &&
-          key != "model") {  // These are for internal use, skip them if they
-                             // exist.
+      if (key != "decrypted_data" && key != "model" && key != "vendor_id" &&
+          key != "victron_record_type") {  // These are for internal use, skip
+                                           // them if they
+                                           // exist.
 
         // victron_instant/[mac_adress]/[attribute]:[value]|
         snprintf(&buf[0], sizeof(buf), "victron_instant/%s/%s:%s|", mac.c_str(),
@@ -77,6 +78,9 @@ void VictronReceiverPush::sendAll(String name, String mac, JsonObject& doc) {
         } else if (key.indexOf("current") >= 0) {
           payload +=
               "\"device_class\":\"current\",\"unit_of_measurement\":\"A\",";
+        } else if (key.indexOf("power") >= 0) {
+          payload +=
+              "\"device_class\":\"current\",\"unit_of_measurement\":\"W\",";
         }
 
         snprintf(&buf[0], sizeof(buf), "\"unique_id\":\"%s_%s\",", mac.c_str(),
@@ -122,6 +126,11 @@ void VictronReceiverPush::sendAll(String name, String mac, JsonObject& doc) {
           snprintf(buf, sizeof(buf),
                    "{\"state\": \"%s\", \"attributes\": "
                    "{\"unit_of_measurement\": \"°C\"}}",
+                   kv.value().as<String>().c_str());
+        } else if (key.indexOf("power") >= 0) {
+          snprintf(buf, sizeof(buf),
+                   "{\"state\": \"%s\", \"attributes\": "
+                   "{\"unit_of_measurement\": \"W\"}}",
                    kv.value().as<String>().c_str());
         } else if (key.indexOf("current") >= 0) {
           snprintf(buf, sizeof(buf),

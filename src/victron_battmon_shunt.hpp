@@ -50,8 +50,8 @@ class VictronShunt : public VictronDevice {
     uint16_t alarm;
     uint16_t aux;
     uint8_t batteryCurrent[3];  // 24 bits
-    uint16_t consumedAh;        // 20 bits, 4 bits from soc needed
-    uint8_t soc[2];             // 10 bits
+    uint8_t consumedAh[3];  // 20 bits, 4 bits to soc
+    uint8_t soc;            // 10 bits
   } __attribute__((packed)) VictronData;
 
   uint16_t _remaningMins;
@@ -89,16 +89,15 @@ class VictronShunt : public VictronDevice {
                           ? static_cast<float>(bc & 0x3FFFFF) / 1000
                           : NAN;
 
-    uint32_t ca = static_cast<uint32_t>(_data->consumedAh) |
-                  static_cast<uint32_t>(_data->soc[0] & 0x0F)
-                      << 16;  // Borrow 4 bits from soc as
-    _consumedAh = ca != 0xFFFFF ? -(static_cast<float>(ca) / 10) : NAN;
+    uint32_t ca = static_cast<uint32_t>(_data->consumedAh[0]) |
+                  static_cast<uint32_t>(_data->consumedAh[1]) << 8 |
+                  static_cast<uint32_t>(_data->consumedAh[2]) << 16;
 
-    uint16_t soc = static_cast<uint16_t>(_data->soc[0] & 0x03) |
-                   static_cast<uint16_t>(_data->soc[1]) << 2;
+    _consumedAh = (ca&0xFFFFF) != 0xFFFFF ? -(static_cast<float>(ca&0xFFFFF) / 10) : NAN;
+
+    uint16_t soc = static_cast<uint16_t>(_data->soc>>2) | static_cast<uint16_t>(_data->consumedAh[2]&0xf0<<6);
     _soc = (soc & 0x3FF) != 0x3FF ? static_cast<float>(soc & 0x3FF) / 10
                                   : NAN;  // 0.1% increments
-
     Log.notice(
         F("VIC : Victron %s (%x) remaningMins=%d V battVoltage=%F alarm=%d "
           "aux=%F consumedAh=%F auxMode=%d battCurrent=%F soc=%F" CR),

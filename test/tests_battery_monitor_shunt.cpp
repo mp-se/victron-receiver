@@ -38,7 +38,7 @@ test(shunt_test1) {
     assertEqual(v.getAuxMode(), 3);
     assertEqual(v.getRemaningMins(), 0);
     data = v.getSoc() * 10;
-    assertEqual(data, 892); // TODO: Not sure this is the correct value. Example states 500...
+    assertEqual(data, 55);
     data = v.getBatteryCurrent() * 1000;
     assertEqual(data, 0);
     data = v.getBatteryVoltage() * 100;

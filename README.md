@@ -90,7 +90,9 @@ victron_instant/[device_mac_adress]/temperature = [Temperature in C]
 
 The data posted to MQTT will contain more information and will link status to the entity (device). This option is not avilable when using the REST API. 
 
-Here you will get separate sensors but they will be named using the device name you set in the configuration. 
+Here you will get separate sensors but they will be named using the device name you set in the configuration.
+
+If you have the sensors at a remote location this method will work with Nabu Casa public API's. This method will be slower than using MQTT, so MQTT is the prefered method if you have everything on the same network.
 
 # Thanks
 

@@ -13,6 +13,7 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 * Identify victron devices and add the mac adress to the configuration automatically.
 * Web interface for easy configuration.
 * MQTT integration with Home Assistant for all identified values. 
+* REST API integration with Home Assistant for all identified values. 
 * Firmware update and Serial Logging via web interface. 
 
 # Victron Devices Supported
@@ -66,9 +67,9 @@ All the configuration is done using a web interface running on the device but af
 
 Next you need to add your victron devices under the Device -> Security section. The mac adress and encryption key can be found under the settings for the device. Press the 3 dots in the upper corner and select Product Info. If the device can be found and data decrypted it will show up in the user interface on the home screen. 
 
-Finally you need to enter the adress and credentials for your Home Assistant MQTT server.
+Finally you need to enter the adress and credentials for your Home Assistant MQTT server or the Home Assistant REST API. 
 
-# Home Assistant
+# Home Assistant (MQTT)
 
 The data posted to MQTT will depend on the victron device and each sensor value will be posted on one topic where the structure is as follows:
 
@@ -84,6 +85,12 @@ victron_instant/[device_mac_adress]/model = [The Victron model ID]
 victron_instant/[device_mac_adress]/battery_voltage = [Value from device]
 victron_instant/[device_mac_adress]/temperature = [Temperature in C]
 ```
+
+# Home Assistant (REST API)
+
+The data posted to MQTT will contain more information and will link status to the entity (device). This option is not avilable when using the REST API. 
+
+Here you will get separate sensors but they will be named using the device name you set in the configuration. 
 
 # Thanks
 

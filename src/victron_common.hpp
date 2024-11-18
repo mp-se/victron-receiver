@@ -34,6 +34,7 @@ SOFTWARE.
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <log.hpp>
 
 enum VictronDeviceType {
   Test = 0x00,
@@ -165,6 +166,29 @@ class VictronDevice {
     _deviceName = deviceName;
     _modelNo = modelNo;
     memcpy(&_data[0], data, sizeof(_data));
+  }
+
+  int32_t _20bitTo32bitSigned(uint32_t data) {
+    return data & 0x00080000 ? data |= 0xFFF00000 : data;
+  }
+  int32_t _22bitTo32bitSigned(uint32_t data) {
+    return data & 0x00200000 ? data |= 0xFFC00000 : data;
+  }
+  int32_t _24bitTo32bitSigned(uint32_t data) {
+    return data & 0x00800000 ? data |= 0xFF000000 : data;
+  }
+
+  uint32_t _create24bitUnsinged(uint8_t a, uint8_t b, uint8_t c) {
+    uint32_t data;
+
+    // data = static_cast<uint32_t>(a) | static_cast<uint32_t>(b) << 8 |
+    // static_cast<uint32_t>(c) << 16; Log.notice(F("VIC : Create 24bit number %x
+    // [%x,%x,%x]" CR), data, a, b, c);
+
+    data = static_cast<uint32_t>(a) << 16 | static_cast<uint32_t>(b) << 8 |
+          static_cast<uint32_t>(c);
+    // Log.notice(F("VIC : Create 24bit number %x [%x,%x,%x]" CR), data, a, b, c);
+    return data;
   }
 
   String deviceStateToString(uint8_t state);

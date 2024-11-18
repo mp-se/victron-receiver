@@ -89,7 +89,7 @@ class VictronSolarCharger : public VictronDevice {
     Log.notice(F("VIC : Victron %s (%x) state=%d error=%d battVolt=%F V "
                  "battCurrent=%F yieldToday=%F "
                  "load=%F pvPower=%F" CR),
-               getDeviceName().c_str(), getModelNo(), getState(), getError(), 
+               getDeviceName().c_str(), getModelNo(), getState(), getError(),
                getBatteryVoltage(), getBatteryCurrent(), getYieldToday(),
                getLoadCurrent(), getPvPower());
   }

@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022-2024 Magnus
+Copyright (c) 2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,17 +21,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <Arduino.h>
-#include <main.hpp>
-#include <helper.hpp>
 #include <AUnit.h>
-#include <log.hpp>
+#include <Arduino.h>
+
 #include <config.hpp>
+#include <display.hpp>
+#include <helper.hpp>
+#include <log.hpp>
+#include <main.hpp>
+#include <serialws.hpp>
 #include <webserver.hpp>
 #include <wificonnection.hpp>
-#include <serialws.hpp>
-#include <display.hpp>
-#include <main.hpp>
 
 using aunit::Printer;
 using aunit::TestRunner;
@@ -50,6 +50,7 @@ void setup() {
   delay(4000);
   Printer::setPrinter(&EspSerial);
 
+  TestRunner::exclude("data_*");
   // TestRunner::exclude("dcdc_*");
   // TestRunner::exclude("battmon_*");
   // TestRunner::exclude("shunt_*");

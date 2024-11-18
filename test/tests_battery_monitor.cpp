@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022-2024 Magnus
+Copyright (c) 2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,20 +24,26 @@ SOFTWARE.
 #include <AUnit.h>
 #include <Arduino.h>
 
-#include <victron_battmon.hpp>
 #include <testdata.hpp>
+#include <victron_battmon.hpp>
 
 test(battmon_test1) {
-    VictronTestData testData = { "Battery Monitor", 0xA3A5, BatteryMonitor, { 0xFF,0xFF,0x45,0x04,0x00,0x00,0xFA,0x73,0xFE,0xFF,0x7F,0xFF,0xFF,0xFF,0xFF,0x00,0x24,0x68,0x00,0x00,0x00 } };
-    VictronBatteryMonitor v(&testData.decrypted[0], testData.model);
-    uint16_t data;
+  // These values has been validated with the App
+  VictronTestData testData = {
+      "Battery Monitor",
+      0xA3A5,
+      BatteryMonitor,
+      {0xFF, 0xFF, 0xBF, 0x04, 0x00, 0x00, 0x00, 0x73, 0xFE, 0xFF, 0x7F,
+       0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x3C, 0xD5, 0x00, 0x00, 0x00}};
+  VictronBatteryMonitor v(&testData.decrypted[0], testData.model);
+  uint16_t data;
 
-    assertEqual(v.getDeviceName(), "Battery Monitor");
-    assertEqual(v.getModelNo(), 0xA3A5);
-    data = v.getBatteryVoltage() * 100;
-    assertEqual(data, 1093);
-    data = v.getTemperatureC() * 100;
-    assertEqual(data, 2374);
+  assertEqual(v.getDeviceName(), "Battery Monitor");
+  assertEqual(v.getModelNo(), 0xA3A5);
+  data = v.getBatteryVoltage() * 100;
+  assertEqual(data, 1215);
+  data = v.getTemperatureC() * 100;
+  assertEqual(data, 2124);
 }
 
 // EOF

@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022-2024 Magnus
+Copyright (c) 2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,29 +24,34 @@ SOFTWARE.
 #include <AUnit.h>
 #include <Arduino.h>
 
-#include <victron_battmon_shunt.hpp>
 #include <testdata.hpp>
+#include <victron_battmon_shunt.hpp>
 
 test(shunt_test1) {
-    VictronTestData testData = { "Shunt", 0xA339, BatteryMonitor, { 0xff,0xff,0xe5,0x04,0x00,0x00,0x00,0x00,0x03,0x00,0x00,0xf4,0x01,0x40,0xdf,0x03,0x00,0x00,0x00,0x00,0x00 } };
-    VictronShunt v(&testData.decrypted[0], testData.model);
-    uint16_t data;
+  // Test data from Thomas Jobs
+  VictronTestData testData = {
+      "Shunt", 0xA389, BatteryMonitor, {0xFF, 0xFF, 0x8C, 0x05, 0x00, 0x00,
+                                        0x1C, 0x05, 0x00, 0x00, 0x00, 0x0B,
+                                        0x00, 0x40, 0xFE, 0x00, 0x3B, 0xE7,
+                                        0x00, 0x00, 0x00}};
+  VictronShunt v(&testData.decrypted[0], testData.model);
+  uint16_t data;
 
-    assertEqual(v.getDeviceName(), "Shunt");
-    assertEqual(v.getModelNo(), 0xA339);
-    assertEqual(v.getAlarm(), 0);
-    assertEqual(v.getAuxMode(), 3);
-    assertEqual(v.getRemaningMins(), 0);
-    data = v.getSoc() * 10;
-    assertEqual(data, 55);
-    data = v.getBatteryCurrent() * 1000;
-    assertEqual(data, 0);
-    data = v.getBatteryVoltage() * 100;
-    assertEqual(data, 1253);
-    data = v.getAux() * 100;
-    assertEqual(data, 0);
-    data = -v.getConsumedAh() * 10;
-    assertEqual(data, 500);
+  assertEqual(v.getDeviceName(), "Shunt");
+  assertEqual(v.getModelNo(), 0xA389);
+  assertEqual(v.getAlarm(), 0);
+  assertEqual(v.getAuxMode(), 0);
+  assertEqual(v.getRemaningMins(), 0);
+  data = v.getSoc() * 10;
+  assertEqual(data, 1000);
+  data = -v.getBatteryCurrent() * 1000;
+  assertEqual(data, 0);
+  data = v.getBatteryVoltage() * 100;
+  assertEqual(data, 1420);
+  data = v.getAux() * 100;
+  assertEqual(data, 1308);
+  data = -v.getConsumedAh() * 10;
+  assertEqual(data, 2);
 }
 
 // EOF

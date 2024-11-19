@@ -28,8 +28,8 @@ SOFTWARE.
 #include <victron_solar.hpp>
 
 test(data_test1) {
-
-  // The will parse the listed packets and dump the values to the serial console.
+  // The will parse the listed packets and dump the values to the serial
+  // console.
 
   VictronTestData testData[] = {
 
@@ -78,8 +78,7 @@ test(data_test1) {
       {"AC Charger", 0xA060, AcCharger, {0x04, 0x00, 0x91, 0x65, 0x06, 0xFF,
                                          0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xAD,
                                          0xFF, 0x40, 0xFE, 0x00, 0x41, 0x00,
-                                         0x00, 0x00, 0x00}}
-    };
+                                         0x00, 0x00, 0x00}}};
 
   for (int idx = 0; idx < sizeof(testData) / sizeof(VictronTestData); idx++) {
     switch (testData[idx].recordType) {

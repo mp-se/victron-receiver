@@ -110,12 +110,15 @@ class VictronShunt : public VictronDevice {
                           ? static_cast<float>(_22bitTo32bitSigned(bc)) / 1000
                           : NAN;
 
-    // Log.notice(F("Consumed: %x %x %x" CR), _data->consumedSoc, _data->consumedSoc>>12, _data->consumedSoc>>2 & 0x3ff);
-    // Log.notice(F("Consumed: %x %x %x" CR), _data->consumedSoc, _data->consumedSoc & 0xFFFFF, _data->consumedSoc>>20 & 0x3FF);
-    // Log.notice(F("Consumed: %x %x %x" CR), _data->consumedSoc, _data->consumedSoc>>2 & 0xFFFFF, _data->consumedSoc>>22 & 0x3FF);
+    // Log.notice(F("Consumed: %x %x %x" CR), _data->consumedSoc,
+    // _data->consumedSoc>>12, _data->consumedSoc>>2 & 0x3ff);
+    // Log.notice(F("Consumed: %x %x %x" CR), _data->consumedSoc,
+    // _data->consumedSoc & 0xFFFFF, _data->consumedSoc>>20 & 0x3FF);
+    // Log.notice(F("Consumed: %x %x %x" CR), _data->consumedSoc,
+    // _data->consumedSoc>>2 & 0xFFFFF, _data->consumedSoc>>22 & 0x3FF);
 
-    uint32_t ca = _data->consumedSoc>>2 & 0xFFFFF;
-    uint16_t soc = _data->consumedSoc>>22 & 0x3FF;
+    uint32_t ca = _data->consumedSoc >> 2 & 0xFFFFF;
+    uint16_t soc = _data->consumedSoc >> 22 & 0x3FF;
     _consumedAh = ca != 0xFFFFF ? -static_cast<float>(ca) / 10 : NAN;
     _soc =
         soc != 0x3FF ? static_cast<float>(soc) / 10 : NAN;  // 0.1% increments
@@ -127,7 +130,8 @@ class VictronShunt : public VictronDevice {
     // uint16_t soc = static_cast<uint32_t>(_data->consumedAh[2] & 0x0F)<<6 |
     //                static_cast<uint16_t>(_data->soc >> 2);
     // _soc =
-    //     soc != 0x3FF ? static_cast<float>(soc) / 10 : NAN;  // 0.1% increments
+    //     soc != 0x3FF ? static_cast<float>(soc) / 10 : NAN;  // 0.1%
+    //     increments
     // Log.notice(F("VIC : %x %x" CR), ca, soc);
 
     if (_soc > 100) _soc = 100.0;

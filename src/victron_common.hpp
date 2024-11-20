@@ -34,6 +34,7 @@ SOFTWARE.
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+
 #include <log.hpp>
 
 enum VictronDeviceType {
@@ -182,12 +183,14 @@ class VictronDevice {
     uint32_t data;
 
     // data = static_cast<uint32_t>(a) | static_cast<uint32_t>(b) << 8 |
-    // static_cast<uint32_t>(c) << 16; Log.notice(F("VIC : Create 24bit number %x
+    // static_cast<uint32_t>(c) << 16; Log.notice(F("VIC : Create 24bit number
+    // %x
     // [%x,%x,%x]" CR), data, a, b, c);
 
     data = static_cast<uint32_t>(a) << 16 | static_cast<uint32_t>(b) << 8 |
-          static_cast<uint32_t>(c);
-    // Log.notice(F("VIC : Create 24bit number %x [%x,%x,%x]" CR), data, a, b, c);
+           static_cast<uint32_t>(c);
+    // Log.notice(F("VIC : Create 24bit number %x [%x,%x,%x]" CR), data, a, b,
+    // c);
     return data;
   }
 

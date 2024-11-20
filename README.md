@@ -16,6 +16,12 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 * REST API integration with Home Assistant for all identified values. 
 * Firmware update and Serial Logging via web interface. 
 
+# Support
+
+If you want to support my work you can do that through these options
+
+[<img src="https://gravitymon.com/images/buymecoffee.png" height=40>](https://www.buymeacoffee.com/mpse/) [<img src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86" height=40>](https://github.com/sponsors/mp-se)
+
 # Victron Devices Supported
 
 Currently there is support for the following Victron Devices mainly since these are the onces I'm using. But there is a feature to capture data from any Victron Device that support the Instant Readout and then I can add support for those.
@@ -117,3 +123,4 @@ Thanks to the following projects for providing examples and data for making the 
 * https://github.com/hoberman/Victron_BLE_Advertising_example
 * https://github.com/keshavdv/victron-ble
 
+* thomasjobs for testing and providing valueable test data.

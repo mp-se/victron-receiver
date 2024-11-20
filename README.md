@@ -5,7 +5,7 @@
 
 # Overview
 
-This is a project for reading Victron Instant Readouts over Bluetooth and pushing this into Home Assistant using an ESP32 board, WiFi and MQTT.
+This is a project for reading Victron Instant Readouts over Bluetooth and pushing this into Home Assistant using an ESP32 board, WiFi and MQTT / Home Assistant REST API.
 
 # Features
 
@@ -20,12 +20,18 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 Currently there is support for the following Victron Devices mainly since these are the onces I'm using. But there is a feature to capture data from any Victron Device that support the Instant Readout and then I can add support for those.
 
-* Battery Monitor: Smart Battery Monitor + SmartShunt
+* Battery Monitor: Smart Battery Monitor 
+    - Tested and working
+* Battery Monitor: SmartShunt
+    - Need help to validate the following values; State Of Charge, Battery Current, Consumed Ah
 * DC-DC Charger: Orion Smart DC-DC Charger
+    - Need help to validate data during charge cycle.
 * AC Charger: Blue Smart IP65 Charger
+    - Charger with one channel has been tested and validated.
 * Solar Charger: BlueSolar MPPT
+    - Need help to validate data during charge cycle.
 
-The following types are **NOT** yet supported due to lack of test data.
+The following types can be supported if I can receive some test data.
 
 * Inverter
 * SmartLithium
@@ -37,11 +43,11 @@ The following types are **NOT** yet supported due to lack of test data.
 * VeBus
 * DcEnergyMeter
 
-Support for other devices can be done on request with a sample of the data (can be recorded in the software). You need to add the encryption key so the device is registered, then it will show up as an unknown device in the web interface. Open an issue in github and provide the captured data as well as what the actual readings is in the app so I can validate the result.
+To get test data, register the device and add the encrytption key so data can be extrated. Then use the copy button in the we UI to copy data to the clipboard. When copying make a note of the values shown in the Victron App so that I can compare those with my code. Open an issue in github and provide the captured data as well as what the actual readings is in the app so I can validate the result.
 
 # Hardware
 
-Currently I'm using the following development board for running my instance but on request I can add support for more. A display is optional so basically you only need an ESP32s3 or ESP32c3 board with BLE5 support. 
+Currently I'm using the following development board for running my instance but on request I can add support for more. A display is optional so basically you only need an ESP32s3 or ESP32c3 board with BLE support. 
 
 * Waveshare ESP32 S3 with TFT (https://www.waveshare.com/product/mcu-tools/development-boards/esp32/esp32-s3-touch-lcd-2.8.htm)
 
@@ -51,9 +57,9 @@ Other options are:
 
 # Flashing
 
-Currently I use VSCode and PlatformIO to build and flash the device. Pre-built binaries are available and can be flashed using esptool. On request more options can be added. 
+Currently I use VSCode and PlatformIO to build and flash the device. Pre-built binaries are available and can be flashed using esptool.  
 
-An option is to use python and esptool for flashing. Run the commands from the root directory for this project.
+Another option is to use python and esptool for flashing. Run the commands from the root directory for this project.
 
 - Install python3 from python.org
 - run> pip install esptool
@@ -86,6 +92,8 @@ victron_instant/[device_mac_adress]/battery_voltage = [Value from device]
 victron_instant/[device_mac_adress]/temperature = [Temperature in C]
 ```
 
+When using each victron device will be an Entity in Home Assistant with all values connected to that entity.
+
 # Home Assistant (REST API)
 
 The data posted to MQTT will contain more information and will link status to the entity (device). This option is not avilable when using the REST API. 
@@ -93,6 +101,14 @@ The data posted to MQTT will contain more information and will link status to th
 Here you will get separate sensors but they will be named using the device name you set in the configuration.
 
 If you have the sensors at a remote location this method will work with Nabu Casa public API's. This method will be slower than using MQTT, so MQTT is the prefered method if you have everything on the same network.
+
+The naming of the sensors using the REST API is as follows. Units will be added for the Temperature, Voltage, Current and Power.
+
+```
+[device name from config]_[attribute from victron device]
+```
+
+When using the REST API each attribute will be a standalone sensor value and not grouped into entities.
 
 # Thanks
 

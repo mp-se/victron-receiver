@@ -179,18 +179,14 @@ class VictronDevice {
     return data & 0x00800000 ? data |= 0xFF000000 : data;
   }
 
-  uint32_t _create24bitUnsinged(uint8_t a, uint8_t b, uint8_t c) {
-    uint32_t data;
+  uint16_t _create16bitUnsigned(uint8_t a, uint8_t b) {
+    uint16_t data = static_cast<uint32_t>(a) | static_cast<uint32_t>(b) << 8;
+    return data;
+  }
 
-    // data = static_cast<uint32_t>(a) | static_cast<uint32_t>(b) << 8 |
-    // static_cast<uint32_t>(c) << 16; Log.notice(F("VIC : Create 24bit number
-    // %x
-    // [%x,%x,%x]" CR), data, a, b, c);
-
-    data = static_cast<uint32_t>(a) << 16 | static_cast<uint32_t>(b) << 8 |
-           static_cast<uint32_t>(c);
-    // Log.notice(F("VIC : Create 24bit number %x [%x,%x,%x]" CR), data, a, b,
-    // c);
+  uint32_t _create24bitUnsigned(uint8_t a, uint8_t b, uint8_t c) {
+    uint32_t data = static_cast<uint32_t>(a) | static_cast<uint32_t>(b) << 8 |
+           static_cast<uint32_t>(c) << 16;
     return data;
   }
 

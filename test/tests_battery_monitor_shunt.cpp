@@ -43,7 +43,7 @@ test(shunt_test1) {
   assertEqual(v.getAuxMode(), 0);
   assertEqual(v.getRemaningMins(), 0);
   data = v.getSoc() * 10;
-  assertEqual(data, 1000);
+  assertEqual(data, 319);
   data = -v.getBatteryCurrent() * 1000;
   assertEqual(data, 0);
   data = v.getBatteryVoltage() * 100;
@@ -51,7 +51,34 @@ test(shunt_test1) {
   data = v.getAux() * 100;
   assertEqual(data, 1308);
   data = -v.getConsumedAh() * 10;
-  assertEqual(data, 2);
+  assertEqual(data, 11);
+}
+
+test(shunt_test2) {
+  // Test data from Thomas Jobs
+  VictronTestData testData = {
+      "Shunt", 0xA389, BatteryMonitor, {0xDB,0x00,0x0A,0x05,0x00,0x00,0xEF,0x04,0x20,0xBF,0xFF,0x85,0x03,0x60,0xE2,0x40,0x64,0x04,0x00,0x00,0x00}};
+  VictronShunt v(&testData.decrypted[0], testData.model);
+  uint16_t data;
+
+  // Expected results, Consumed = -90.4, Soc = 55%, Current 4.12
+
+  assertEqual(v.getDeviceName(), "Shunt");
+  assertEqual(v.getModelNo(), 0xA389);
+  assertEqual(v.getAlarm(), 0);
+  assertEqual(v.getAuxMode(), 0);
+  assertEqual(v.getRemaningMins(), 219);
+
+  data = v.getSoc() * 10;
+  assertEqual(data, 440);
+  data = -v.getBatteryCurrent() * 1000;
+  assertEqual(data, 4152);
+  data = v.getBatteryVoltage() * 100;
+  assertEqual(data, 1290);
+  data = v.getAux() * 100;
+  assertEqual(data, 1263);
+  data = -v.getConsumedAh() * 10;
+  assertEqual(data, 901);
 }
 
 // EOF

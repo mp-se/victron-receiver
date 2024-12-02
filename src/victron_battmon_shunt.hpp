@@ -106,10 +106,9 @@ class VictronShunt : public VictronDevice {
                           : NAN;
 
     uint32_t ca = _create24bitUnsigned(_data->consumedAh[0],_data->consumedAh[1],_data->consumedAh[2]) & 0xFFFFF;
-    uint16_t soc = static_cast<uint16_t>(_data->soc)>>2 | static_cast<uint16_t>(_data->consumedAh[2] & 0xf0)<<2;
+    uint16_t soc = static_cast<uint16_t>(_data->soc)<<4 | static_cast<uint16_t>(_data->consumedAh[2] & 0xf0)>>4;
 
-    Log.notice("1: %x %d" CR, soc, soc);
-
+    soc = soc & 0x3ff;
     _consumedAh = ca != 0xFFFFF ? -static_cast<float>(ca) / 10 : NAN;
     _soc =
         soc != 0x3FF ? static_cast<float>(soc) / 10 : NAN;  // 0.1% increments

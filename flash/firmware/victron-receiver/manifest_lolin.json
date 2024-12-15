@@ -1,0 +1,24 @@
+{
+  "name": "Victron Receiver (Lolin)",
+  "version": "0.2.0",
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        { "path": "bootloader32.bin", "offset": 4096 },
+        { "path": "partitions32.bin", "offset": 32768 },
+        { "path": "boot32.bin", "offset": 57344 },
+        { "path": "firmware32.bin", "offset": 65536 }     
+      ]
+    },
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        { "path": "bootloader32s3.bin", "offset": 0 },
+        { "path": "partitions32s3.bin", "offset": 32768 },
+        { "path": "boot32s3.bin", "offset": 57344 },
+        { "path": "firmware32s3.bin", "offset": 65536 }     
+      ]
+    }
+  ]
+}

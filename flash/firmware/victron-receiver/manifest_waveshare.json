@@ -1,0 +1,15 @@
+{
+    "name": "Victron Receiver (Waveshare)",
+    "version": "0.2.0",
+    "builds": [
+      {
+        "chipFamily": "ESP32-S3",
+        "parts": [
+          { "path": "bootloader32s3w.bin", "offset": 0 },
+          { "path": "partitions32s3w.bin", "offset": 32768 },
+          { "path": "boot32s3w.bin", "offset": 57344 },
+          { "path": "firmware32s3w.bin", "offset": 65536 }     
+          ]
+      }
+    ]
+  }

@@ -27,13 +27,11 @@ SOFTWARE.
 #include <testdata.hpp>
 #include <victron_ac.hpp>
 
-test(ac_test1) {
+test(ac_test1)
+{
   // These values has been validated with the App
   VictronTestData testData = {
-      "AC Charger", 0xA339, AcCharger, {0x06, 0x00, 0x3D, 0xA5, 0x01, 0xFF,
-                                        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-                                        0xFF, 0x00, 0x00, 0x00, 0xA1, 0x41,
-                                        0x00, 0x00, 0x00}};
+      "AC Charger", 0xA339, AcCharger, {0x06, 0x00, 0x3D, 0xA5, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0xA1, 0x41, 0x00, 0x00, 0x00}};
 
   VictronAcCharger v(&testData.decrypted[0], testData.model);
   uint16_t data;
@@ -56,12 +54,10 @@ test(ac_test1) {
   assertEqual(isnan(v.getCurrentAC()), true);
 }
 
-test(ac_test2) {
+test(ac_test2)
+{
   VictronTestData testData = {
-      "AC Charger", 0xA339, AcCharger, {0x04, 0x00, 0xA0, 0x25, 0x04, 0xFF,
-                                        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-                                        0xFF, 0xFF, 0xFF, 0x3F, 0x7C, 0x00,
-                                        0x00, 0x00, 0x00}};
+      "AC Charger", 0xA339, AcCharger, {0x04, 0x00, 0xA0, 0x25, 0x04, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x3F, 0x7C, 0x00, 0x00, 0x00, 0x00}};
   VictronAcCharger v(&testData.decrypted[0], testData.model);
   uint16_t data;
 
@@ -80,6 +76,30 @@ test(ac_test2) {
   assertEqual(isnan(v.getCurrent3()), true);
 
   assertEqual(isnan(v.getTemperature()), true);
+  assertEqual(isnan(v.getCurrentAC()), true);
+}
+
+test(ac_test3)
+{
+  VictronTestData testData = {
+      "AC Charger", 0xA339, AcCharger, {0x0B, 0x00, 0x05, 0x25, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xA8, 0xFF, 0xFF, 0xFF, 0x40, 0xEC, 0xF2, 0x00, 0x00, 0x00}};
+  VictronAcCharger v(&testData.decrypted[0], testData.model);
+  uint16_t data;
+
+  assertEqual(v.getDeviceName(), "AC Charger");
+  assertEqual(v.getModelNo(), 0xA339);
+  assertEqual(v.getError(), 0);
+  assertEqual(v.getState(), 11);
+  data = v.getVoltage1() * 100;
+  assertEqual(data, 1285);
+  data = v.getCurrent1() * 100;
+  assertEqual(data, 410);
+
+  assertEqual(isnan(v.getVoltage2()), true);
+  assertEqual(isnan(v.getCurrent2()), true);
+  assertEqual(isnan(v.getVoltage3()), true);
+  assertEqual(isnan(v.getCurrent3()), true);
+  assertEqual(v.getTemperature(), 0.0);
   assertEqual(isnan(v.getCurrentAC()), true);
 }
 

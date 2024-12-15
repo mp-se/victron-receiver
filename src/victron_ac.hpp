@@ -108,10 +108,8 @@ class VictronAcCharger : public VictronDevice {
                         ? _data->temperature & 0x7F - 40
                         : NAN;
 
-    uint16_t cur = static_cast<uint16_t>(_data->temperature & 0x01) |
-                   static_cast<uint16_t>(_data->currentAC)
-                       << 1;  // Borrow one unit from tempC
-    _currentAC = (cur & 0x1FF) != 0x1FF ? cur : NAN;
+    uint16_t cur = static_cast<uint16_t>(_data->temperature & 0x80) << 1 | static_cast<uint16_t>(_data->currentAC); // Borrow one unit from tempC
+    _currentAC = (cur & 0x1FF) != 0x1FF ? cur / 10 : NAN;
 
     Log.notice(
         F("VIC : Victron %s (%x) battVolt1=%F V battCurr1=%F battVolt2=%F V "

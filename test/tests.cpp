@@ -3,13 +3,6 @@ MIT License
 
 Copyright (c) 2024 Magnus
 
-Based on code/ideas from these projects:
-https://github.com/hoberman/Victron_BLE_Advertising_example
-https://github.com/keshavdv/victron-ble
-
-Victron docs on the manufacturer data in advertisement packets can be found at:
-https://community.victronenergy.com/storage/attachments/48745-extra-manufacturer-data-2022-12-14.pdf
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -28,15 +21,46 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#include <AUnit.h>
+#include <Arduino.h>
 
-#ifndef SRC_VICTRON_HPP_
-#define SRC_VICTRON_HPP_
+#include <config.hpp>
+#include <display.hpp>
+#include <helper.hpp>
+#include <log.hpp>
+#include <main.hpp>
+#include <serialws.hpp>
+#include <webserver.hpp>
+#include <wificonnection.hpp>
 
-#include <victron_ac.hpp>             // AC Charger
-#include <victron_battmon.hpp>        // Smart BatteryMon (Subset of data)
-#include <victron_battmon_shunt.hpp>  // BatteryMon (Complete)
-#include <victron_common.hpp>
-#include <victron_dcdc.hpp>   // DC-DC Charger
-#include <victron_solar.hpp>  // Solar Charger
+using aunit::Printer;
+using aunit::TestRunner;
+using aunit::Verbosity;
 
-#endif  // SRC_VICTRON_HPP_
+SerialDebug mySerial;
+VictronReceiverConfig myConfig("", "");
+WifiConnection myWifi(&myConfig, "", "", "", "", "");
+VictronReceiverWebServer myWebServer(&myConfig);
+SerialWebSocket mySerialWebSocket;
+Display myDisplay;
+RunMode runMode = RunMode::receiverMode;
+
+void setup() {
+  Log.notice("Victron Receiver - Unit Test Build");
+  delay(4000);
+  Printer::setPrinter(&EspSerial);
+
+  TestRunner::exclude("data_*");
+  // TestRunner::exclude("dcdc_*");
+  // TestRunner::exclude("battmon_*");
+  // TestRunner::exclude("shunt_*");
+  // TestRunner::exclude("ac_*");
+  // TestRunner::exclude("solar_*");
+}
+
+void loop() {
+  TestRunner::run();
+  delay(10);
+}
+
+// EOF

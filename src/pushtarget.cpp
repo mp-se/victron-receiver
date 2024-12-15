@@ -38,20 +38,23 @@ void VictronReceiverPush::sendAll(String name, String mac, JsonObject& doc) {
   _http.setReuse(true);
   _httpSecure.setReuse(true);
 
+  String payload;
+  payload.reserve(2000);
+  mac.replace(":", "");
+  doc["name"] = name;
+
   if (myConfig.hasTargetMqtt()) {
-    String payload;
-    payload.reserve(2000);
-    mac.replace(":", "");
-    doc["name"] = name;
+    Log.info(F("PUSH: Sending data to MQTT for device %s" CR), name.c_str());
 
     // Convert the entries in the json document to mqtt messages on a topic
     for (JsonPair kv : doc) {
       String key = kv.key().c_str();
       char buf[200];
 
-      if (key != "decrypted_data" &&
-          key != "model") {  // These are for internal use, skip them if they
-                             // exist.
+      if (key != "decrypted_data" && key != "model" && key != "vendor_id" &&
+          key != "victron_record_type") {  // These are for internal use, skip
+                                           // them if they
+                                           // exist.
 
         // victron_instant/[mac_adress]/[attribute]:[value]|
         snprintf(&buf[0], sizeof(buf), "victron_instant/%s/%s:%s|", mac.c_str(),
@@ -75,6 +78,9 @@ void VictronReceiverPush::sendAll(String name, String mac, JsonObject& doc) {
         } else if (key.indexOf("current") >= 0) {
           payload +=
               "\"device_class\":\"current\",\"unit_of_measurement\":\"A\",";
+        } else if (key.indexOf("power") >= 0) {
+          payload +=
+              "\"device_class\":\"current\",\"unit_of_measurement\":\"W\",";
         }
 
         snprintf(&buf[0], sizeof(buf), "\"unique_id\":\"%s_%s\",", mac.c_str(),
@@ -93,6 +99,54 @@ void VictronReceiverPush::sendAll(String name, String mac, JsonObject& doc) {
     }
 
     sendMqtt(payload);
+  } else if (myConfig.hasTargetHttpPost()) {
+    // Convert the entries in the json document to rest api requests
+    for (JsonPair kv : doc) {
+      String key = kv.key().c_str();
+      char buf[200];
+      char url[200];
+
+      if (key != "decrypted_data" && key != "model" && key != "vendor_id" &&
+          key != "victron_record_type") {  // These are for internal use, skip
+                                           // them if they
+                                           // exist.
+
+        Log.info(F("PUSH: Sending data to REST API for device %s and %s" CR),
+                 name.c_str(), key.c_str());
+
+        snprintf(url, sizeof(url), "%sapi/states/sensor.%s_%s",
+                 myConfig.getTargetHttpPost(), name.c_str(), key.c_str());
+
+        if (key.indexOf("voltage") >= 0) {
+          snprintf(buf, sizeof(buf),
+                   "{\"state\": \"%s\", \"attributes\": "
+                   "{\"unit_of_measurement\": \"V\"}}",
+                   kv.value().as<String>().c_str());
+        } else if (key.indexOf("temperature") >= 0) {
+          snprintf(buf, sizeof(buf),
+                   "{\"state\": \"%s\", \"attributes\": "
+                   "{\"unit_of_measurement\": \"°C\"}}",
+                   kv.value().as<String>().c_str());
+        } else if (key.indexOf("power") >= 0) {
+          snprintf(buf, sizeof(buf),
+                   "{\"state\": \"%s\", \"attributes\": "
+                   "{\"unit_of_measurement\": \"W\"}}",
+                   kv.value().as<String>().c_str());
+        } else if (key.indexOf("current") >= 0) {
+          snprintf(buf, sizeof(buf),
+                   "{\"state\": \"%s\", \"attributes\": "
+                   "{\"unit_of_measurement\": \"A\"}}",
+                   kv.value().as<String>().c_str());
+        } else {
+          snprintf(buf, sizeof(buf), "{\"state\": \"%s\"}",
+                   kv.value().as<String>().c_str());
+        }
+
+        String payload(buf);
+        sendHttpPost(payload, url, "Content-Type: application/json",
+                     myConfig.getHeader2HttpPost());
+      }
+    }
   }
 }
 

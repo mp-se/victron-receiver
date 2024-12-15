@@ -38,7 +38,7 @@ SOFTWARE.
 constexpr auto CFG_APPNAME = "victron";
 constexpr auto CFG_FILENAME = "/victron.json";
 constexpr auto CFG_AP_SSID = "Victron";
-constexpr auto CFG_AP_PASS = "instant";
+constexpr auto CFG_AP_PASS = "instant1";
 
 #if !defined(USER_SSID)
 #define USER_SSID ""

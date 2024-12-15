@@ -145,14 +145,27 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
     switch (vicData->victronRecordType) {
       case VictronDeviceType::BatteryMonitor: {
         if (vicData->model == 0xA3A4 || vicData->model == 0xA3A5) {
-          VictronSmartBatteryMonitor vbm(&decrypted[0], vicData->model);
+          VictronBatteryMonitor vbm(&decrypted[0], vicData->model);
+          vbm.toJson(obj);
+        } else {
+          VictronShunt vbm(&decrypted[0], vicData->model);
           vbm.toJson(obj);
         }
       } break;
 
       case VictronDeviceType::DcDcConverter: {
-        VictronSmartDcDcCharger vdc(&decrypted[0], vicData->model);
+        VictronDcDcCharger vdc(&decrypted[0], vicData->model);
         vdc.toJson(obj);
+      } break;
+
+      case VictronDeviceType::AcCharger: {
+        VictronAcCharger vbm(&decrypted[0], vicData->model);
+        vbm.toJson(obj);
+      } break;
+
+      case VictronDeviceType::SolarCharger: {
+        VictronSolarCharger vbm(&decrypted[0], vicData->model);
+        vbm.toJson(obj);
       } break;
 
       default: {

@@ -19,9 +19,8 @@ jobs:
         run: |
           echo "Checkout UI"
           git clone https://github.com/mp-se/victron-receiver-ui victron-receiver-ui 
-          cp victron-receiver-ui/dist/css/app.css.gz html/
-          cp victron-receiver-ui/dist/js/app.js.gz html/
-          cp victron-receiver-ui/dist/index.html html/
+          cp victron-receiver-ui/dist/assets/style.css.gz html/app.css.gz
+          cp victron-receiver-ui/dist/assets/index.js.gz html/app.js.gz
 
       - name: Setup PlatformIO
         uses: n-vr/setup-platformio-action@v1.0.1    
@@ -29,10 +28,7 @@ jobs:
       - name: PlatformIO Run
         uses: karniv00l/platformio-run-action@v1
         with:
-          environments: "victron-s3-waveshare"
-          #targets: ""
-          #project-dir: "./some_dir"
-          #project-conf: "./some_dir/custom.ini"
+          environments: "victron-s3-waveshare,victron-lolin,victron-s3-lolin"
           jobs: 6
           silent: false
           verbose: true
@@ -46,3 +42,5 @@ jobs:
           default_author: github_actor
           message: 'GitHub Action Build'
           pathspec_error_handling: ignore
+
+          

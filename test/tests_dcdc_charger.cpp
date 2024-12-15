@@ -3,13 +3,6 @@ MIT License
 
 Copyright (c) 2024 Magnus
 
-Based on code/ideas from these projects:
-https://github.com/hoberman/Victron_BLE_Advertising_example
-https://github.com/keshavdv/victron-ble
-
-Victron docs on the manufacturer data in advertisement packets can be found at:
-https://community.victronenergy.com/storage/attachments/48745-extra-manufacturer-data-2022-12-14.pdf
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -28,15 +21,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#include <AUnit.h>
+#include <Arduino.h>
 
-#ifndef SRC_VICTRON_HPP_
-#define SRC_VICTRON_HPP_
+#include <testdata.hpp>
+#include <victron_dcdc.hpp>
 
-#include <victron_ac.hpp>             // AC Charger
-#include <victron_battmon.hpp>        // Smart BatteryMon (Subset of data)
-#include <victron_battmon_shunt.hpp>  // BatteryMon (Complete)
-#include <victron_common.hpp>
-#include <victron_dcdc.hpp>   // DC-DC Charger
-#include <victron_solar.hpp>  // Solar Charger
+test(dcdc_test1) {
+  // These values has been validated with the App
+  VictronTestData testData = {
+      "DC-DC Charger",
+      0xA3C0,
+      DcDcConverter,
+      {0x00, 0x00, 0x3D, 0x05, 0xFF, 0x7F, 0x80, 0x00, 0x00, 0x00, 0x00,
+       0x00, 0xFF, 0xFF, 0xFF, 0x00, 0x61, 0x00, 0x00, 0x00, 0x00}};
+  VictronDcDcCharger v(&testData.decrypted[0], testData.model);
+  uint16_t data;
 
-#endif  // SRC_VICTRON_HPP_
+  assertEqual(v.getDeviceName(), "DC-DC Charger");
+  assertEqual(v.getModelNo(), 0xA3C0);
+  assertEqual(v.getError(), 0);
+  assertEqual(v.getState(), 0);
+  data = v.getOffReasons();
+  assertEqual(data, 128);
+  data = v.getInputVoltage() * 100;
+  assertEqual(data, 1341);
+  assertEqual(isnan(v.getOutputVoltage()), true);
+}
+
+// EOF

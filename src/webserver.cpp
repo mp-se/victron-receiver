@@ -32,6 +32,7 @@ SOFTWARE.
 #include <pushtarget.hpp>
 #include <resources.hpp>
 #include <templating.hpp>
+#include <testdata.hpp>
 #include <uptime.hpp>
 #include <webserver.hpp>
 
@@ -121,6 +122,8 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
   obj[PARAM_PLATFORM] = "esp32s3";
 #elif defined(ESP32C3)
   obj[PARAM_PLATFORM] = "esp32c3";
+#elif defined(ESP32)
+  obj[PARAM_PLATFORM] = "esp32";
 #else
 #error "Unsupported platform"
 #endif
@@ -150,6 +153,18 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
     }
   }
 
+#if defined(ENABLE_SIMULATION)
+  for (int i = 0; i < getNoTestData(); i++) {
+    VictronBleSimulationData vbd = createDeviceFromTestData(i);
+    JsonObject n = devices.createNestedObject();
+    n[PARAM_NAME] = vbd.getName();
+    n[PARAM_DATA] = vbd.getJson();
+    n[PARAM_MAC] = "00:00:00:00:00";
+    n[PARAM_UPDATE_TIME] = 0;
+    n[PARAM_PUSH_TIME] = 0;
+  }
+#endif
+
   response->setLength();
   request->send(response);
 }
@@ -161,7 +176,8 @@ bool VictronReceiverWebServer::setupWebServer() {
   MDNS.addService("victron-receiver", "tcp", 80);
 
   // Static content
-  Log.notice(F("WEB : Setting up handlers for gravmon gateway web server." CR));
+  Log.notice(
+      F("WEB : Setting up handlers for victron receiver web server." CR));
 
   AsyncCallbackJsonWebHandler *handler;
   handler = new AsyncCallbackJsonWebHandler(

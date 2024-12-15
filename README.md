@@ -63,7 +63,9 @@ Other options are:
 
 # Flashing
 
-Currently I use VSCode and PlatformIO to build and flash the device. Pre-built binaries are available and can be flashed using esptool.  
+Flashing can be done using the web-flasher, platformio or python (commandline). Easy option is to use the web-flasher here https://mp-se.github.io/victron-receiver/flash/index.html
+
+## Flashing via commandline
 
 Another option is to use python and esptool for flashing. Run the commands from the root directory for this project.
 

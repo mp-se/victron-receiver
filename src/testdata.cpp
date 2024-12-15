@@ -80,7 +80,7 @@ VictronBleSimulationData createDeviceFromTestData(int idx) {
   Log.notice(F("SIM : Parsing test data for %d." CR), idx);
 
   JsonDocument doc;
-  JsonObject obj = doc.as<JsonObject>();
+  JsonObject obj = doc.to<JsonObject>();
 
   switch (testData[idx].recordType) {
     case VictronDeviceType::BatteryMonitor: {

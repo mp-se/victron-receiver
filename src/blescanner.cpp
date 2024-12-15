@@ -140,7 +140,7 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
     esp_aes_free(&ctx);
 
     JsonDocument doc;
-    JsonObject obj = doc.as<JsonObject>();
+    JsonObject obj = doc.to<JsonObject>();
 
     switch (vicData->victronRecordType) {
       case VictronDeviceType::BatteryMonitor: {
@@ -184,7 +184,8 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
       vbd.setMacAdress(cfg.mac);
       vbd.setName(cfg.name);
       String j;
-      serializeJson(obj, j);
+      j.reserve(1000);
+      serializeJson(doc, j);
       vbd.setJson(j);
       vbd.setUpdated();
     }

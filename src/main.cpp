@@ -21,12 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#include <ImprovWiFi.h>
+
 #include <blescanner.hpp>
 #include <config.hpp>
 #include <display.hpp>
 #include <helper.hpp>
 #include <led.hpp>
 #include <log.hpp>
+#include <looptimer.hpp>
 #include <main.hpp>
 #include <pushtarget.hpp>
 #include <serialws.hpp>
@@ -46,12 +49,12 @@ constexpr auto CFG_AP_PASS = "instant1";
 #endif
 
 void controller();
-
 void renderDisplayHeader();
 void renderDisplayFooter();
 void renderDisplayLogs();
+void checkForImprovWifi();
 
-SerialDebug mySerial;
+SerialDebug mySerial(115200L, false);
 VictronReceiverConfig myConfig(CFG_APPNAME, CFG_FILENAME);
 WifiConnection myWifi(&myConfig, CFG_AP_SSID, CFG_AP_PASS, CFG_APPNAME,
                       USER_SSID, USER_PASS);
@@ -73,6 +76,8 @@ int logIndex = 0;
 bool logUpdated = true;
 
 void setup() {
+  delay(4000);
+
   Log.notice(F("Main: Started setup for %s." CR), myConfig.getID());
   printBuildOptions();
   detectChipRevision();
@@ -88,6 +93,15 @@ void setup() {
   myConfig.setWifiScanAP(true);
   checkResetReason();
   myConfig.loadFile();
+
+  // No stored config, check if we can get config via improve (serial)
+  if (!myWifi.hasConfig()) {
+    myDisplay.printLineCentered(3, "Waiting for remote WIFI setup");
+    checkForImprovWifi();  // Will return once timeout occurs or configuration
+                           // is completed
+    myDisplay.printLineCentered(4, "");
+    myDisplay.printLineCentered(5, "");
+  }
 
   // No stored config, move to portal
   if (!myWifi.hasConfig()) {
@@ -173,6 +187,8 @@ void setup() {
   loopMillis = millis();
 }
 
+LoopTimer mainLoop(2000);
+
 void loop() {
   myUptime.calculate();
   controller();
@@ -198,8 +214,8 @@ void loop() {
     logUpdated = false;
   }
 
-  if (abs((int32_t)(millis() - loopMillis)) > 2000) {
-    loopMillis = millis();
+  if (mainLoop.hasExipred()) {
+    mainLoop.reset();
     renderDisplayFooter();
   }
 }
@@ -221,12 +237,12 @@ void controller() {
 
   // Process gravitymon from BLE
   for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
-    VictronBleData& vbd = bleScanner.getVictronBleData(i);
+    VictronBleData &vbd = bleScanner.getVictronBleData(i);
 
     if (vbd.getUpdated() && (vbd.getPushAge() > myConfig.getPushResendTime())) {
       addLogEntry(vbd.getTimeUpdated(), vbd.getName());
 
-      DynamicJsonDocument doc(2000);
+      JsonDocument doc;
       DeserializationError err = deserializeJson(doc, vbd.getJson());
 
       if (!err) {
@@ -272,6 +288,60 @@ void renderDisplayLogs() {
     j--;
     if (j < 0) j = maxLogEntries - 1;
     myDisplay.printLine(i + 1, &logEntryList[j].s[0]);
+  }
+}
+
+// Code for handling wifi setup over serial connection with esp-web-tools
+constexpr auto IMPROVE_TIMEOUT_SECONDS = 30;
+
+LoopTimer improveTimeout(IMPROVE_TIMEOUT_SECONDS * 1000);
+
+void improveSetWifiCredentials(const char *ssid, const char *password) {
+  myConfig.setWifiSSID(ssid, 0);
+  myConfig.setWifiPass(password, 0);
+  myConfig.saveFile();
+}
+
+void improveInfo(const char *info) { myDisplay.printLineCentered(4, info); }
+
+void improveDebug(const char *debug) { myDisplay.printLineCentered(5, debug); }
+
+void checkForImprovWifi() {
+  improveTimeout.reset();
+
+#if defined(ESP32S3)
+  ImprovWiFi improvWiFi(CFG_APPNAME, CFG_APPVER, "ESP32S3", myConfig.getMDNS());
+#elif defined(ESP32)
+  ImprovWiFi improvWiFi(CFG_APPNAME, CFG_APPVER, "ESP32", myConfig.getMDNS());
+#else
+#error "Undefined target"
+#endif
+
+  improvWiFi.setWiFiCallback(improveSetWifiCredentials);
+  improvWiFi.setInfoCallback(improveInfo);
+  // improvWiFi.setDebugCallback(improveDebug);
+
+  LoopTimer update(500);
+
+  // Run for 10 seconds
+  while (!improveTimeout.hasExipred() || improvWiFi.isConfigInitiated()) {
+    if (improvWiFi.isConfigCompleted()) return;
+
+    if (update.hasExipred()) {
+      update.reset();
+
+      char buf[80] = "";
+
+      if (!improvWiFi.isConfigInitiated())
+        snprintf(
+            buf, sizeof(buf), "Waiting for %d s",
+            IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000));
+
+      myDisplay.printLineCentered(6, buf);
+    }
+
+    improvWiFi.loop();
+    delay(1);
   }
 }
 

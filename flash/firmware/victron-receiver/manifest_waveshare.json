@@ -1,6 +1,6 @@
 {
     "name": "Victron Receiver (Waveshare)",
-    "version": "0.2.0",
+    "version": "0.2.5",
     "builds": [
       {
         "chipFamily": "ESP32-S3",

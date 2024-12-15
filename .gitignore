@@ -1,0 +1,14 @@
+.vscode
+.pio
+.DS_store
+dist/
+bin/
+src/
+lib/
+include/
+html/
+script/
+test/
+*.json
+*.ini
+*toml

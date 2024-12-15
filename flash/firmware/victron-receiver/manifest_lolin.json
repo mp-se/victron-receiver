@@ -1,6 +1,6 @@
 {
   "name": "Victron Receiver (Lolin)",
-  "version": "0.2.0",
+  "version": "0.2.5",
   "builds": [
     {
       "chipFamily": "ESP32",

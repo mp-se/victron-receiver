@@ -26,8 +26,8 @@ SOFTWARE.
 #define SRC_BLESCANNER_HPP_
 
 #include <ArduinoJson.h>
-#include <ArduinoLog.h>
 
+#include <ArduinoLog.hpp>
 #include <config.hpp>
 #include <victron.hpp>
 

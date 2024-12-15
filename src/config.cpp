@@ -28,7 +28,7 @@ SOFTWARE.
 #include <resources.hpp>
 
 VictronReceiverConfig::VictronReceiverConfig(String baseMDNS, String fileName)
-    : BaseConfig(baseMDNS, fileName, JSON_BUFFER_SIZE_XL) {}
+    : BaseConfig(baseMDNS, fileName) {}
 
 void VictronReceiverConfig::createJson(JsonObject& doc) {
   // Call base class functions
@@ -41,14 +41,15 @@ void VictronReceiverConfig::createJson(JsonObject& doc) {
   doc[PARAM_BLE_SCAN_TIME] = getBleScanTime();
   doc[PARAM_PUSH_RESEND_TIME] = getPushResendTime();
 
-  JsonArray devices = doc.createNestedArray(PARAM_VICTRON_CONFIG);
+  JsonArray devices = doc[PARAM_VICTRON_CONFIG].to<JsonArray>();
 
   for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
     VictronConfig vc = getVictronConfig(i);
-    JsonObject n = devices.createNestedObject();
+    JsonObject n;
     n[PARAM_MAC] = vc.mac;
     n[PARAM_KEY] = vc.key;
     n[PARAM_NAME] = vc.name;
+    devices.add(n);
   }
 }
 

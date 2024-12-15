@@ -139,8 +139,8 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
 
     esp_aes_free(&ctx);
 
-    DynamicJsonDocument doc(2000);
-    JsonObject obj = doc.createNestedObject();
+    JsonDocument doc;
+    JsonObject obj = doc.as<JsonObject>();
 
     switch (vicData->victronRecordType) {
       case VictronDeviceType::BatteryMonitor: {

@@ -46,8 +46,7 @@ void VictronReceiverWebServer::webHandleConfigRead(
   }
 
   Log.notice(F("WEB : webServer callback for /api/config(read)." CR));
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_L);
+  AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
   myConfig.createJson(obj);
   response->setLength();
@@ -66,8 +65,7 @@ void VictronReceiverWebServer::webHandleConfigWrite(
   obj.clear();
   myConfig.saveFile();
 
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_S);
+  AsyncJsonResponse *response = new AsyncJsonResponse(false);
   obj = response->getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Configuration updated";
@@ -87,8 +85,7 @@ void VictronReceiverWebServer::webHandleFactoryDefaults(
   LittleFS.end();
   Log.notice(F("WEB : Deleted files in filesystem, rebooting." CR));
 
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_S);
+  AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Factory reset completed, rebooting";
@@ -109,8 +106,7 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
     ESP_RESET();
   }
 
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_L);
+  AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
 
   obj[PARAM_ID] = myConfig.getID();
@@ -139,29 +135,31 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
   obj[PARAM_UPTIME_HOURS] = myUptime.getHours();
   obj[PARAM_UPTIME_DAYS] = myUptime.getDays();
 
-  JsonArray devices = obj.createNestedArray(PARAM_VICTRON_DEVICE);
+  JsonArray devices = obj[PARAM_VICTRON_DEVICE].to<JsonArray>();
 
   for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
     VictronBleData vbd = bleScanner.getVictronBleData(i);
     if (vbd.getMacAdress() != "") {
-      JsonObject n = devices.createNestedObject();
+      JsonObject n;
       n[PARAM_NAME] = vbd.getName();
       n[PARAM_DATA] = vbd.getJson();
       n[PARAM_MAC] = vbd.getMacAdress();
       n[PARAM_UPDATE_TIME] = vbd.getUpdateAge();
       n[PARAM_PUSH_TIME] = vbd.getPushAge();
+      devices.add(n);
     }
   }
 
 #if defined(ENABLE_SIMULATION)
   for (int i = 0; i < getNoTestData(); i++) {
     VictronBleSimulationData vbd = createDeviceFromTestData(i);
-    JsonObject n = devices.createNestedObject();
+    JsonObject n;
     n[PARAM_NAME] = vbd.getName();
     n[PARAM_DATA] = vbd.getJson();
     n[PARAM_MAC] = "00:00:00:00:00";
     n[PARAM_UPDATE_TIME] = 0;
     n[PARAM_PUSH_TIME] = 0;
+    devices.add(n);
   }
 #endif
 
@@ -183,8 +181,7 @@ bool VictronReceiverWebServer::setupWebServer() {
   handler = new AsyncCallbackJsonWebHandler(
       "/api/config",
       std::bind(&VictronReceiverWebServer::webHandleConfigWrite, this,
-                std::placeholders::_1, std::placeholders::_2),
-      JSON_BUFFER_SIZE_L);
+                std::placeholders::_1, std::placeholders::_2));
   _server->addHandler(handler);
   _server->on("/api/config", HTTP_GET,
               std::bind(&VictronReceiverWebServer::webHandleConfigRead, this,

@@ -79,8 +79,8 @@ int getNoTestData() { return sizeof(testData) / sizeof(VictronTestData); }
 VictronBleSimulationData createDeviceFromTestData(int idx) {
   Log.notice(F("SIM : Parsing test data for %d." CR), idx);
 
-  DynamicJsonDocument doc(2000);
-  JsonObject obj = doc.createNestedObject();
+  JsonDocument doc;
+  JsonObject obj = doc.as<JsonObject>();
 
   switch (testData[idx].recordType) {
     case VictronDeviceType::BatteryMonitor: {

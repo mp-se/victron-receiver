@@ -137,29 +137,29 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
 
   JsonArray devices = obj[PARAM_VICTRON_DEVICE].to<JsonArray>();
 
+  int j = 0;
+
   for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
     VictronBleData vbd = bleScanner.getVictronBleData(i);
     if (vbd.getMacAdress() != "") {
-      JsonObject n;
-      n[PARAM_NAME] = vbd.getName();
-      n[PARAM_DATA] = vbd.getJson();
-      n[PARAM_MAC] = vbd.getMacAdress();
-      n[PARAM_UPDATE_TIME] = vbd.getUpdateAge();
-      n[PARAM_PUSH_TIME] = vbd.getPushAge();
-      devices.add(n);
+      devices[j][PARAM_NAME] = vbd.getName();
+      devices[j][PARAM_DATA] = vbd.getJson();
+      devices[j][PARAM_MAC] = vbd.getMacAdress();
+      devices[j][PARAM_UPDATE_TIME] = vbd.getUpdateAge();
+      devices[j][PARAM_PUSH_TIME] = vbd.getPushAge();
+      j++;
     }
   }
 
 #if defined(ENABLE_SIMULATION)
   for (int i = 0; i < getNoTestData(); i++) {
     VictronBleSimulationData vbd = createDeviceFromTestData(i);
-    JsonObject n;
-    n[PARAM_NAME] = vbd.getName();
-    n[PARAM_DATA] = vbd.getJson();
-    n[PARAM_MAC] = "00:00:00:00:00";
-    n[PARAM_UPDATE_TIME] = 0;
-    n[PARAM_PUSH_TIME] = 0;
-    devices.add(n);
+    devices[j][PARAM_NAME] = vbd.getName();
+    devices[j][PARAM_DATA] = vbd.getJson();
+    devices[j][PARAM_MAC] = "00:00:00:00:00";
+    devices[j][PARAM_UPDATE_TIME] = 0;
+    devices[j][PARAM_PUSH_TIME] = 0;
+    j++;
   }
 #endif
 
@@ -177,15 +177,15 @@ bool VictronReceiverWebServer::setupWebServer() {
   Log.notice(
       F("WEB : Setting up handlers for victron receiver web server." CR));
 
+  _server->on("/api/config", HTTP_GET,
+              std::bind(&VictronReceiverWebServer::webHandleConfigRead, this,
+                        std::placeholders::_1));
   AsyncCallbackJsonWebHandler *handler;
   handler = new AsyncCallbackJsonWebHandler(
       "/api/config",
       std::bind(&VictronReceiverWebServer::webHandleConfigWrite, this,
                 std::placeholders::_1, std::placeholders::_2));
   _server->addHandler(handler);
-  _server->on("/api/config", HTTP_GET,
-              std::bind(&VictronReceiverWebServer::webHandleConfigRead, this,
-                        std::placeholders::_1));
   _server->on("/api/factory", HTTP_GET,
               std::bind(&VictronReceiverWebServer::webHandleFactoryDefaults,
                         this, std::placeholders::_1));

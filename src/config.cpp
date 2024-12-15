@@ -45,11 +45,9 @@ void VictronReceiverConfig::createJson(JsonObject& doc) {
 
   for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
     VictronConfig vc = getVictronConfig(i);
-    JsonObject n;
-    n[PARAM_MAC] = vc.mac;
-    n[PARAM_KEY] = vc.key;
-    n[PARAM_NAME] = vc.name;
-    devices.add(n);
+    devices[i][PARAM_MAC] = vc.mac;
+    devices[i][PARAM_KEY] = vc.key;
+    devices[i][PARAM_NAME] = vc.name;
   }
 }
 

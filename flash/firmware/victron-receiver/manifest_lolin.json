@@ -4,6 +4,7 @@
   "builds": [
     {
       "chipFamily": "ESP32",
+      "board": "Lolin ESP32 PRO with 2.4 TFT",
       "parts": [
         { "path": "bootloader32.bin", "offset": 4096 },
         { "path": "partitions32.bin", "offset": 32768 },
@@ -13,6 +14,7 @@
     },
     {
       "chipFamily": "ESP32-S3",
+      "board": "Lolin ESP32 S3 PRO with 2.4 TFT",
       "parts": [
         { "path": "bootloader32s3.bin", "offset": 0 },
         { "path": "partitions32s3.bin", "offset": 32768 },

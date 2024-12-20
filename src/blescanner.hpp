@@ -39,8 +39,8 @@ SOFTWARE.
 #include <NimBLEScan.h>
 #include <NimBLEUtils.h>
 
-class BleDeviceCallbacks : public NimBLEAdvertisedDeviceCallbacks {
-  void onResult(NimBLEAdvertisedDevice* advertisedDevice) override;
+class BleDeviceCallbacks : public NimBLEScanCallbacks {
+  void onResult(const NimBLEAdvertisedDevice* advertisedDevice) override;
 };
 
 class VictronBleData {
@@ -86,7 +86,7 @@ class BleScanner {
   void deInit();
 
   bool scan();
-  bool waitForScan();
+  // bool waitForScan();
 
   void setScanTime(int scanTime) { _scanTime = scanTime; }
   void setAllowActiveScan(bool activeScan) { _activeScan = activeScan; }

@@ -231,7 +231,7 @@ void addLogEntry(tm timeinfo, String name) {
 
 void controller() {
   bleScanner.scan();
-  bleScanner.waitForScan();
+  // bleScanner.waitForScan();
 
   VictronReceiverPush push(&myConfig);
 

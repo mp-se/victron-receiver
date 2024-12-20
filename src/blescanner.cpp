@@ -38,7 +38,8 @@ SOFTWARE.
 
 BleScanner bleScanner;
 
-void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
+void BleDeviceCallbacks::onResult(const NimBLEAdvertisedDevice* advertisedDevice) {
+
   // See if we have manufacturer data and then look to see if it's coming from a
   // Victron device.
   if (advertisedDevice->haveManufacturerData() == true) {
@@ -197,7 +198,8 @@ BleScanner::BleScanner() { _deviceCallbacks = new BleDeviceCallbacks(); }
 void BleScanner::init() {
   NimBLEDevice::init("");
   _bleScan = NimBLEDevice::getScan();
-  _bleScan->setAdvertisedDeviceCallbacks(_deviceCallbacks);
+  // _bleScan->setAdvertisedDeviceCallbacks(_deviceCallbacks);
+  _bleScan->setScanCallbacks(_deviceCallbacks);
   _bleScan->setMaxResults(0);
   _bleScan->setActiveScan(_activeScan);
 
@@ -206,20 +208,20 @@ void BleScanner::init() {
             // with ibeacon advertisement interval
   _bleScan->setWindow(37);  // Set to less or equal setInterval value. Leave
                             // reasonable gap to allow WiFi some time.
-  scan();
+  // scan();
 }
 
 void BleScanner::deInit() {
-  waitForScan();
+  // waitForScan();
   NimBLEDevice::deinit();
 }
 
 bool BleScanner::scan() {
   if (!_bleScan) return false;
 
-  if (_bleScan->isScanning()) return true;
+  // if (_bleScan->isScanning()) return true;
 
-  _bleScan->clearResults();
+  // _bleScan->clearResults();
 
   for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
     _victron[i].clearUpdate();
@@ -229,22 +231,26 @@ bool BleScanner::scan() {
              _activeScan ? "ACTIVE" : "PASSIVE");
   _bleScan->setActiveScan(_activeScan);
 
-  if (_bleScan->start(_scanTime, nullptr, true)) {
-    return true;
-  }
-
-  Log.error(F("BLE : Scan failed to start." CR));
-  return false;
-}
-
-bool BleScanner::waitForScan() {
-  if (!_bleScan) return false;
-
-  while (_bleScan->isScanning()) {
-    delay(100);
-  }
-
+  NimBLEScanResults foundDevices = _bleScan->getResults(_scanTime * 1000, false);
+  Log.notice(F("BLE : Scanning completed, found %d results." CR), foundDevices.getCount());
+  _bleScan->clearResults(); // delete results scan buffer to release memory
   return true;
+  // if (_bleScan->start(_scanTime, nullptr, true)) {
+  //   return true;
+  // }
+
+  // Log.error(F("BLE : Scan failed to start." CR));
+  // return false;
 }
+
+// bool BleScanner::waitForScan() {
+//   if (!_bleScan) return false;
+
+//   while (_bleScan->isScanning()) {
+//     delay(100);
+//   }
+
+//   return true;
+// }
 
 // EOF

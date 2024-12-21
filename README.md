@@ -7,6 +7,11 @@
 
 This is a project for reading Victron Instant Readouts over Bluetooth and pushing this into Home Assistant using an ESP32 board, WiFi and MQTT / Home Assistant REST API.
 
+# Changes
+
+0.2.5 - Version that correcly decode the first few devices (AC Charger, DCDC Charger, Battery Monitor, Smart Shunt & Solar Charger) with Home Assistant API integration (MQTT + REST API). 
+0.3.0 - Upgrade to latest libraries and Arduino 3.0.7
+
 # Features
 
 * Collect data from Victron Devices that supports the Instant Readout option. 

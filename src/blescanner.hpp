@@ -86,7 +86,6 @@ class BleScanner {
   void deInit();
 
   bool scan();
-  // bool waitForScan();
 
   void setScanTime(int scanTime) { _scanTime = scanTime; }
   void setAllowActiveScan(bool activeScan) { _activeScan = activeScan; }

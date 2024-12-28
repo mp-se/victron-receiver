@@ -35,8 +35,7 @@ VictronReceiverPush::VictronReceiverPush(
 }
 
 void VictronReceiverPush::sendAll(String name, String mac, JsonObject& doc) {
-  _http.setReuse(true);
-  _httpSecure.setReuse(true);
+  _http->setReuse(true);
 
   String payload;
   payload.reserve(2000);

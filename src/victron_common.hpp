@@ -186,7 +186,7 @@ class VictronDevice {
 
   uint32_t _create24bitUnsigned(uint8_t a, uint8_t b, uint8_t c) {
     uint32_t data = static_cast<uint32_t>(a) | static_cast<uint32_t>(b) << 8 |
-           static_cast<uint32_t>(c) << 16;
+                    static_cast<uint32_t>(c) << 16;
     return data;
   }
 

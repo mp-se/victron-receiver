@@ -7,6 +7,11 @@
 
 This is a project for reading Victron Instant Readouts over Bluetooth and pushing this into Home Assistant using an ESP32 board, WiFi and MQTT / Home Assistant REST API.
 
+# Changes
+
+* 0.2.5 - Version that correcly decode the first few devices (AC Charger, DCDC Charger, Battery Monitor, Smart Shunt & Solar Charger) with Home Assistant API integration (MQTT + REST API). 
+* 0.3.0 - Upgrade to latest libraries and Arduino 3.0.7, Added configuration backup feature.
+
 # Features
 
 * Collect data from Victron Devices that supports the Instant Readout option. 
@@ -63,7 +68,13 @@ Other options are:
 
 # Flashing
 
-Currently I use VSCode and PlatformIO to build and flash the device. Pre-built binaries are available and can be flashed using esptool.  
+Flashing can be done using the web-flasher, platformio or python (commandline). Easy option is to use the web-flasher here https://mp-se.github.io/victron-receiver/flash/index.html. This method will do a full erase before installation and this is a good option for first use. 
+
+When the installation is completed you will be prompted for adding wifi credentials via the web interface. This is only active during the first 30 seconds 
+after a boot and no wifi settings is defined. This will be shown on the TFT display. You can also set credentials using the AP approach described in 
+the next chapter. 
+
+## Flashing via commandline
 
 Another option is to use python and esptool for flashing. Run the commands from the root directory for this project.
 
@@ -73,7 +84,7 @@ Another option is to use python and esptool for flashing. Run the commands from 
 
 Example: python3 flash.py esp32s3w COM10
 
-# Software Setup
+# Network / Software Setup
 
 All the configuration is done using a web interface running on the device but after flashing there is a need to setup the wifi support. After installation the device will create an SSID called Victron with the password 'instant1'. Join this network and then navigate to http://192.168.4.1 to open up the user interface. Under WIFI you can scan for existing networks, select the one you want and enter the SSID. Once the wifi is settings is saved you can reset the device and it should connect to the network. If you have an display the IP adress is shown on the bottom of the screen.
 

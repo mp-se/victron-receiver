@@ -51,8 +51,8 @@ class VictronShunt : public VictronDevice {
     uint16_t aux;
     uint8_t batteryCurrent[3];  // 24 bits
     // uint32_t consumedSoc;
-    uint8_t consumedAh[3];      // 20 bits, 4 bits to soc
-    uint8_t soc;                // 10 bits
+    uint8_t consumedAh[3];  // 20 bits, 4 bits to soc
+    uint8_t soc;            // 10 bits
   } __attribute__((packed)) VictronData;
 
   uint16_t _remaningMins;
@@ -77,11 +77,12 @@ class VictronShunt : public VictronDevice {
             : NAN;  // 10 mV increments
     _alarm = _data->alarm != 0xFFFF ? _data->alarm : 0;
 
-    uint32_t bc = _create24bitUnsigned(_data->batteryCurrent[0],
-                                       _data->batteryCurrent[1],
-                                       _data->batteryCurrent[2]);
+    uint32_t bc =
+        _create24bitUnsigned(_data->batteryCurrent[0], _data->batteryCurrent[1],
+                             _data->batteryCurrent[2]);
 
-    _auxMode = bc &0x03;  // 0=StarterVoltage, 1=MidPointVoltage, 2=Temperature, 3=Off
+    _auxMode =
+        bc & 0x03;  // 0=StarterVoltage, 1=MidPointVoltage, 2=Temperature, 3=Off
 
     switch (_auxMode) {
       case 0:  // Aux mode
@@ -105,8 +106,12 @@ class VictronShunt : public VictronDevice {
                           ? static_cast<float>(_22bitTo32bitSigned(bc)) / 1000
                           : NAN;
 
-    uint32_t ca = _create24bitUnsigned(_data->consumedAh[0],_data->consumedAh[1],_data->consumedAh[2]) & 0xFFFFF;
-    uint16_t soc = static_cast<uint16_t>(_data->soc)<<4 | static_cast<uint16_t>(_data->consumedAh[2] & 0xf0)>>4;
+    uint32_t ca =
+        _create24bitUnsigned(_data->consumedAh[0], _data->consumedAh[1],
+                             _data->consumedAh[2]) &
+        0xFFFFF;
+    uint16_t soc = static_cast<uint16_t>(_data->soc) << 4 |
+                   static_cast<uint16_t>(_data->consumedAh[2] & 0xf0) >> 4;
 
     soc = soc & 0x3ff;
     _consumedAh = ca != 0xFFFFF ? -static_cast<float>(ca) / 10 : NAN;

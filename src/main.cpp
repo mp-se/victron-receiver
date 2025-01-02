@@ -96,6 +96,7 @@ void setup() {
 
   // No stored config, check if we can get config via improve (serial)
   if (!myWifi.hasConfig()) {
+    Log.notice(F("Main: Waiting for remote WIFI setup." CR));
     myDisplay.printLineCentered(3, "Waiting for remote WIFI setup");
     checkForImprovWifi();  // Will return once timeout occurs or configuration
                            // is completed
@@ -333,9 +334,10 @@ void checkForImprovWifi() {
       char buf[80] = "";
 
       if (!improvWiFi.isConfigInitiated())
+        int time = IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000);
+        Log.notice(F("Main: Waiting for remote WIFI setup, waiting for %d." CR), time);
         snprintf(
-            buf, sizeof(buf), "Waiting for %d s",
-            IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000));
+            buf, sizeof(buf), "Waiting for %d s", time);
 
       myDisplay.printLineCentered(6, buf);
     }

@@ -76,8 +76,7 @@ int logIndex = 0;
 bool logUpdated = true;
 
 void setup() {
-  delay(4000);
-
+  // delay(4000);
   Log.notice(F("Main: Started setup for %s." CR), myConfig.getID());
   printBuildOptions();
   detectChipRevision();

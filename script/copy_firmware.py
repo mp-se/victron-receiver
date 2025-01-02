@@ -12,7 +12,7 @@ def after_build(source, target, env):
     dir    = env.GetLaunchDir()
     name   = env.get( "PIOENV" )
     if name == "victron-s3-waveshare" :
-        target = dir + "/bin/firmware32s3w.bin"
+        target = dir + "/bin/firmware32s3w_tft.bin"
         source = dir + "/.pio/build/" + name + "/firmware.bin"
         print( "Copy file : " + source + " -> " + target )
         shutil.copyfile( source, target )
@@ -22,7 +22,7 @@ def after_build(source, target, env):
         print( "Copy file : " + source + " -> " + target )
         shutil.copyfile( source, target )
     elif name == "victron-lolin" :
-        target = dir + "/bin/firmware32.bin"
+        target = dir + "/bin/firmware32_tft.bin"
         source = dir + "/.pio/build/" + name + "/firmware.bin"
         print( "Copy file : " + source + " -> " + target )
         shutil.copyfile( source, target )
@@ -32,12 +32,22 @@ def after_build(source, target, env):
         print( "Copy file : " + source + " -> " + target )
         shutil.copyfile( source, target )
     elif name == "victron-s3-lolin" :
-        target = dir + "/bin/firmware32s3.bin"
+        target = dir + "/bin/firmware32s3_tft.bin"
         source = dir + "/.pio/build/" + name + "/firmware.bin"
         print( "Copy file : " + source + " -> " + target )
         shutil.copyfile( source, target )
 
         target = dir + "/bin/partitions32s3.bin"
+        source = dir + "/.pio/build/" + name + "/partitions.bin"
+        print( "Copy file : " + source + " -> " + target )
+        shutil.copyfile( source, target )
+    elif name == "victron-c3-lolin" :
+        target = dir + "/bin/firmware32c3.bin"
+        source = dir + "/.pio/build/" + name + "/firmware.bin"
+        print( "Copy file : " + source + " -> " + target )
+        shutil.copyfile( source, target )
+
+        target = dir + "/bin/partitions32c3.bin"
         source = dir + "/.pio/build/" + name + "/partitions.bin"
         print( "Copy file : " + source + " -> " + target )
         shutil.copyfile( source, target )

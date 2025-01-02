@@ -28,7 +28,7 @@ jobs:
       - name: PlatformIO Run
         uses: karniv00l/platformio-run-action@v1
         with:
-          environments: "victron-s3-waveshare,victron-lolin,victron-s3-lolin,victron-c3-lolin"
+          environments: "victron-s3-waveshare-tft,victron-lolin-tft,victron-s3-lolin-tft,victron-c3-lolin,victron-s3-lolin"
           jobs: 6
           silent: false
           verbose: true

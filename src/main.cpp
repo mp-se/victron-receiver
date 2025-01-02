@@ -312,6 +312,8 @@ void checkForImprovWifi() {
 
 #if defined(ESP32S3)
   ImprovWiFi improvWiFi(CFG_APPNAME, CFG_APPVER, "ESP32S3", myConfig.getMDNS());
+#elif defined(ESP32C3)
+  ImprovWiFi improvWiFi(CFG_APPNAME, CFG_APPVER, "ESP32C3", myConfig.getMDNS());
 #elif defined(ESP32)
   ImprovWiFi improvWiFi(CFG_APPNAME, CFG_APPVER, "ESP32", myConfig.getMDNS());
 #else

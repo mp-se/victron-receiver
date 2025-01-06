@@ -128,17 +128,7 @@ void setup() {
     case RunMode::receiverMode:
       Log.notice(F("Main: Connecting to WIFI." CR));
       myDisplay.printLineCentered(3, "Connecting to WIFI");
-
-      if (strlen(myConfig.getWifiDirectSSID())) {
-        myDisplay.printLineCentered(4, "Creating AP");
-        Log.notice(F("Main: Connecting to WIFI and creating AP." CR));
-        myWifi.connect(false, WIFI_AP_STA);
-        myWifi.setAP(myConfig.getWifiDirectSSID(),
-                     myConfig.getWifiDirectPass());
-        myWifi.startAP(WIFI_AP_STA);
-      } else {
-        myWifi.connect(false, WIFI_AP);
-      }
+      myWifi.connect();
       break;
   }
 

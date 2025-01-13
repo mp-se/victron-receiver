@@ -1,0 +1,48 @@
+{
+  "id": "9b6dcc",
+  "temp_format": "C",
+  "app_ver": "0.1.8",
+  "app_build": "..d93485",
+  "mdns": "victron9b6dcc",
+  "platform": "esp32s3",
+  "rssi": -46,
+  "wifi_ssid": "jobsslow",
+  "total_heap": 324012,
+  "free_heap": 166692,
+  "ip": "192.168.1.104",
+  "wifi_setup": false,
+  "uptime_seconds": 3,
+  "uptime_minutes": 4,
+  "uptime_hours": 0,
+  "uptime_days": 0,
+  "victron_device": [
+    {
+      "name": "Smartsolar",
+      "data": "{\"name\":\"Solar Charger\",\"model\":\"0xA060\",\"decrypted_data\":\"0x00,0x00,0x1C,0x05,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFE,0x00,0x50,0xFE,0x00,0x35,0xE5,0x00,0x00,0x00\",\"state\":0,\"state_message\":\"Off\",\"error\":0,\"error_message\":\"0 - No error\",\"battery_voltage\":13.08,\"battery_current\":0.00,\"pv_power\":0.00,\"load_current\":0.00}",
+      "mac": "E9:0A:5A:D8:24:32",
+      "update_time": 61,
+      "push_time": 36
+    },
+    {
+      "name": "Batterysense",
+      "data": "{\"name\":\"Smart Battery Monitor\",\"model\":\"0xA3A4\",\"decrypted_data\":\"0xFF,0xFF,0x1B,0x05,0x00,0x00,0xC0,0x6C,0xFE,0xFF,0x7F,0xFF,0xFF,0xFF,0xFF,0x00,0x3A,0xE5,0x00,0x00,0x00\",\"battery_voltage\":13.07,\"temperature\":5.25}",
+      "mac": "D4:40:0B:E0:6E:DD",
+      "update_time": 62,
+      "push_time": 29
+    },
+    {
+      "name": "Smartshunt",
+      "data": "{\"name\":\"Smart Shunt\",\"model\":\"0xA389\",\"decrypted_data\":\"0x38,0x09,0x1B,0x05,0x00,0x00,0x01,0x05,0xCC,0xCB,0xFF,0x08,0x00,0x50,0xFE,0x00,0x68,0xE5,0x00,0x00,0x00\",\"alarm\":0,\"battery_voltage\":13.07,\"battery_current\":4190.963,\"consumed_ah\":-0.800000012,\"soc\":101.6,\"remaning_mins\":2360,\"aux_voltage\":12.81}",
+      "mac": "FB:46:C5:95:BC:2B",
+      "update_time": 61,
+      "push_time": 8
+    },
+    {
+      "name": "DCDCCharger",
+      "data": "{\"name\":\"Smart DC-DC Charger\",\"model\":\"0xA3C8\",\"decrypted_data\":\"0x00,0x00,0xFE,0x04,0xFF,0x7F,0x08,0x00,0x00,0x00,0xFF,0x08,0x00,0x50,0xFE,0x00,0x62,0x8F,0x00,0x00,0x00\",\"state\":0,\"state_message\":\"Off\",\"error\":0,\"error_message\":\"0 - No error\",\"off_reason\":8,\"off_reason_message\":\"Remote input. \",\"input_voltage\":12.78,\"output_voltage\":0.00}",
+      "mac": "F0:F1:7D:C5:18:F1",
+      "update_time": 61,
+      "push_time": 63
+    }
+  ]
+}

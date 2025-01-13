@@ -5,7 +5,6 @@ on:
   push:
     branches: 
       - dev
-      - master
 
 jobs:
   pio-build:

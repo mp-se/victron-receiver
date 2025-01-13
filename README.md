@@ -136,4 +136,3 @@ Thanks to the following projects for providing examples and data for making the 
 * https://github.com/keshavdv/victron-ble
 
 * thomasjobs for testing and providing valueable test data.
-

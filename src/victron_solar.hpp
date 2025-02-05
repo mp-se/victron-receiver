@@ -44,16 +44,6 @@ class VictronSolarCharger : public VictronDevice {
    * TODO: Add other models that this should support...
    */
  private:
-  typedef struct {
-    uint8_t state;
-    uint8_t error;
-    uint16_t batteryVoltage;
-    uint16_t batteryCurrent;
-    uint16_t yieldToday;
-    uint16_t pvPower;
-    uint16_t loadCurrent;
-  } __attribute__((packed)) VictronData;
-
   uint8_t _state;
   uint8_t _error;
   float _batteryVoltage, _batteryCurrent;
@@ -61,29 +51,51 @@ class VictronSolarCharger : public VictronDevice {
 
  public:
   VictronSolarCharger(const uint8_t* data, uint16_t model) {
-    VictronSolarCharger::VictronData* _data =
-        (VictronSolarCharger::VictronData*)data;
-
     setBaseData("Solar Charger", model, data);
 
-    _state = _data->state != 0xFF ? _data->state : 0;
-    _error = _data->error != 0xFF ? _data->error : 0;
+    BitReader br(data, 21);
+
+    /*
+    typedef struct {
+      uint8_t state;
+      uint8_t error;
+      uint16_t batteryVoltage;
+      uint16_t batteryCurrent;
+      uint16_t yieldToday;
+      uint16_t pvPower;
+      uint16_t loadCurrent;
+      uint16_t test1;
+      uint16_t test2;
+      uint16_t test3;
+    } __attribute__((packed)) VictronData;
+    */
+
+    uint8_t state = br.readUnsigned(8);
+    uint8_t error = br.readUnsigned(8);
+    int16_t batteryVoltage = br.readSigned(16);
+    int16_t batteryCurrent = br.readSigned(16);
+    uint16_t yieldToday = br.readUnsigned(16);
+    uint16_t pvPower = br.readUnsigned(16);
+    uint16_t loadCurrent = br.readUnsigned(16);
+
+    _state = state != 0xFF ? state : 0;
+    _error = error != 0xFF ? error : 0;
 
     _batteryVoltage =
-        (_data->batteryVoltage & 0x7FFF) != 0x7FFF
-            ? static_cast<float>(_data->batteryVoltage & 0x7FFF) / 100
+        (batteryVoltage & 0x7FFF) != 0x7FFF
+            ? static_cast<float>(batteryVoltage & 0x7FFF) / 100
             : NAN;  // 10 mV increments
     _batteryCurrent =
-        (_data->batteryCurrent & 0x7FFF) != 0x7FFF
-            ? static_cast<float>(_data->batteryCurrent & 0x7FFF) / 10
+        (batteryCurrent & 0x7FFF) != 0x7FFF
+            ? static_cast<float>(batteryCurrent & 0x7FFF) / 10
             : NAN;  // 0.1 A increments
-    _yieldToday = _data->yieldToday != 0xFFFF
-                      ? static_cast<float>(_data->yieldToday) / 100
+    _yieldToday = yieldToday != 0xFFFF
+                      ? static_cast<float>(yieldToday) / 100
                       : NAN;  // 10 mV increments
-    _pvPower = _data->pvPower != 0xFFFF ? static_cast<float>(_data->pvPower)
+    _pvPower = pvPower != 0xFFFF ? static_cast<float>(pvPower)
                                         : NAN;  // W
-    _loadCurrent = (_data->loadCurrent & 0x1FF) != 0x1FF
-                       ? static_cast<float>(_data->loadCurrent & 0x1FF) / 10
+    _loadCurrent = (loadCurrent & 0x1FF) != 0x1FF
+                       ? static_cast<float>(loadCurrent & 0x1FF) / 10
                        : NAN;  // 0.1 A increments
 
     Log.notice(F("VIC : Victron %s (%x) state=%d error=%d battVolt=%F V "

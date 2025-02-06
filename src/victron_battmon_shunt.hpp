@@ -59,17 +59,6 @@ class VictronShunt : public VictronDevice {
 
     BitReader br(data, 21);
 
-    /*typedef struct {
-      uint16_t remainingMins;
-      uint16_t batteryVoltage;
-      uint16_t alarm;
-      uint16_t aux;
-      uint8_t batteryCurrent[3];  // 24 bits
-      // uint32_t consumedSoc;
-      uint8_t consumedAh[3];  // 20 bits, 4 bits to soc
-      uint8_t soc;            // 10 bits
-    } __attribute__((packed)) VictronData;*/
-
     uint16_t remainingMins = br.readUnsigned(16);
     int16_t batteryVoltage = br.readSigned(16);
     uint16_t alarm = br.readUnsigned(16);

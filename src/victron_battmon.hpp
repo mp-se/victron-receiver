@@ -53,13 +53,6 @@ class VictronBatteryMonitor : public VictronDevice {
 
     BitReader br(data, 21);
 
-    /*typedef struct {
-      uint16_t unused;
-      int16_t batteryVoltage;
-      uint16_t alarm;
-      uint16_t temperature;
-    } __attribute__((packed)) VictronData;*/
-
     uint16_t unused = br.readUnsigned(16);
     int16_t batteryVoltage = br.readSigned(16);
     uint16_t alarm = br.readUnsigned(16);

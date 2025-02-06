@@ -56,17 +56,6 @@ class VictronInverter : public VictronDevice {
 
     BitReader br(data, 21);
 
-    /*
-    typedef struct {
-      uint8_t state;
-      uint16_t alarm;
-      int16_t batteryVoltage;
-      uint16_t acPower;
-      uint16_t acVoltage;
-      uint16_t acCurrent;
-    } __attribute__((packed)) VictronData;
-    */
-
     uint8_t state = br.readUnsigned(8);
     uint16_t alarm = br.readUnsigned(16);
     int16_t batteryVoltage = br.readSigned(16);

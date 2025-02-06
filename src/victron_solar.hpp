@@ -55,21 +55,6 @@ class VictronSolarCharger : public VictronDevice {
 
     BitReader br(data, 21);
 
-    /*
-    typedef struct {
-      uint8_t state;
-      uint8_t error;
-      uint16_t batteryVoltage;
-      uint16_t batteryCurrent;
-      uint16_t yieldToday;
-      uint16_t pvPower;
-      uint16_t loadCurrent;
-      uint16_t test1;
-      uint16_t test2;
-      uint16_t test3;
-    } __attribute__((packed)) VictronData;
-    */
-
     uint8_t state = br.readUnsigned(8);
     uint8_t error = br.readUnsigned(8);
     int16_t batteryVoltage = br.readSigned(16);

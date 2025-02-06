@@ -44,17 +44,6 @@ class VictronAcCharger : public VictronDevice {
    * TODO: Add other models that this should support...
    */
  private:
-  typedef struct {
-    uint8_t state;
-    uint8_t error;
-    uint8_t channel1[3];
-    uint8_t channel2[3];
-    uint8_t channel3[3];
-    uint8_t temperature;
-    uint8_t currentAC;
-    uint8_t unused[7];
-  } __attribute__((packed)) VictronData;
-
   uint8_t _state;
   uint8_t _error;
   float _voltage1, _voltage2, _voltage3;
@@ -64,52 +53,42 @@ class VictronAcCharger : public VictronDevice {
 
  public:
   VictronAcCharger(const uint8_t* data, uint16_t model) {
-    VictronAcCharger::VictronData* _data = (VictronAcCharger::VictronData*)data;
-
     setBaseData("AC Charger", model, data);
 
-    _state = _data->state != 0xFF ? _data->state : 0;
-    _error = _data->error != 0xFF ? _data->error : 0;
+    BitReader br(data, 21);
 
-    uint32_t ch1 = static_cast<uint32_t>(_data->channel1[0]) |
-                   static_cast<uint32_t>(_data->channel1[1]) << 8 |
-                   static_cast<uint32_t>(_data->channel1[2]) << 16;
-    uint16_t ch1V = ch1 & 0x1FFF;
-    uint16_t ch1A = ch1 >> 13 & 0x7FF;
+    uint8_t state = br.readUnsigned(8);
+    uint8_t error = br.readUnsigned(8);
+    uint16_t voltage1 = br.readUnsigned(13);
+    uint16_t current1 = br.readUnsigned(11);
+    uint16_t voltage2 = br.readUnsigned(13);
+    uint16_t current2 = br.readUnsigned(11);
+    uint16_t voltage3 = br.readUnsigned(13);
+    uint16_t current3 = br.readUnsigned(11);
+    uint16_t temperature = br.readUnsigned(7);
+    uint16_t currentAC = br.readUnsigned(9);
 
-    _voltage1 = (ch1V) != 0x1FFF ? static_cast<float>(ch1V) / 100
+    _state = state != 0xFF ? state : 0;
+    _error = error != 0xFF ? error : 0;
+
+    _voltage1 = (voltage1) != 0x1FFF ? static_cast<float>(voltage1) / 100
                                  : NAN;  // 10 mV increments
-    _current1 = (ch1A) != 0x7FF ? static_cast<float>(ch1A) / 10
-                                : NAN;  // 10 mV increments
-
-    uint32_t ch2 = static_cast<uint32_t>(_data->channel2[0]) |
-                   static_cast<uint32_t>(_data->channel2[1]) << 8 |
-                   static_cast<uint32_t>(_data->channel2[2]) << 16;
-    uint16_t ch2V = ch2 & 0x1FFF;
-    uint16_t ch2A = ch2 >> 13 & 0x7FF;
-
-    _voltage2 = (ch2V) != 0x1FFF ? static_cast<float>(ch2V) / 100
+    _current1 = (current1) != 0x7FF ? static_cast<float>(current1) / 10
                                  : NAN;  // 10 mV increments
-    _current2 = (ch2A) != 0x7FF ? static_cast<float>(ch2A) / 10
-                                : NAN;  // 10 mV increments
-
-    uint32_t ch3 = static_cast<uint32_t>(_data->channel3[0]) |
-                   static_cast<uint32_t>(_data->channel3[1]) << 8 |
-                   static_cast<uint32_t>(_data->channel3[2]) << 16;
-    uint16_t ch3V = ch3 & 0x1FFF;
-    uint16_t ch3A = ch3 >> 13 & 0x7FF;
-
-    _voltage3 = (ch3V) != 0x1FFF ? static_cast<float>(ch3V) / 100
+    _voltage2 = (voltage2) != 0x1FFF ? static_cast<float>(voltage2) / 100
                                  : NAN;  // 10 mV increments
-    _current3 = (ch3A) != 0x7FF ? static_cast<float>(ch3A) / 10
-                                : NAN;  // 10 mV increments
+    _current2 = (current2) != 0x7FF ? static_cast<float>(current2) / 10
+                                 : NAN;  // 10 mV increments
+    _voltage3 = (voltage3) != 0x1FFF ? static_cast<float>(voltage3) / 100
+                                 : NAN;  // 10 mV increments
+    _current3 = (current3) != 0x7FF ? static_cast<float>(current3) / 10
+                                 : NAN;  // 10 mV increments
 
-    _temperatureC = (_data->temperature & 0x7F) != 0x7F
-                        ? _data->temperature & 0x7F - 40
+    _temperatureC = (temperature & 0x7F) != 0x7F
+                        ? temperature & 0x7F - 40
                         : NAN;
-
-    uint16_t cur = static_cast<uint16_t>(_data->temperature & 0x80) << 1 | static_cast<uint16_t>(_data->currentAC); // Borrow one unit from tempC
-    _currentAC = (cur & 0x1FF) != 0x1FF ? cur / 10 : NAN;
+    _currentAC = (currentAC) != 0x1FF ? static_cast<float>(currentAC) / 10
+                                 : NAN;  // 10 mV increments
 
     Log.notice(
         F("VIC : Victron %s (%x) battVolt1=%F V battCurr1=%F battVolt2=%F V "

@@ -73,16 +73,6 @@ class VictronDcDcCharger : public VictronDevice {
 
     BitReader br(data, 21);
 
-    /*
-    typedef struct {
-      uint8_t state;
-      uint8_t error;
-      uint16_t inputVoltage;
-      int16_t outputVoltage;
-      uint32_t offReason;
-    } __attribute__((packed)) VictronData;
-    */
-
     uint8_t state = br.readUnsigned(8);
     uint8_t error = br.readUnsigned(8);
     uint16_t inputVoltage = br.readUnsigned(16);

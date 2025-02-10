@@ -56,22 +56,17 @@ class VictronInverter : public VictronDevice {
 
     BitReader br(data, 21);
 
-    uint8_t state = br.readUnsigned(8);
-    uint16_t alarm = br.readUnsigned(16);
+    _state = br.readUnsigned(8);
+    _alarm = br.readUnsigned(16);
     int16_t batteryVoltage = br.readSigned(16);
     uint16_t acPower = br.readUnsigned(16);
     int16_t acVoltage = br.readSigned(16);
     uint16_t acCurrent = br.readUnsigned(16);
 
-    _state = state != 0xFF ? state : 0;
-    _alarm = alarm != 0xFFFF ? alarm : 0;
-
-    _batteryVoltage =
-        (batteryVoltage & 0x7FFF) != 0x7FFF
-            ? static_cast<float>(batteryVoltage & 0x7FFF) / 100
-            : NAN;  // 10 mV increments
-    _acPower =
-        acPower != 0xFFFF ? static_cast<float>(acPower) : NAN;
+    _batteryVoltage = (batteryVoltage & 0x7FFF) != 0x7FFF
+                          ? static_cast<float>(batteryVoltage & 0x7FFF) / 100
+                          : NAN;  // 10 mV increments
+    _acPower = acPower != 0xFFFF ? static_cast<float>(acPower) : NAN;
     _acVoltage = (acVoltage & 0x7FFF) != 0x7FFF
                      ? static_cast<float>(acVoltage & 0x7FFF) / 100
                      : NAN;  // 10 mV increments
@@ -91,8 +86,11 @@ class VictronInverter : public VictronDevice {
   void toJson(JsonObject& doc) {
     VictronDevice::toJson(doc);
 
-    doc["state"] = getState();
-    doc["state_message"] = deviceStateToString(getState());
+    if (getState() != 0xFF) {
+      doc["state"] = getState();
+      doc["state_message"] = deviceStateToString(getState());
+    }
+
     doc["alarm"] = getAlarm();
 
     if (!isnan(getBatteryVoltage()))

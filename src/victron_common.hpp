@@ -35,8 +35,9 @@ SOFTWARE.
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-#include <log.hpp>
 #include <bitreader.hpp>
+#include <cstdio>
+#include <log.hpp>
 
 enum VictronDeviceType {
   Test = 0x00,

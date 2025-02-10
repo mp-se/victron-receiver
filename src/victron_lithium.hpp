@@ -67,14 +67,13 @@ class VictronLithium : public VictronDevice {
     cell[5] = br.readUnsigned(7);
     cell[6] = br.readUnsigned(7);
     cell[7] = br.readUnsigned(7);
-    uint16_t batteryVoltage = br.readUnsigned(12); 
+    uint16_t batteryVoltage = br.readUnsigned(12);
     _balancerStatus = br.readUnsigned(4);
     uint16_t batteryTemperature = br.readUnsigned(7);
 
-    for(int i = 0; i < sizeof(cell); i++) {
-      _cell[i] = cell[i] != 0xFF
-                          ? static_cast<float>(cell[i]) / 100
-                          : NAN;  // 10 mV increments
+    for (int i = 0; i < sizeof(cell); i++) {
+      _cell[i] = cell[i] != 0xFF ? static_cast<float>(cell[i]) / 100
+                                 : NAN;  // 10 mV increments
     }
 
     _batteryVoltage = batteryVoltage != 0x0FFF
@@ -82,8 +81,8 @@ class VictronLithium : public VictronDevice {
                           : NAN;  // 10 mV increments
 
     _batteryTemperature = batteryTemperature != 0x7F
-                          ? static_cast<float>(batteryTemperature) - 40
-                          : NAN;
+                              ? static_cast<float>(batteryTemperature) - 40
+                              : NAN;
   }
 
   float getBatteryVoltage() { return _batteryVoltage; }
@@ -101,21 +100,32 @@ class VictronLithium : public VictronDevice {
     doc["bms_flags"] = getBmsFlags();
     doc["error"] = getError();
 
-    doc["battery_voltage"] =
-        serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
-    doc["battery_temperature"] =
-        serialized(String(getBatteryTemperature(), DECIMALS_TEMP));
-    doc["balancer_status"] = getBatteryStatus();
+    if (!isnan(getBatteryVoltage()))
+      doc["battery_voltage"] =
+          serialized(String(getBatteryVoltage(), DECIMALS_VOLTAGE));
 
-    doc["cell1"] = serialized(String(getCell(0), DECIMALS_VOLTAGE));
-    doc["cell2"] = serialized(String(getCell(1), DECIMALS_VOLTAGE));
-    doc["cell3"] = serialized(String(getCell(2), DECIMALS_VOLTAGE));
-    doc["cell4"] = serialized(String(getCell(3), DECIMALS_VOLTAGE));
-    doc["cell5"] = serialized(String(getCell(4), DECIMALS_VOLTAGE));
-    doc["cell6"] = serialized(String(getCell(5), DECIMALS_VOLTAGE));
-    doc["cell7"] = serialized(String(getCell(6), DECIMALS_VOLTAGE));
-    doc["cell8"] = serialized(String(getCell(7), DECIMALS_VOLTAGE));
-    
+    if (!isnan(getBatteryTemperature()))
+      doc["battery_temperature"] =
+          serialized(String(getBatteryTemperature(), DECIMALS_TEMP));
+
+    if (!isnan(getBatteryStatus())) doc["balancer_status"] = getBatteryStatus();
+
+    if (!isnan(getCell(0)))
+      doc["cell1"] = serialized(String(getCell(0), DECIMALS_VOLTAGE));
+    if (!isnan(getCell(1)))
+      doc["cell2"] = serialized(String(getCell(1), DECIMALS_VOLTAGE));
+    if (!isnan(getCell(2)))
+      doc["cell3"] = serialized(String(getCell(2), DECIMALS_VOLTAGE));
+    if (!isnan(getCell(3)))
+      doc["cell4"] = serialized(String(getCell(3), DECIMALS_VOLTAGE));
+    if (!isnan(getCell(4)))
+      doc["cell5"] = serialized(String(getCell(4), DECIMALS_VOLTAGE));
+    if (!isnan(getCell(5)))
+      doc["cell6"] = serialized(String(getCell(5), DECIMALS_VOLTAGE));
+    if (!isnan(getCell(6)))
+      doc["cell7"] = serialized(String(getCell(6), DECIMALS_VOLTAGE));
+    if (!isnan(getCell(7)))
+      doc["cell8"] = serialized(String(getCell(7), DECIMALS_VOLTAGE));
   }
 };
 

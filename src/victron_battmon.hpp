@@ -43,7 +43,6 @@ class VictronBatteryMonitor : public VictronDevice {
    * 0xA3A5: "Smart Battery Sense",
    */
  private:
-
   float _batteryVoltage;
   float _temperatureC;
 

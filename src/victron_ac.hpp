@@ -57,8 +57,8 @@ class VictronAcCharger : public VictronDevice {
 
     BitReader br(data, 21);
 
-    uint8_t state = br.readUnsigned(8);
-    uint8_t error = br.readUnsigned(8);
+    _state = br.readUnsigned(8);
+    _error = br.readUnsigned(8);
     uint16_t voltage1 = br.readUnsigned(13);
     uint16_t current1 = br.readUnsigned(11);
     uint16_t voltage2 = br.readUnsigned(13);
@@ -68,27 +68,23 @@ class VictronAcCharger : public VictronDevice {
     uint16_t temperature = br.readUnsigned(7);
     uint16_t currentAC = br.readUnsigned(9);
 
-    _state = state != 0xFF ? state : 0;
-    _error = error != 0xFF ? error : 0;
-
     _voltage1 = (voltage1) != 0x1FFF ? static_cast<float>(voltage1) / 100
-                                 : NAN;  // 10 mV increments
+                                     : NAN;  // 10 mV increments
     _current1 = (current1) != 0x7FF ? static_cast<float>(current1) / 10
-                                 : NAN;  // 10 mV increments
+                                    : NAN;  // 10 mV increments
     _voltage2 = (voltage2) != 0x1FFF ? static_cast<float>(voltage2) / 100
-                                 : NAN;  // 10 mV increments
+                                     : NAN;  // 10 mV increments
     _current2 = (current2) != 0x7FF ? static_cast<float>(current2) / 10
-                                 : NAN;  // 10 mV increments
+                                    : NAN;  // 10 mV increments
     _voltage3 = (voltage3) != 0x1FFF ? static_cast<float>(voltage3) / 100
-                                 : NAN;  // 10 mV increments
+                                     : NAN;  // 10 mV increments
     _current3 = (current3) != 0x7FF ? static_cast<float>(current3) / 10
-                                 : NAN;  // 10 mV increments
+                                    : NAN;  // 10 mV increments
 
-    _temperatureC = (temperature & 0x7F) != 0x7F
-                        ? temperature & 0x7F - 40
-                        : NAN;
+    _temperatureC =
+        (temperature & 0x7F) != 0x7F ? temperature & 0x7F - 40 : NAN;
     _currentAC = (currentAC) != 0x1FF ? static_cast<float>(currentAC) / 10
-                                 : NAN;  // 10 mV increments
+                                      : NAN;  // 10 mV increments
 
     Log.notice(
         F("VIC : Victron %s (%x) battVolt1=%F V battCurr1=%F battVolt2=%F V "
@@ -112,10 +108,15 @@ class VictronAcCharger : public VictronDevice {
   void toJson(JsonObject& doc) {
     VictronDevice::toJson(doc);
 
-    doc["state"] = getState();
-    doc["state_message"] = deviceStateToString(getState());
-    doc["error"] = getError();
-    doc["error_message"] = deviceChargerErrorToString(getError());
+    if (getState() != 0xFF) {
+      doc["state"] = getState();
+      doc["state_message"] = deviceStateToString(getState());
+    }
+    
+    if (getError() != 0xFF) {
+      doc["error"] = getError();
+      doc["error_message"] = deviceChargerErrorToString(getError());
+    }
 
     if (!isnan(getVoltage1()))
       doc["battery_voltage1"] =

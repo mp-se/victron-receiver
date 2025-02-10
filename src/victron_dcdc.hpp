@@ -73,11 +73,11 @@ class VictronDcDcCharger : public VictronDevice {
 
     BitReader br(data, 21);
 
-    uint8_t state = br.readUnsigned(8);
-    uint8_t error = br.readUnsigned(8);
+    _state = br.readUnsigned(8);
+    _error = br.readUnsigned(8);
     uint16_t inputVoltage = br.readUnsigned(16);
     int16_t outputVoltage = br.readSigned(16);
-    uint32_t offReason = br.readUnsigned(32);
+    _offReason = br.readUnsigned(32);
 
     _inputVoltage = inputVoltage != 0xFFFF
                         ? static_cast<float>(inputVoltage) / 100
@@ -85,9 +85,6 @@ class VictronDcDcCharger : public VictronDevice {
     _outputVoltage = outputVoltage != 0X7FFF
                          ? static_cast<float>(outputVoltage) / 100
                          : NAN;  // 10 mV increments
-    _state = state != 0xFF ? state : 0;
-    _error = error != 0xFF ? error : 0;
-    _offReason = offReason != 0xFFFFFFFF ? offReason : 0;
 
     Log.notice(F("VIC : Victron %s (%x) input=%F V output=%F V state=%d "
                  "error=%d, off=%d" CR),
@@ -106,10 +103,16 @@ class VictronDcDcCharger : public VictronDevice {
   void toJson(JsonObject& doc) {
     VictronDevice::toJson(doc);
 
-    doc["state"] = getState();
-    doc["state_message"] = deviceStateToString(getState());
-    doc["error"] = getError();
-    doc["error_message"] = deviceChargerErrorToString(getError());
+    if (getState() != 0xFF) {
+      doc["state"] = getState();
+      doc["state_message"] = deviceStateToString(getState());
+    }
+
+    if (getError() != 0xFF) {
+      doc["error"] = getError();
+      doc["error_message"] = deviceChargerErrorToString(getError());
+    }
+
     doc["off_reason"] = getOffReasons();
     doc["off_reason_message"] = offReasonToString(getOffReasons());
 

@@ -25,40 +25,40 @@ SOFTWARE.
 #define SRC_BITREADER_HPP_
 
 #include <Arduino.h>
+
 #include <log.hpp>
 
 class BitReader {
-private:
-  const uint8_t *_data; 
+ private:
+  const uint8_t *_data;
   uint8_t _len;
   uint8_t _offset;
 
-  uint32_t readBit() {    
-    if((_offset/8) >= _len) {
+  uint32_t readBit() {
+    if ((_offset / 8) >= _len) {
       return 0;
     }
 
-    uint8_t bit = *(_data + (_offset>>3)) >> (_offset & 7) & 1;
+    uint8_t bit = *(_data + (_offset >> 3)) >> (_offset & 7) & 1;
     _offset++;
     return static_cast<uint32_t>(bit);
   }
-  
-public:
+
+ public:
   BitReader(const uint8_t *data, uint8_t len) {
     _data = data;
     _len = len;
     _offset = 0;
   }
 
-  void resetOffset() {
-    _offset = 0;
-  }
+  void resetOffset() { _offset = 0; }
 
   uint32_t readUnsigned(uint8_t noBits) {
     uint32_t value = 0;
 
-    for(int i = 0; i < noBits; i++) {
-      value |= readBit() << i;;      
+    for (int i = 0; i < noBits; i++) {
+      value |= readBit() << i;
+      ;
     }
 
     return value;
@@ -74,4 +74,4 @@ public:
   }
 };
 
-#endif // SRC_BITREADER_HPP_
+#endif  // SRC_BITREADER_HPP_

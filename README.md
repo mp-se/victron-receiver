@@ -9,6 +9,8 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 # Changes
 
+* 0.4.0 - Revert to Arduino 2 for better stability, rewriten data parsing using BitReader and updated dependecies.
+
 * 0.3.0 - Upgrade to latest libraries and Arduino 3.0.7, Added configuration backup feature.
 
 * 0.2.5 - Version that correcly decode the first few devices (AC Charger, DCDC Charger, Battery Monitor, Smart Shunt & Solar Charger) with Home Assistant API integration (MQTT + REST API). 

@@ -38,7 +38,14 @@ SOFTWARE.
 
 BleScanner bleScanner;
 
-void BleDeviceCallbacks::onResult(const NimBLEAdvertisedDevice* advertisedDevice) {
+#if defined(USE_NIMBLE2)
+void BleDeviceCallbacks::onResult(
+    const NimBLEAdvertisedDevice* advertisedDevice) {
+#else
+void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
+#endif
+  Log.info(F("BLE : Callback for device %s." CR),
+           advertisedDevice->getAddress().toString().c_str());
 
   // See if we have manufacturer data and then look to see if it's coming from a
   // Victron device.
@@ -198,23 +205,23 @@ BleScanner::BleScanner() { _deviceCallbacks = new BleDeviceCallbacks(); }
 void BleScanner::init() {
   NimBLEDevice::init("");
   _bleScan = NimBLEDevice::getScan();
+#if defined(USE_NIMBLE2)
   _bleScan->setScanCallbacks(_deviceCallbacks);
+#else
+  _bleScan->setAdvertisedDeviceCallbacks(_deviceCallbacks);
+#endif
   _bleScan->setMaxResults(0);
   _bleScan->setActiveScan(_activeScan);
-
-  _bleScan->setInterval(
-      97);  // Select prime numbers to reduce risk of frequency beat pattern
-            // with ibeacon advertisement interval
-  _bleScan->setWindow(37);  // Set to less or equal setInterval value. Leave
-                            // reasonable gap to allow WiFi some time.
+  _bleScan->setInterval(97);
+  _bleScan->setWindow(37);
 }
 
-void BleScanner::deInit() {
-  NimBLEDevice::deinit();
-}
+void BleScanner::deInit() { NimBLEDevice::deinit(); }
 
 bool BleScanner::scan() {
   if (!_bleScan) return false;
+
+  if (_bleScan->isScanning()) return true;
 
   for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
     _victron[i].clearUpdate();
@@ -224,10 +231,31 @@ bool BleScanner::scan() {
              _activeScan ? "ACTIVE" : "PASSIVE");
   _bleScan->setActiveScan(_activeScan);
 
-  NimBLEScanResults foundDevices = _bleScan->getResults(_scanTime * 1000, false);
-  Log.notice(F("BLE : Scanning completed, found %d results." CR), foundDevices.getCount());
-  _bleScan->clearResults(); // delete results scan buffer to release memory
+#if defined(USE_NIMBLE2)
+  NimBLEScanResults foundDevices =
+      _bleScan->getResults(_scanTime * 1000, false);
+  Log.notice(F("BLE : Scanning completed, found %d results." CR),
+             foundDevices.getCount());
+  _bleScan->clearResults();
   return true;
+#else
+  _bleScan->clearResults();
+  return _bleScan->start(_scanTime, nullptr, true);
+#endif
+}
+
+bool BleScanner::waitForScan() {
+#if defined(USE_NIMBLE2)
+  return true;
+#else
+  if (!_bleScan) return false;
+
+  while (_bleScan->isScanning()) {
+    delay(100);
+  }
+
+  return true;
+#endif
 }
 
 // EOF

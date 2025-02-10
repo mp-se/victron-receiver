@@ -25,6 +25,7 @@ SOFTWARE.
 
 #include <blescanner.hpp>
 #include <config.hpp>
+#include <cstdio>
 #include <display.hpp>
 #include <helper.hpp>
 #include <led.hpp>
@@ -221,7 +222,7 @@ void addLogEntry(tm timeinfo, String name) {
 
 void controller() {
   bleScanner.scan();
-  // bleScanner.waitForScan();
+  bleScanner.waitForScan();
 
   VictronReceiverPush push(&myConfig);
 
@@ -325,10 +326,11 @@ void checkForImprovWifi() {
       char buf[80] = "";
 
       if (!improvWiFi.isConfigInitiated())
-        int time = IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000);
-        Log.notice(F("Main: Waiting for remote WIFI setup, waiting for %d." CR), time);
-        snprintf(
-            buf, sizeof(buf), "Waiting for %d s", time);
+        int time =
+            IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000);
+      Log.notice(F("Main: Waiting for remote WIFI setup, waiting for %d." CR),
+                 time);
+      snprintf(buf, sizeof(buf), "Waiting for %d s", time);
 
       myDisplay.printLineCentered(6, buf);
     }

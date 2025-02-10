@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2024 Magnus
+Copyright (c) 2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,46 +23,39 @@ SOFTWARE.
  */
 #include <AUnit.h>
 #include <Arduino.h>
+#include <bitreader.hpp>
 
-#include <config.hpp>
-#include <display.hpp>
-#include <helper.hpp>
-#include <log.hpp>
-#include <main.hpp>
-#include <serialws.hpp>
-#include <webserver.hpp>
-#include <wificonnection.hpp>
+test(bitereader_test1) {
+  uint8_t data[] = { 0xff, 0x00, 0x7f, 0xff, 0x80, 0x7f };
 
-using aunit::Printer;
-using aunit::TestRunner;
-using aunit::Verbosity;
+  BitReader br(&data[0], sizeof(data));
 
-SerialDebug mySerial;
-VictronReceiverConfig myConfig("", "");
-WifiConnection myWifi(&myConfig, "", "", "", "", "");
-VictronReceiverWebServer myWebServer(&myConfig);
-SerialWebSocket mySerialWebSocket;
-Display myDisplay;
-RunMode runMode = RunMode::receiverMode;
+  uint32_t u1, u2;
+  int32_t s1, s2;
 
-void setup() {
-  Log.notice("Victron Receiver - Unit Test Build");
-  delay(4000);
-  Printer::setPrinter(&EspSerial);
+  u1 = br.readUnsigned(8);
+  u2 = 255;
+  assertEqual(u1, u2);
 
-  // TestRunner::exclude("bitreader");
-  // TestRunner::exclude("data_*");
-  // TestRunner::exclude("dcdc_*");
-  // TestRunner::exclude("battmon_*");
-  // TestRunner::exclude("shunt_*");
-  // TestRunner::exclude("inverter_*");
-  // TestRunner::exclude("ac_*");
-  // TestRunner::exclude("solar_*");
-}
+  u1 = br.readUnsigned(4);
+  u2 = 0x0;
+  assertEqual(u1, u2);
 
-void loop() {
-  TestRunner::run();
-  delay(10);
+  u1 = br.readUnsigned(4);
+  u2 = 0x0;
+  assertEqual(u1, u2);
+
+  s1 = br.readSigned(8);
+  s2 = 127;
+  assertEqual(u1, u2);
+
+  s1 = br.readSigned(8);
+  s2 = -127;
+  assertEqual(u1, u2);
+
+  s1 = br.readSigned(16);
+  s2 = -127;
+  assertEqual(u1, u2);
 }
 
 // EOF

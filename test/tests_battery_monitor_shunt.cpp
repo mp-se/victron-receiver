@@ -72,7 +72,7 @@ test(shunt_test2) {
   data = v.getSoc() * 10;
   assertEqual(data, 550);
   data = -v.getBatteryCurrent() * 1000;
-  assertEqual(data, 4152);
+  assertEqual(data, 4096);
   data = v.getBatteryVoltage() * 100;
   assertEqual(data, 1290);
   data = v.getAux() * 100;

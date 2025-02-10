@@ -61,14 +61,6 @@ class VictronDcDcCharger : public VictronDevice {
    * 0xA3CF: "Orion Smart 48V|48V-8.5A Isolated DC-DC Charger",
    */
  private:
-  typedef struct {
-    uint8_t state;
-    uint8_t error;
-    uint16_t inputVoltage;
-    int16_t outputVoltage;
-    uint32_t offReason;
-  } __attribute__((packed)) VictronData;
-
   uint8_t _state;
   uint8_t _error;
   float _inputVoltage;
@@ -77,21 +69,22 @@ class VictronDcDcCharger : public VictronDevice {
 
  public:
   VictronDcDcCharger(const uint8_t* data, uint16_t model) {
-    VictronDcDcCharger::VictronData* _data =
-        (VictronDcDcCharger::VictronData*)data;
-    uint32_t v;
-
     setBaseData("DC-DC Charger", model, data);
 
-    _inputVoltage = _data->inputVoltage != 0xFFFF
-                        ? static_cast<float>(_data->inputVoltage) / 100
+    BitReader br(data, 21);
+
+    _state = br.readUnsigned(8);
+    _error = br.readUnsigned(8);
+    uint16_t inputVoltage = br.readUnsigned(16);
+    int16_t outputVoltage = br.readSigned(16);
+    _offReason = br.readUnsigned(32);
+
+    _inputVoltage = inputVoltage != 0xFFFF
+                        ? static_cast<float>(inputVoltage) / 100
                         : NAN;  // 10 mV increments
-    _outputVoltage = _data->outputVoltage != 0X7FFF
-                         ? static_cast<float>(_data->outputVoltage) / 100
+    _outputVoltage = outputVoltage != 0X7FFF
+                         ? static_cast<float>(outputVoltage) / 100
                          : NAN;  // 10 mV increments
-    _state = _data->state != 0xFF ? _data->state : 0;
-    _error = _data->error != 0xFF ? _data->error : 0;
-    _offReason = _data->offReason != 0xFFFFFFFF ? _data->offReason : 0;
 
     Log.notice(F("VIC : Victron %s (%x) input=%F V output=%F V state=%d "
                  "error=%d, off=%d" CR),
@@ -110,10 +103,16 @@ class VictronDcDcCharger : public VictronDevice {
   void toJson(JsonObject& doc) {
     VictronDevice::toJson(doc);
 
-    doc["state"] = getState();
-    doc["state_message"] = deviceStateToString(getState());
-    doc["error"] = getError();
-    doc["error_message"] = deviceChargerErrorToString(getError());
+    if (getState() != 0xFF) {
+      doc["state"] = getState();
+      doc["state_message"] = deviceStateToString(getState());
+    }
+
+    if (getError() != 0xFF) {
+      doc["error"] = getError();
+      doc["error_message"] = deviceChargerErrorToString(getError());
+    }
+
     doc["off_reason"] = getOffReasons();
     doc["off_reason_message"] = offReasonToString(getOffReasons());
 

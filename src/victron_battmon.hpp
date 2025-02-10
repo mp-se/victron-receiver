@@ -43,28 +43,24 @@ class VictronBatteryMonitor : public VictronDevice {
    * 0xA3A5: "Smart Battery Sense",
    */
  private:
-  typedef struct {
-    uint16_t unused;
-    int16_t batteryVoltage;
-    uint16_t alarm;
-    uint16_t temperature;
-  } __attribute__((packed)) VictronData;
-
   float _batteryVoltage;
   float _temperatureC;
 
  public:
   VictronBatteryMonitor(const uint8_t* data, uint16_t model) {
-    VictronBatteryMonitor::VictronData* _data =
-        (VictronBatteryMonitor::VictronData*)data;
-    uint32_t v;
-
     setBaseData("Battery Monitor", model, data);
 
-    _batteryVoltage = _data->batteryVoltage != 0x7FFF
-                          ? static_cast<float>(_data->batteryVoltage) / 100
+    BitReader br(data, 21);
+
+    uint16_t unused = br.readUnsigned(16);
+    int16_t batteryVoltage = br.readSigned(16);
+    uint16_t alarm = br.readUnsigned(16);
+    uint16_t temperatureC = br.readUnsigned(16);
+
+    _batteryVoltage = batteryVoltage != 0x7FFF
+                          ? static_cast<float>(batteryVoltage) / 100
                           : NAN;  // 10 mV increments
-    _temperatureC = (static_cast<float>(_data->temperature) / 100) -
+    _temperatureC = (static_cast<float>(temperatureC) / 100) -
                     273.15;  // Value of the temperature (K)
 
     Log.notice(F("VIC : Victron %s (%x) volt=%F V temp=%F C" CR),

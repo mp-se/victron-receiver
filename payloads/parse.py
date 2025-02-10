@@ -1,212 +1,117 @@
 import logging
-import json
-# import time
-# import os
-# from uuid import UUID
-from construct import Array, Byte, Const, Int8sl, Int16ub, Int16sb, Int32ub, Int16sl, Int16ul, Int32ul, Int8ul, Struct, GreedyBytes
-# from construct.core import ConstError
+
+# Bitreader from https://github.com/keshavdv/victron-ble/blob/main/victron_ble/devices/base.py
+class BitReader:
+    def __init__(self, data: bytes):
+        self._data = data
+        self._index = 0
+
+    def read_bit(self) -> int:
+        bit = (self._data[self._index >> 3] >> (self._index & 7)) & 1
+        self._index += 1
+        return bit
+
+    def read_unsigned_int(self, num_bits: int) -> int:
+        value = 0
+        for position in range(0, num_bits):
+            value |= self.read_bit() << position
+        return value
+
+    def read_signed_int(self, num_bits: int) -> int:
+        return BitReader.to_signed_int(self.read_unsigned_int(num_bits), num_bits)
+
+    @staticmethod
+    def to_signed_int(value: int, num_bits: int) -> int:
+        return value - (1 << num_bits) if value & (1 << (num_bits - 1)) else value
 
 
-# ibeacon_format = Struct(
-#     "type_length" / Const(b"\x02\x15"),
-#     "uuid" / Array(16, Byte),
-#     "major" / Int16ub,
-#     "minor" / Int16ub,
-#     "power" / Int8sl,
-# )
 
-# eddystone_format = Struct(
-#     "type_length" / Const(b"\x20\x00"),
-#     "battery" / Int16ub,
-#     "temp" / Int16ub,
-#     "gravity" / Int16ub,
-#     "angle" / Int16ub,
-#     "chipid" / Int32ub,
-# )
-
-# Generic structure
-generic = Struct(
-     "byte" / Array(21, Byte),
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)-15s %(name)-8s %(levelname)s: %(message)s",
 )
 
-logger = logging.getLogger("parse")
+# Reading data related to: Solar Charger
+# -------------------------------------------------------------------------------------------
 
-def parse_ac_charger(fName):
+input = "0x06,0x00,0x30,0x05,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFE,0x98,0x83,0xCB,0x3F,0xF5,0xA3,0x00,0x00,0x00"
+data = bytes.fromhex(input.replace("0x","").replace(",",""))
+reader = BitReader(data)
 
-    ac_charger = Struct(
-        "state" / Int8ul, # Correct
-        "error" / Int8ul, # Assumed correct
-        "batteryVoltage1" / Int16ul, # Correct (Need filter 0x1fff)
-        
-        "A" / Int16ul, # Not used ?
-        "B" / Int16ul,
-        "C" / Int16ul,
-        "D" / Int16ul,
-        "E" / Int16ul,
-       
-        # "E2" / Int8ul,
+# This is the content of the solar charger profile,
+charge_state = reader.read_unsigned_int(8)
+charger_error = reader.read_unsigned_int(8)
+# Battery voltage reading in 0.01V increments
+battery_voltage = reader.read_signed_int(16) / 100
+# Battery charging Current reading in 0.1A increments
+battery_charging_current = reader.read_signed_int(16) / 10
+# Todays solar power yield in 10Wh increments
+yield_today = reader.read_unsigned_int(16) / 10
+# Current power from solar in 1W increments
+solar_power = reader.read_unsigned_int(16)
+# External device load in 0.1A increments
+external_device_load = reader.read_unsigned_int(9) /10
 
-        "F" / Int16ul, # Temp ?
-        "G" / Int16ul, # Current ?
-        "H" / Int16ul,
-        GreedyBytes
-    )
+print("State:", charge_state)
+print("Error:", charger_error)
+print("Batt V:", battery_voltage)
+print("Batt A:", battery_charging_current)
+print("Yield:", yield_today)
+print("PV:", solar_power)
+print("Load:", external_device_load)
 
-    with open(fName, 'r') as file:
-        data = json.load(file)
+# Reading data related to: AC Charger
+# -------------------------------------------------------------------------------------------
 
-    s = bytes.fromhex(data["decrypted_data"].replace("0x","").replace(",",""))
+# input = "0x06,0x00,0x60,0xA5,0x05,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xA6,0xFF,0xFF,0xFF,0x3F,0x6B,0xDF,0x00,0x00,0x00"
+# data = bytes.fromhex(input.replace("0x","").replace(",",""))
+# reader = BitReader(data)
 
-    d = ac_charger.parse(s)
-    # logger.info(f"AC - State: {d['state']} ")
-    # logger.info(f"AC - Error {d['error']} ")
+# device_state = reader.read_unsigned_int(8)
+# charger_error = reader.read_unsigned_int(8)
+# battery_voltage1 = reader.read_unsigned_int(13)
+# battery_current1 = reader.read_unsigned_int(11)
+# battery_voltage2 = reader.read_unsigned_int(13)
+# battery_current2 = reader.read_unsigned_int(11)
+# battery_voltage3 = reader.read_unsigned_int(13)
+# battery_current3 = reader.read_unsigned_int(11)
+# temp = reader.read_unsigned_int(7)
+# current = reader.read_unsigned_int(9)
 
-    d['batteryVoltage1'] = d['batteryVoltage1']&0x1FFF
-    # d['batteryVoltage2'] = d['batteryVoltage2']&0x1FFF
-    # d['batteryVoltage3'] = d['batteryVoltage3']&0x1FFF
+# print("State", device_state)
+# print("Error", charger_error)
+# print("Batt1 (V)", battery_voltage1/100, hex(battery_voltage1))
+# print("Batt1 (A)", battery_current1/10, hex(battery_current1))
+# print("Batt2 (V)", battery_voltage2/100, hex(battery_voltage2))
+# print("Batt2 (A)", battery_current2/10, hex(battery_current2))
+# print("Batt3 (V)", battery_voltage3/100, hex(battery_voltage2))
+# print("Batt3 (A)", battery_current3/10, hex(battery_current3))
+# print("Temp", temp-40)
+# print("Total (A)", current/10)
 
-    #d['batteryCurrent1'] = d['batteryCurrent1']&0x7FF
-    # d['batteryCurrent2'] = d['batteryCurrent2']&0x7FF
-    # d['batteryCurrent3'] = d['batteryCurrent3']&0x7FF
+# Reading data related to: Battery Monitor
+# -------------------------------------------------------------------------------------------
 
-    # d['temperature'] = d['temperature']&0x7F
-    # d['acCurrent'] = d['acCurrent']&0x1FF
+# input = "0xFF,0xFF,0x8C,0x05,0x00,0x00,0x1C,0x05,0x00,0x00,0x00,0x0B,0x00,0x40,0xFE,0x00,0x3B,0xE7,0x00,0x00,0x00"
+# data = bytes.fromhex(input.replace("0x","").replace(",",""))
+# reader = BitReader(data)
 
-    d['A'] = d['A']&0x1FF
-    # d['G'] = d['G']&0x1FF
-    # d['H'] = d['H']&0x1FF
+# ttg = reader.read_unsigned_int(16)
+# battery_voltage = reader.read_signed_int(16)
+# alarm = reader.read_unsigned_int(16)
+# variant = reader.read_unsigned_int(16)
+# variant_type = reader.read_unsigned_int(2)
+# battery_current = reader.read_unsigned_int(22)
+# consumed = reader.read_unsigned_int(20)
+# soc = reader.read_unsigned_int(10)
 
-    logger.info(f"AC - BattVoltage1 { 0 if d['batteryVoltage1'] == 0X1FFF else d['batteryVoltage1'] / 100 } ({hex(d['batteryVoltage1'])})")
-
-    logger.info(f"AC - A {d['A']/10} ({hex(d['A'])})")
-    # logger.info(f"AC - B ({hex(d['B'])})")
-    # logger.info(f"AC - C ({hex(d['C'])})")
-    # logger.info(f"AC - D ({hex(d['D'])})")
-    # logger.info(f"AC - E ({hex(d['E'])})")
-
-    # logger.info(f"AC - F {d['F']/10} ({hex(d['F'])})")
-    # logger.info(f"AC - G {d['G']/10} ({hex(d['G'])})")
-    # logger.info(f"AC - H {d['H']/10} ({hex(d['H'])})")
-
-    # logger.info(f"AC - BattCurrent1 { 0 if d['batteryCurrent1'] == 0x7FF else d['batteryCurrent1'] / 10 } ({hex(d['batteryCurrent1'])})")
-    # logger.info(f"AC - BattVoltage2 { 0 if d['batteryVoltage2'] == 0X1FFF else d['batteryVoltage2'] / 100 } ({hex(d['batteryVoltage2'])})")
-    # logger.info(f"AC - BattCurrent2 { 0 if d['batteryCurrent2'] == 0x7FF else d['batteryCurrent2'] / 10 } ({hex(d['batteryCurrent2'])})")
-    # logger.info(f"AC - BattVoltage3 { 0 if d['batteryVoltage3'] == 0X1FFF else d['batteryVoltage3'] / 100 } ({hex(d['batteryVoltage3'])})")
-    # logger.info(f"AC - BattCurrent3 { 0 if d['batteryCurrent3'] == 0x7FF else d['batteryCurrent3'] / 10 } ({hex(d['batteryCurrent3'])})")
-
-    # logger.info(f"AC - Temperature { 0 if d['temperature'] == 0x7F else d['temperature'] - 40 } ({hex(d['temperature'])})")
-    # logger.info(f"AC - AC Current { 0 if d['acCurrent'] == 0x1FF else d['acCurrent'] / 10 } ({hex(d['acCurrent'])})")
-
-
-def parse_dcdc_charger(fName):
-    dcdc_charger = Struct(
-        "state" / Int8ul,
-        "error" / Int8ul,
-        "inputVoltage" / Int16ul,
-        "outputVoltage" / Int16sl,
-        "offReason" / Int32ul,
-        GreedyBytes
-    )
-
-    with open(fName, 'r') as file:
-        data = json.load(file)
-
-    s = bytes.fromhex(data["decrypted_data"].replace("0x","").replace(",",""))
-
-    d = dcdc_charger.parse(s)
-    logger.info(f"DCDC - State: {d['state']} ")
-    logger.info(f"DCDC - Error {d['error']} ")
-    logger.info(f"DCDC - InVoltage {d['inputVoltage'] / 100 } ")
-    logger.info(f"DCDC - OutVoltage { 0 if d['outputVoltage'] == 0x7fff else d['outputVoltage'] / 100 } ")
-    logger.info(f"DCDC - OffReason {d['offReason']} ")
+# print("TTG", ttg)
+# print("Batt (V)", battery_voltage/100, hex(battery_voltage))
+# print("Alarm", hex(alarm))
+# print("Variant", variant/100, hex(variant))
+# print("VariantType", variant_type)
+# print("Batt (A)", battery_current/1000, hex(battery_current))
+# print("Consumed", consumed/10, hex(consumed))
+# print("SOC", soc/10, hex(soc))
 
 
-def parse_smartmon(fName):
-    smartmon = Struct(
-        "unused" / Int16ul,
-        "batteryVoltage" / Int16sl,
-        "alarm" / Int16ul,
-        "temperature" / Int16ul,
-        GreedyBytes
-    )
-
-    with open(fName, 'r') as file:
-        data = json.load(file)
-
-    s = bytes.fromhex(data["decrypted_data"].replace("0x","").replace(",",""))
-
-    d = smartmon.parse(s)
-    logger.info(f"MON - alarm: {d['alarm']} ")
-    logger.info(f"MON - BattVoltage {d['batteryVoltage'] / 100 } ")
-    logger.info(f"MON - temperature {d['temperature'] / 100 - 273.15} ")
-
-
-def parse_dump(fName):
-    dump = Struct(
-        "1" / Int8ul,
-        "2" / Int8ul,
-        "3" / Int16ul,
-
-        "4" / Int16ul,
-        "5" / Int16ul,
-        "6" / Int16ul,
-        "7" / Int16ul,
-        "8" / Int16ul,
-        "9" / Int16ul,
-        "A" / Int16ul,
-        "B" / Int16ul,
-        GreedyBytes
-    )
-
-    with open(fName, 'r') as file:
-        data = json.load(file)
-
-    s = bytes.fromhex(data["decrypted_data"].replace("0x","").replace(",",""))
-
-    d = dump.parse(s)
-    # logger.info(f"1 {d['1']} {hex(d['1'])}")
-    # logger.info(f"2 {d['2']} {hex(d['2'])}")
-    # logger.info(f"3 {d['3']} {hex(d['3']&0x1fff)}")
-    logger.info(f"4 {d['4']} {hex(d['4'])}")
-    logger.info(f"5 {d['5']} {hex(d['5'])}")
-    logger.info(f"6 {d['6']} {hex(d['6'])}")
-    logger.info(f"7 {d['7']} {hex(d['7'])}")
-    logger.info(f"8 {d['8']} {hex(d['8']&0x1fff)} {d['8']&0x1ff} {hex(d['8']&0x1ff)}")
-    logger.info(f"9 {d['9']} {hex(d['9']&0x1fff)} {d['9']&0x1ff} {hex(d['9']&0x1ff)}")
-    logger.info(f"A {d['A']} {hex(d['A']&0x1fff)} {d['A']&0x1ff} {hex(d['A']&0x1ff)}")
-    # logger.info(f"B {d['B']} {hex(d['B']&0x1fff)} {d['B']&0x1ff} {hex(d['B']&0x1ff)}")
-
-
-def main():
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)-15s %(name)-8s %(levelname)s: %(message)s",
-    )
-
-    # parse_dcdc_charger('dcdc_charger.json')
-    # parse_ac_charger('ac_charger.json')
-    # parse_ac_charger('ac_charger1.json')
-    # parse_ac_charger('ac_charger2.json')
-    # parse_ac_charger('ac_charger3.json')
-    # # parse_smartmon('smart_monitor.json')
- 
-    # parse_dump('ac_charger.json')
-    # parse_dump('ac_charger1.json')
-    # parse_dump('ac_charger2.json')
-    # parse_dump('ac_charger3.json')
-
-    # "decrypted_data": "0x06,0x00,0x2C,0x05,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00,0x86,0xCA,0x00,0x00,0x00",
-    # "decrypted_dat1": "0x04,0x00,0xA0,0xA5,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x03,0x06,0x00,0x73,0x00,0x00,0x00,0x00",
-    # "decrypted_dat2": "0x04,0x00,0xA0,0x65,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x07,0x06,0x00,0xF4,0x01,0x00,0x00,0x00",
-    # "decrypted_dat3": "0x05,0x00,0x65,0x05,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x07,0x06,0x00,0x47,0x07,0x00,0x00,0x00",
-    # "decrypted_dat4": "0x04,0x00,0xA0,0x25,0x04,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x3F,0x7C,0x00,0x00,0x00,0x00",
-    #                    0x10,0x02,0x89,0xa3,0x02,0xb0,0x40,0xaf,0x92,0x5d,0x09,0xa4,0xd8,0x9a,0xa01,0x28,0xbd,0xef4,0x8c,0x62,0x98,0xa9
-
-    #                    
-
-    a = 0x747 # 0x0073 # 0xca86
-
-    print(f"{a&0x1ff} {a&0x7ff}")
-
-main()
-logger.info("Exit from data parser")

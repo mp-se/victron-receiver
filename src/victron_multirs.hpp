@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2024 Magnus
+Copyright (c) 2025 Magnus
 
 Based on code/ideas from these projects:
 https://github.com/hoberman/Victron_BLE_Advertising_example
@@ -29,17 +29,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#ifndef SRC_VICTRON_SOLAR_HPP_
-#define SRC_VICTRON_SOLAR_HPP_
+#ifndef SRC_VICTRON_MULTIRS_HPP_
+#define SRC_VICTRON_MULTIRS_HPP_
 
 #include <log.hpp>
 #include <main.hpp>
 #include <victron_common.hpp>
 
-class VictronSolarCharger : public VictronDevice {
+class VictronMultiRS : public VictronDevice {
   /*
    * Used for the following model numbers:
-   * 0xA042: "BlueSolar MPPT 75|15"
    *
    * TODO: Add other models that this should support...
    */
@@ -47,41 +46,52 @@ class VictronSolarCharger : public VictronDevice {
   uint8_t _state;
   uint8_t _error;
   float _batteryVoltage, _batteryCurrent;
-  float _yieldToday, _pvPower, _loadCurrent;
+  uint8_t _activeAcIn;
+  float _activeAcInPower, _acOutPower, _pvPower, _yieldToday;
 
  public:
-  VictronSolarCharger(const uint8_t* data, uint16_t model) {
-    setBaseData("Solar Charger", model, data);
+  VictronMultiRS(const uint8_t* data, uint16_t model) {
+    setBaseData("Multi RS", model, data);
 
     BitReader br(data, 21);
 
-    _state = br.readUnsigned(8);
-    _error = br.readUnsigned(8);
-    int16_t batteryVoltage = br.readSigned(16);
-    int16_t batteryCurrent = br.readSigned(16);
-    uint16_t yieldToday = br.readUnsigned(16);
+    _state = br.readUnsigned(8);  // 0xFF = N/A
+    _error = br.readUnsigned(8);  // 0xFF = N/A
+    uint16_t batteryCurrent = br.readSigned(16);
+    int16_t batteryVoltage = br.readUnsigned(14);
+    _activeAcIn = br.readUnsigned(2);
+    int16_t activeAcInPower = br.readSigned(16);
+    int16_t acOutPower = br.readSigned(16);
     uint16_t pvPower = br.readUnsigned(16);
-    uint16_t loadCurrent = br.readUnsigned(16);
+    uint16_t yieldToday = br.readUnsigned(16);
 
-    _batteryVoltage = (batteryVoltage & 0x7FFF) != 0x7FFF
-                          ? static_cast<float>(batteryVoltage & 0x7FFF) / 100
-                          : NAN;  // 10 mV increments
     _batteryCurrent = (batteryCurrent & 0x7FFF) != 0x7FFF
                           ? static_cast<float>(batteryCurrent & 0x7FFF) / 10
                           : NAN;  // 0.1 A increments
+    _batteryVoltage = (batteryVoltage & 0x7FFF) != 0x7FFF
+                          ? static_cast<float>(batteryVoltage & 0x7FFF) / 100
+                          : NAN;  // 10 mV increments
+
+    _activeAcInPower = activeAcInPower != 0x7FFF
+                           ? static_cast<float>(activeAcInPower)
+                           : NAN;  // 1W increments
+
+    _acOutPower = acOutPower != 0x7FFF ? static_cast<float>(acOutPower)
+                                       : NAN;  // 1W increments
+
+    _pvPower =
+        pvPower != 0xFFFF ? static_cast<float>(pvPower) : NAN;  // 1W increments
+
     _yieldToday = yieldToday != 0xFFFF ? static_cast<float>(yieldToday) / 100
-                                       : NAN;  // 10 mV increments
-    _pvPower = pvPower != 0xFFFF ? static_cast<float>(pvPower) : NAN;  // W
-    _loadCurrent = (loadCurrent & 0x1FF) != 0x1FF
-                       ? static_cast<float>(loadCurrent & 0x1FF) / 10
-                       : NAN;  // 0.1 A increments
+                                       : NAN;  // 0.01 kWh increments
 
     Log.notice(F("VIC : Victron %s (%x) state=%d error=%d battVolt=%F V "
-                 "battCurrent=%F yieldToday=%F "
-                 "load=%F pvPower=%F" CR),
+                 "battCurrent=%F acIn=%d "
+                 "acInPower=%F acOutPower=%F, pvPower=%F, yieldToday=%F" CR),
                getDeviceName().c_str(), getModelNo(), getState(), getError(),
-               getBatteryVoltage(), getBatteryCurrent(), getYieldToday(),
-               getLoadCurrent(), getPvPower());
+               getBatteryVoltage(), getBatteryCurrent(), getActiveAcIn(),
+               getActiveAcInPower(), getAcOutPower(), getPvPower(),
+               getYieldToday());
   }
 
   uint8_t getState() { return _state; }
@@ -89,19 +99,21 @@ class VictronSolarCharger : public VictronDevice {
 
   float getBatteryVoltage() { return _batteryVoltage; }
   float getBatteryCurrent() { return _batteryCurrent; }
+  uint8_t getActiveAcIn() { return _activeAcIn; }
+  float getActiveAcInPower() { return _activeAcInPower; }
+  float getAcOutPower() { return _acOutPower; }
   float getYieldToday() { return _yieldToday; }
   float getPvPower() { return _pvPower; }
-  float getLoadCurrent() { return _loadCurrent; }
 
   void toJson(JsonObject& doc) {
     VictronDevice::toJson(doc);
 
-    if (getState() != 0XFF) {
+    if (getState() != 0xFF) {
       doc["state"] = getState();
       doc["state_message"] = deviceStateToString(getState());
     }
 
-    if (getError() != 0XFF) {
+    if (getError() != 0xFF) {
       doc["error"] = getError();
       doc["error_message"] = deviceChargerErrorToString(getError());
     }
@@ -114,13 +126,21 @@ class VictronSolarCharger : public VictronDevice {
       doc["battery_current"] =
           serialized(String(getBatteryCurrent(), DECIMALS_CURRENT));
 
+    doc["active_ac_in"] = getActiveAcIn();
+
     if (!isnan(getPvPower()))
       doc["pv_power"] = serialized(String(getPvPower(), DECIMALS_POWER));
 
-    if (!isnan(getLoadCurrent()))
-      doc["load_current"] =
-          serialized(String(getLoadCurrent(), DECIMALS_CURRENT));
+    if (!isnan(getActiveAcInPower()))
+      doc["active_ac_in_power"] =
+          serialized(String(getActiveAcInPower(), DECIMALS_POWER));
+
+    if (!isnan(getAcOutPower()))
+      doc["ac_out_power"] = serialized(String(getAcOutPower(), DECIMALS_POWER));
+
+    if (!isnan(getYieldToday()))
+      doc["yield_today"] = serialized(String(getYieldToday(), DECIMALS_POWER));
   }
 };
 
-#endif  // SRC_VICTRON_SOLAR_HPP_
+#endif  // SRC_VICTRON_MULTIRS_HPP_

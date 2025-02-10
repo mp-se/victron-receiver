@@ -44,17 +44,6 @@ class VictronShunt : public VictronDevice {
    * 0xA38B: "SmartShunt 2000A/50mV"
    */
  private:
-  typedef struct {
-    uint16_t remainingMins;
-    uint16_t batteryVoltage;
-    uint16_t alarm;
-    uint16_t aux;
-    uint8_t batteryCurrent[3];  // 24 bits
-    // uint32_t consumedSoc;
-    uint8_t consumedAh[3];  // 20 bits, 4 bits to soc
-    uint8_t soc;            // 10 bits
-  } __attribute__((packed)) VictronData;
-
   uint16_t _remaningMins;
   uint16_t _alarm;
   float _batteryVoltage;
@@ -66,59 +55,51 @@ class VictronShunt : public VictronDevice {
 
  public:
   VictronShunt(const uint8_t* data, uint16_t model) {
-    VictronShunt::VictronData* _data = (VictronShunt::VictronData*)data;
-
     setBaseData("Shunt", model, data);
 
-    _remaningMins = _data->remainingMins != 0xFFFF ? _data->remainingMins : 0;
-    _batteryVoltage =
-        (_data->batteryVoltage & 0x7FFF) != 0x7FFF
-            ? static_cast<float>(_data->batteryVoltage & 0x7FFF) / 100
-            : NAN;  // 10 mV increments
-    _alarm = _data->alarm != 0xFFFF ? _data->alarm : 0;
+    BitReader br(data, 21);
 
-    uint32_t bc =
-        _create24bitUnsigned(_data->batteryCurrent[0], _data->batteryCurrent[1],
-                             _data->batteryCurrent[2]);
+    uint16_t remainingMins = br.readUnsigned(16);
+    int16_t batteryVoltage = br.readSigned(16);
+    _alarm = br.readUnsigned(16);
+    uint16_t aux = br.readUnsigned(16);
+    uint16_t auxMode = br.readUnsigned(2);
+    int32_t batteryCurrent = br.readSigned(22);
+    int32_t consumedAh = br.readSigned(20);
+    uint16_t soc = br.readUnsigned(10);
+
+    _remaningMins = remainingMins != 0xFFFF ? remainingMins : 0;
+    _batteryVoltage = (batteryVoltage & 0x7FFF) != 0x7FFF
+                          ? static_cast<float>(batteryVoltage & 0x7FFF) / 100
+                          : NAN;  // 10 mV increments
 
     _auxMode =
-        bc & 0x03;  // 0=StarterVoltage, 1=MidPointVoltage, 2=Temperature, 3=Off
+        auxMode &
+        0x03;  // 0=StarterVoltage, 1=MidPointVoltage, 2=Temperature, 3=Off
 
     switch (_auxMode) {
       case 0:  // Aux mode
-        _aux = static_cast<float>(static_cast<int16_t>(_data->aux)) /
-               100;  // 10 mV increments
-        break;
-      case 1:                                         // Mid mode
-        _aux = static_cast<float>(_data->aux) / 100;  // 10 mV increments
-        break;
-      case 2:  // Temperature
         _aux =
-            static_cast<float>(_data->aux) / 100 - 273.15;  // Kelvin to Celcius
+            static_cast<float>(br.convert(aux, 16)) / 100;  // 10 mV increments
+        break;
+      case 1:                                  // Mid mode
+        _aux = static_cast<float>(aux) / 100;  // 10 mV increments
+        break;
+      case 2:                                           // Temperature
+        _aux = static_cast<float>(aux) / 100 - 273.15;  // Kelvin to Celcius
         break;
       case 3:  // Disabled
         _aux = NAN;
         break;
     }
 
-    bc = bc >> 2;
-    _batteryCurrent = bc != 0x3FFFFF
-                          ? static_cast<float>(_22bitTo32bitSigned(bc)) / 1000
+    _batteryCurrent = batteryCurrent != 0x3FFFFF
+                          ? static_cast<float>(batteryCurrent) / 1000
                           : NAN;
-
-    uint32_t ca =
-        _create24bitUnsigned(_data->consumedAh[0], _data->consumedAh[1],
-                             _data->consumedAh[2]) &
-        0xFFFFF;
-    uint16_t soc = static_cast<uint16_t>(_data->soc) << 4 |
-                   static_cast<uint16_t>(_data->consumedAh[2] & 0xf0) >> 4;
-
-    soc = soc & 0x3ff;
-    _consumedAh = ca != 0xFFFFF ? -static_cast<float>(ca) / 10 : NAN;
+    _consumedAh =
+        consumedAh != 0xFFFFF ? -static_cast<float>(consumedAh) / 10 : NAN;
     _soc =
         soc != 0x3FF ? static_cast<float>(soc) / 10 : NAN;  // 0.1% increments
-
-    // if (_soc > 100) _soc = 100.0;
 
     Log.notice(
         F("VIC : Victron %s (%x) remaningMins=%d V battVoltage=%F alarm=%d "

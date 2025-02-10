@@ -39,8 +39,8 @@ class VictronReceiverConfig : public BaseConfig {
  private:
   String _timezone = "CET-1CEST,M3.5.0,M10.5.0/3";  // Stockholm TZ
   bool _bleActiveScan = false;
-  int _bleScanTime = 4;
-  int _pushResendTime = 30;
+  int _bleScanTime = 4;      // seconds
+  int _pushResendTime = 30;  // seconds
   VictronConfig _victron[MAX_VICTRON_DEVICES];
 
   void formatFileSystem();

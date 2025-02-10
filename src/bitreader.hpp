@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2024 Magnus
+Copyright (c) 2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,48 +21,57 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <AUnit.h>
+#ifndef SRC_BITREADER_HPP_
+#define SRC_BITREADER_HPP_
+
 #include <Arduino.h>
 
-#include <config.hpp>
-#include <display.hpp>
-#include <helper.hpp>
 #include <log.hpp>
-#include <main.hpp>
-#include <serialws.hpp>
-#include <webserver.hpp>
-#include <wificonnection.hpp>
 
-using aunit::Printer;
-using aunit::TestRunner;
-using aunit::Verbosity;
+class BitReader {
+ private:
+  const uint8_t *_data;
+  uint8_t _len;
+  uint8_t _offset;
 
-SerialDebug mySerial;
-VictronReceiverConfig myConfig("", "");
-WifiConnection myWifi(&myConfig, "", "", "", "", "");
-VictronReceiverWebServer myWebServer(&myConfig);
-SerialWebSocket mySerialWebSocket;
-Display myDisplay;
-RunMode runMode = RunMode::receiverMode;
+  uint32_t readBit() {
+    if ((_offset / 8) >= _len) {
+      return 0;
+    }
 
-void setup() {
-  Log.notice("Victron Receiver - Unit Test Build");
-  delay(4000);
-  Printer::setPrinter(&EspSerial);
+    uint8_t bit = *(_data + (_offset >> 3)) >> (_offset & 7) & 1;
+    _offset++;
+    return static_cast<uint32_t>(bit);
+  }
 
-  // TestRunner::exclude("bitreader");
-  // TestRunner::exclude("data_*");
-  // TestRunner::exclude("dcdc_*");
-  // TestRunner::exclude("battmon_*");
-  // TestRunner::exclude("shunt_*");
-  // TestRunner::exclude("inverter_*");
-  // TestRunner::exclude("ac_*");
-  // TestRunner::exclude("solar_*");
-}
+ public:
+  BitReader(const uint8_t *data, uint8_t len) {
+    _data = data;
+    _len = len;
+    _offset = 0;
+  }
 
-void loop() {
-  TestRunner::run();
-  delay(10);
-}
+  void resetOffset() { _offset = 0; }
 
-// EOF
+  uint32_t readUnsigned(uint8_t noBits) {
+    uint32_t value = 0;
+
+    for (int i = 0; i < noBits; i++) {
+      value |= readBit() << i;
+      ;
+    }
+
+    return value;
+  }
+
+  int32_t readSigned(uint8_t noBits) {
+    uint32_t value = readUnsigned(noBits);
+    return (value & (1 << (noBits - 1))) ? value | 0x80000000 : value;
+  }
+
+  int32_t convert(uint32_t value, uint8_t noBits) {
+    return (value & (1 << (noBits - 1))) ? value | 0x80000000 : value;
+  }
+};
+
+#endif  // SRC_BITREADER_HPP_

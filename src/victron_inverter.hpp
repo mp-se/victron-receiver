@@ -43,15 +43,6 @@ class VictronInverter : public VictronDevice {
    * This is not yet tested, lack data to test with
    */
  private:
-  typedef struct {
-    uint8_t state;
-    uint16_t alarm;
-    int16_t batteryVoltage;
-    uint16_t acPower;
-    uint16_t acVoltage;
-    uint16_t acCurrent;
-  } __attribute__((packed)) VictronData;
-
   uint8_t _state;
   uint16_t _alarm;
   float _batteryVoltage;
@@ -61,25 +52,26 @@ class VictronInverter : public VictronDevice {
 
  public:
   VictronInverter(const uint8_t* data, uint16_t model) {
-    VictronInverter::VictronData* _data = (VictronInverter::VictronData*)data;
-    uint32_t v;
-
     setBaseData("Inverter", model, data);
 
-    _state = _data->state != 0xFF ? _data->state : 0;
-    _alarm = _data->alarm != 0xFFFF ? _data->alarm : 0;
+    BitReader br(data, 21);
 
-    _batteryVoltage =
-        (_data->batteryVoltage & 0x7FFF) != 0x7FFF
-            ? static_cast<float>(_data->batteryVoltage & 0x7FFF) / 100
-            : NAN;  // 10 mV increments
-    _acPower =
-        _data->acPower != 0xFFFF ? static_cast<float>(_data->acPower) : NAN;
-    _acVoltage = (_data->acVoltage & 0x7FFF) != 0x7FFF
-                     ? static_cast<float>(_data->acVoltage & 0x7FFF) / 100
+    _state = br.readUnsigned(8);
+    _alarm = br.readUnsigned(16);
+    int16_t batteryVoltage = br.readSigned(16);
+    uint16_t acPower = br.readUnsigned(16);
+    int16_t acVoltage = br.readSigned(16);
+    uint16_t acCurrent = br.readUnsigned(16);
+
+    _batteryVoltage = (batteryVoltage & 0x7FFF) != 0x7FFF
+                          ? static_cast<float>(batteryVoltage & 0x7FFF) / 100
+                          : NAN;  // 10 mV increments
+    _acPower = acPower != 0xFFFF ? static_cast<float>(acPower) : NAN;
+    _acVoltage = (acVoltage & 0x7FFF) != 0x7FFF
+                     ? static_cast<float>(acVoltage & 0x7FFF) / 100
                      : NAN;  // 10 mV increments
-    _acCurrent = (_data->acCurrent & 0x7FF) != 0x7FF
-                     ? static_cast<float>(_data->acCurrent & 0x7FF) / 10
+    _acCurrent = (acCurrent & 0x7FF) != 0x7FF
+                     ? static_cast<float>(acCurrent & 0x7FF) / 10
                      : NAN;
   }
 
@@ -94,8 +86,11 @@ class VictronInverter : public VictronDevice {
   void toJson(JsonObject& doc) {
     VictronDevice::toJson(doc);
 
-    doc["state"] = getState();
-    doc["state_message"] = deviceStateToString(getState());
+    if (getState() != 0xFF) {
+      doc["state"] = getState();
+      doc["state_message"] = deviceStateToString(getState());
+    }
+
     doc["alarm"] = getAlarm();
 
     if (!isnan(getBatteryVoltage()))

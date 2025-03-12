@@ -45,16 +45,67 @@ class VictronBatteryProtect : public VictronDevice {
     bool _switchState;
 
  public:
-    VictronBatteryProtect(const uint8_t* data, uint16_t model);
+    VictronBatteryProtect(const uint8_t* data, uint16_t model) {
+        setBaseData("Smart BatteryProtect", model, data);
+        
+        BitReader br(data, 21);
+        
+        // First byte is state
+        _state = br.readUnsigned(8);
+        
+        // Second byte is error
+        _error = br.readUnsigned(8);
+        
+        // Skip next 5 bytes (reserved/unknown)
+        br.readUnsigned(40);
+        
+        // Battery voltage
+        uint32_t voltage = br.readUnsigned(16);
+        _batteryVoltage = voltage / 100.0f;
+        
+        // Skip next 10 bytes
+        br.readUnsigned(80);
+        
+        // Switch state might be in the last byte
+        uint32_t status = br.readUnsigned(8);
+        _switchState = (status & 0x01) != 0;
+    }
 
     uint8_t getState() { return _state; }
     uint8_t getError() { return _error; }
     float getBatteryVoltage() { return _batteryVoltage; }
     bool getSwitchState() { return _switchState; }
 
-    String getStateString();
-    String getErrorString();
-    void toJson(JsonObject& doc) override;
+    String getStateString() {
+        switch(_state) {
+            case 0: return "Off";
+            case 1: return "Low voltage";
+            case 2: return "High voltage";
+            case 3: return "High temperature";
+            case 4: return "On";
+            default: return "Unknown";
+        }
+    }
+
+    String getErrorString() {
+        switch(_error) {
+            case 0: return "No error";
+            case 1: return "Battery voltage too low";
+            case 2: return "Battery voltage too high";
+            case 3: return "Temperature too high";
+            default: return "Unknown error";
+        }
+    }
+
+    void toJson(JsonObject& doc) override {
+        VictronDevice::toJson(doc);
+        doc["state"] = _state;
+        doc["state_message"] = getStateString();
+        doc["error"] = _error;
+        doc["error_message"] = getErrorString();
+        doc["battery_voltage"] = _batteryVoltage;
+        doc["switch_state"] = _switchState;
+    }
 };
 
 #endif  // SRC_VICTRON_BATTERYPROTECT_HPP_ 

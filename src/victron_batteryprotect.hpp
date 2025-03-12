@@ -29,15 +29,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#ifndef SRC_VICTRON_HPP_
-#define SRC_VICTRON_HPP_
+#ifndef SRC_VICTRON_BATTERYPROTECT_HPP_
+#define SRC_VICTRON_BATTERYPROTECT_HPP_
 
-#include <victron_ac.hpp>             // AC Charger
-#include <victron_battmon.hpp>        // Smart BatteryMon (Subset of data)
-#include <victron_battmon_shunt.hpp>  // BatteryMon (Complete)
+#include <bitreader.hpp>
+#include <log.hpp>
+#include <main.hpp>
 #include <victron_common.hpp>
-#include <victron_dcdc.hpp>   // DC-DC Charger
-#include <victron_solar.hpp>  // Solar Charger
-#include <victron_batteryprotect.hpp>  // Add this line
 
-#endif  // SRC_VICTRON_HPP_
+class VictronBatteryProtect : public VictronDevice {
+ private:
+    uint8_t _state;
+    uint8_t _error;
+    float _batteryVoltage;
+    float _current;
+    float _temperature;
+    bool _switchState;
+
+ public:
+    VictronBatteryProtect(const uint8_t* data, uint16_t model);
+
+    uint8_t getState() { return _state; }
+    uint8_t getError() { return _error; }
+    float getBatteryVoltage() { return _batteryVoltage; }
+    float getCurrent() { return _current; }
+    float getTemperature() { return _temperature; }
+    bool getSwitchState() { return _switchState; }
+
+    String getStateString();
+    String getErrorString();
+    void toJson(JsonObject& doc) override;
+};
+
+#endif  // SRC_VICTRON_BATTERYPROTECT_HPP_ 

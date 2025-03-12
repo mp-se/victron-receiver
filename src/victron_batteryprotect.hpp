@@ -42,8 +42,6 @@ class VictronBatteryProtect : public VictronDevice {
     uint8_t _state;
     uint8_t _error;
     float _batteryVoltage;
-    float _current;
-    float _temperature;
     bool _switchState;
 
  public:
@@ -52,8 +50,6 @@ class VictronBatteryProtect : public VictronDevice {
     uint8_t getState() { return _state; }
     uint8_t getError() { return _error; }
     float getBatteryVoltage() { return _batteryVoltage; }
-    float getCurrent() { return _current; }
-    float getTemperature() { return _temperature; }
     bool getSwitchState() { return _switchState; }
 
     String getStateString();

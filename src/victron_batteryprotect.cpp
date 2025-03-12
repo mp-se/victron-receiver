@@ -49,23 +49,12 @@ VictronBatteryProtect::VictronBatteryProtect(const uint8_t* data, uint16_t model
     uint32_t voltage = br.readUnsigned(16);
     _batteryVoltage = voltage / 100.0f;
     
-    // Current
-    uint32_t current = br.readUnsigned(16);
-    _current = current / 10.0f;
+    // Skip next 10 bytes
+    br.readUnsigned(80);
     
-    // Temperature
-    uint32_t temp = br.readUnsigned(16);
-    _temperature = temp / 10.0f;
-    
-    // Skip 3 bytes
-    br.readUnsigned(24);
-    
-    // Switch state and other status info
-    uint32_t status = br.readUnsigned(24);
+    // Switch state might be in the last byte
+    uint32_t status = br.readUnsigned(8);
     _switchState = (status & 0x01) != 0;
-    
-    // Skip final bytes
-    br.readUnsigned(24);
 }
 
 String VictronBatteryProtect::getStateString() {
@@ -96,7 +85,5 @@ void VictronBatteryProtect::toJson(JsonObject& doc) {
     doc["error"] = _error;
     doc["error_message"] = getErrorString();
     doc["battery_voltage"] = _batteryVoltage;
-    doc["current"] = _current;
-    doc["temperature"] = _temperature;
     doc["switch_state"] = _switchState;
 } 

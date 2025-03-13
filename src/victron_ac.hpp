@@ -112,7 +112,7 @@ class VictronAcCharger : public VictronDevice {
       doc["state"] = getState();
       doc["state_message"] = deviceStateToString(getState());
     }
-    
+
     if (getError() != 0xFF) {
       doc["error"] = getError();
       doc["error_message"] = deviceChargerErrorToString(getError());

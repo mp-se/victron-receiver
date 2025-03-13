@@ -21,56 +21,35 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_BITREADER_HPP_
-#define SRC_BITREADER_HPP_
-
+#include <AUnit.h>
 #include <Arduino.h>
 
-#include <log.hpp>
+#include <testdata.hpp>
+#include <victron_battprotect.hpp>
 
-class BitReader {
- private:
-  const uint8_t *_data;
-  uint8_t _len;
-  uint8_t _offset;
+test(battprot_test1) {
+  // These values has been validated with the App
+  VictronTestData testData = {
+      "Battery Protect",
+      0xA3B0,
+      BatteryProtect,
+      {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x74,0x0A,0x0C,0x00,0x08,0x00,0x00,0x00,0xFF,0x31,0x43,0x00,0x00,0x00}};
+  VictronBatteryProtect v(&testData.decrypted[0], testData.model);
+  uint16_t data;
 
-  uint32_t readBit() {
-    if ((_offset / 8) >= _len) {
-      return 0;
-    }
+  assertEqual(v.getDeviceName(), "Battery Protect");
+  assertEqual(v.getModelNo(), 0xA3B0);
+  assertEqual(v.getError(), 0);
+  assertEqual(v.getState(), 0);
+  assertEqual(v.getOutputState(), 0);
+  assertEqual(v.getAlarmReason(), 0);
+  assertEqual(v.getWarningReason(),8);
+  data = v.getOffReasons();
+  assertEqual(data, 10);
+  data = v.getInputVoltage() * 100;
+  assertEqual(data, 2676);
+  data = v.getOutputVoltage() * 100;
+  assertEqual(data, 12);
+}
 
-    uint8_t bit = *(_data + (_offset >> 3)) >> (_offset & 7) & 1;
-    _offset++;
-    return static_cast<uint32_t>(bit);
-  }
-
- public:
-  BitReader(const uint8_t *data, uint8_t len) {
-    _data = data;
-    _len = len;
-    _offset = 0;
-  }
-
-  void resetOffset() { _offset = 0; }
-
-  uint32_t readUnsigned(uint8_t noBits) {
-    uint32_t value = 0;
-
-    for (int i = 0; i < noBits; i++) {
-      value |= readBit() << i;
-    }
-
-    return value;
-  }
-
-  int32_t readSigned(uint8_t noBits) {
-    uint32_t value = readUnsigned(noBits);
-    return (value & (1 << (noBits - 1))) ? value | 0x80000000 : value;
-  }
-
-  int32_t convert(uint32_t value, uint8_t noBits) {
-    return (value & (1 << (noBits - 1))) ? value | 0x80000000 : value;
-  }
-};
-
-#endif  // SRC_BITREADER_HPP_
+// EOF

@@ -38,6 +38,7 @@ SOFTWARE.
 #include <utils.hpp>
 #include <webserver.hpp>
 #include <wificonnection.hpp>
+#include <resources.hpp>
 
 constexpr auto CFG_APPNAME = "victron";
 constexpr auto CFG_FILENAME = "/victron.json";
@@ -245,6 +246,16 @@ void controller() {
       }
     }
   }
+
+  // Send some data connected to the device itself
+  JsonDocument doc2;
+
+  doc2[PARAM_APP_VER] = CFG_APPVER;
+  doc2[PARAM_APP_BUILD] = CFG_GITREV;
+  doc2[PARAM_PUSH_RESEND_TIME] = myConfig.getPushResendTime();
+
+  JsonObject obj2 = doc2.as<JsonObject>();
+  push.sendAll("victron_receiver", myConfig.getMDNS(), obj2);
 }
 
 void renderDisplayHeader() {

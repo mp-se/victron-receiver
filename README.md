@@ -49,7 +49,7 @@ The following types can be supported if I can receive some test data.
 * SmartLithium
 * InverterRS
 * GxDevice
-* SmartBatteryProtect
+* BatteryProtect
 * LynxSmartBMS
 * MultiRS
 * VeBus

@@ -72,7 +72,12 @@ VictronTestData testData[] = {
     {"Solar Charger", 0xA042, SolarCharger, {0x00, 0x00, 0x8E, 0x05, 0x00, 0x00,
                                              0x00, 0x00, 0x00, 0x00, 0x00, 0xFE,
                                              0xFF, 0x40, 0xFE, 0x00, 0x08, 0xE7,
-                                             0x00, 0x00, 0x00}}};
+                                             0x00, 0x00, 0x00}},
+    {"Battery Protect",
+     0xA3B0,
+     BatteryProtect,
+     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x0A, 0x0C, 0x00,
+      0x08, 0x00, 0x00, 0x00, 0xFF, 0x31, 0x43, 0x00, 0x00, 0x00}}};
 
 int getNoTestData() { return sizeof(testData) / sizeof(VictronTestData); }
 
@@ -107,6 +112,11 @@ VictronBleSimulationData createDeviceFromTestData(int idx) {
 
     case VictronDeviceType::SolarCharger: {
       VictronSolarCharger vbm(&testData[idx].decrypted[0], testData[idx].model);
+      vbm.toJson(obj);
+    } break;
+
+    case VictronDeviceType::BatteryProtect: {
+      VictronBatteryProtect vbm(&testData[idx].decrypted[0], testData[idx].model);
       vbm.toJson(obj);
     } break;
 

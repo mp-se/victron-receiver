@@ -49,7 +49,7 @@ enum VictronDeviceType {
   InverterRS = 0x06,
   GxDevice = 0x07,
   AcCharger = 0x08,  // Supported
-  SmartBatteryProtect = 0x09,
+  BatteryProtect = 0x09,
   LynxSmartBMS = 0x0a,
   MultiRS = 0x0b,
   VeBus = 0x0c,

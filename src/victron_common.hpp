@@ -48,15 +48,16 @@ enum VictronDeviceType {
   SmartLithium = 0x05,
   InverterRS = 0x06,
   GxDevice = 0x07,
-  AcCharger = 0x08,  // Supported
-  BatteryProtect = 0x09,
+  AcCharger = 0x08,       // Supported
+  BatteryProtect = 0x09,  // Supported
   LynxSmartBMS = 0x0a,
   MultiRS = 0x0b,
   VeBus = 0x0c,
   DcEnergyMeter = 0x0d
 };
 
-enum VictronDeviceState {
+namespace VictronDeviceState {
+enum State {
   Off = 0,
   LowPower = 1,
   Fault = 2,
@@ -71,10 +72,33 @@ enum VictronDeviceState {
   RepeatedAbsorption = 246,
   Recondition = 247,
   BatterySafe = 248,
+  Active = 249,
   ExternalControl = 252
 };
+}  // namespace VictronDeviceState
 
-enum VictronChargerError {
+namespace VictronAlarmReason {
+enum AlarmReason {
+  NoAlarm = 0,
+  LowVoltage = 1,
+  HighVoltage = 2,
+  LowSoc = 4,
+  LowStarterVoltage = 8,
+  HighStarterVoltage = 16,
+  LowTemperature = 32,
+  HighTemperature = 64,
+  MidVoltage = 128,
+  Overload = 256,
+  DcRipple = 512,
+  LowVACOut = 1024,
+  HighVACOut = 2048,
+  ShortCircuit = 4096,
+  BmsLockout = 8192,
+};
+}  // namespace VictronAlarmReason
+
+namespace VictronChargerError {
+enum ChargerError {
   NoError = 0,
   TemperatureBatteryHigh = 1,
   VoltageHigh = 2,
@@ -143,6 +167,7 @@ enum VictronChargerError {
   InternalSupplyC = 212,
   InternalSupplyD = 215,
 };
+}  // namespace VictronChargerError
 
 // Must use the "packed" attribute to make sure the compiler doesn't add any
 // padding to deal with word alignment.
@@ -174,6 +199,7 @@ class VictronDevice {
   String deviceStateToString(uint8_t state);
   String deviceChargerErrorToString(uint8_t error);
   String offReasonToString(uint32_t offReason);
+  String deviceAlarmReasonToString(uint16_t alarm);
 
  public:
   VictronDevice() {}

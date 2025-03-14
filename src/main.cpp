@@ -33,12 +33,12 @@ SOFTWARE.
 #include <looptimer.hpp>
 #include <main.hpp>
 #include <pushtarget.hpp>
+#include <resources.hpp>
 #include <serialws.hpp>
 #include <uptime.hpp>
 #include <utils.hpp>
 #include <webserver.hpp>
 #include <wificonnection.hpp>
-#include <resources.hpp>
 
 constexpr auto CFG_APPNAME = "victron";
 constexpr auto CFG_FILENAME = "/victron.json";

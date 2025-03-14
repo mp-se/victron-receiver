@@ -92,6 +92,7 @@ class VictronInverter : public VictronDevice {
     }
 
     doc["alarm"] = getAlarm();
+    doc["alarm_message"] = deviceAlarmReasonToString(getAlarm());
 
     if (!isnan(getBatteryVoltage()))
       doc["battery_voltage"] =

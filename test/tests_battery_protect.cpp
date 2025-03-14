@@ -42,14 +42,39 @@ test(battprot_test1) {
   assertEqual(v.getError(), 0);
   assertEqual(v.getState(), 0);
   assertEqual(v.getOutputState(), 0);
-  assertEqual(v.getAlarmReason(), 0);
-  assertEqual(v.getWarningReason(),8);
+  assertEqual(v.getAlarm(), 0);
+  assertEqual(v.getWarning(),0);
   data = v.getOffReasons();
-  assertEqual(data, 10);
+  assertEqual(data, 8);
   data = v.getInputVoltage() * 100;
   assertEqual(data, 2676);
   data = v.getOutputVoltage() * 100;
   assertEqual(data, 12);
+}
+
+test(battprot_test2) {
+  // These values has been validated with the App
+  VictronTestData testData = {
+      "Battery Protect",
+      0xA3B0,
+      BatteryProtect,
+      {0xF9,0x01,0x00,0x00,0x00,0x00,0x00,0x24,0x0A,0x23,0x0A,0x00,0x00,0x00,0x00,0x00,0x89,0x9E,0x00,0x00,0x00}};
+  VictronBatteryProtect v(&testData.decrypted[0], testData.model);
+  uint16_t data;
+
+  assertEqual(v.getDeviceName(), "Battery Protect");
+  assertEqual(v.getModelNo(), 0xA3B0);
+  assertEqual(v.getError(), 0);
+  assertEqual(v.getState(), 249);
+  assertEqual(v.getOutputState(), 1);
+  assertEqual(v.getAlarm(), 0);
+  assertEqual(v.getWarning(),0);
+  data = v.getOffReasons();
+  assertEqual(data, 0);
+  data = v.getInputVoltage() * 100;
+  assertEqual(data, 2596);
+  data = v.getOutputVoltage() * 100;
+  assertEqual(data, 2595);
 }
 
 // EOF

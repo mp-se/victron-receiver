@@ -45,8 +45,8 @@ class VictronBatteryProtect : public VictronDevice {
  private:
   uint8_t _state, _outputState;
   uint8_t _error;
-  uint16_t _alarmReason;
-  uint16_t _warningReason;
+  uint16_t _alarm;
+  uint16_t _warning;
   float _inputVoltage, _outputVoltage;
   uint32_t _offReason;
 
@@ -59,13 +59,13 @@ class VictronBatteryProtect : public VictronDevice {
     _state = br.readUnsigned(8);        // 0xFF = N/A
     _outputState = br.readUnsigned(8);  // 0xFF = N/A
     _error = br.readUnsigned(8);        // 0xFF = N/A
-    _alarmReason = br.readUnsigned(16);
-    _warningReason = br.readUnsigned(16);
+    _alarm = br.readUnsigned(16);
+    _warning = br.readUnsigned(16);
 
     uint16_t inputVoltage = br.readSigned(16);     // 0x7FFF = N/A
     uint16_t outputVoltage = br.readUnsigned(16);  // 0xFFFF = N/A
 
-    _warningReason = br.readUnsigned(32);
+    _offReason = br.readUnsigned(32);
 
     _inputVoltage = (inputVoltage & 0x7FFF) != 0x7FFF
                         ? static_cast<float>(inputVoltage) / 100
@@ -79,16 +79,16 @@ class VictronBatteryProtect : public VictronDevice {
                  "alarm=%d warning=%d inputVolt=%F V outputVolt=%F V"
                  "offReason=%d" CR),
                getDeviceName().c_str(), getModelNo(), getState(), getError(),
-               getOutputState(), getAlarmReason(), getWarningReason(),
-               getInputVoltage(), getOutputVoltage(), getOffReasons());
+               getOutputState(), getAlarm(), getWarning(), getInputVoltage(),
+               getOutputVoltage(), getOffReasons());
   }
 
   uint8_t getState() { return _state; }
   uint8_t getOutputState() { return _outputState; }
   uint8_t getError() { return _error; }
 
-  uint16_t getAlarmReason() { return _alarmReason; }
-  uint16_t getWarningReason() { return _warningReason; }
+  uint16_t getAlarm() { return _alarm; }
+  uint16_t getWarning() { return _warning; }
 
   float getInputVoltage() { return _inputVoltage; }
   float getOutputVoltage() { return _outputVoltage; }
@@ -122,8 +122,10 @@ class VictronBatteryProtect : public VictronDevice {
       doc["output_voltage"] =
           serialized(String(getOutputVoltage(), DECIMALS_VOLTAGE));
 
-    doc["alarm_reason"] = getAlarmReason();
-    doc["warning_reason"] = getWarningReason();
+    doc["alarm"] = getAlarm();
+    doc["alarm_message"] = deviceAlarmReasonToString(getAlarm());
+    doc["warning"] = getWarning();
+    doc["warning_message"] = deviceAlarmReasonToString(getWarning());
     doc["off_reason"] = getOffReasons();
     doc["off_reason_message"] = offReasonToString(getOffReasons());
   }

@@ -9,6 +9,10 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 # Changes
 
+* 0.5.0 - Added support for Battery Protect and Update UI dependecies
+
+* 0.4.0 - Revert to Arduino 2.x for stability reasons. Changed packet parsing to simplify decoding and updated dependecies.
+
 * 0.3.0 - Upgrade to latest libraries and Arduino 3.0.7, Added configuration backup feature.
 
 * 0.2.5 - Version that correcly decode the first few devices (AC Charger, DCDC Charger, Battery Monitor, Smart Shunt & Solar Charger) with Home Assistant API integration (MQTT + REST API). 
@@ -42,6 +46,8 @@ Currently there is support for the following Victron Devices mainly since these 
     - Charger with one channel has been tested and validated.
 * Solar Charger: BlueSolar MPPT
     - Need help to validate data during charge cycle.
+* Smart Battery Protect
+    - Tested and working
 
 The following types can be supported if I can receive some test data.
 
@@ -49,7 +55,6 @@ The following types can be supported if I can receive some test data.
 * SmartLithium
 * InverterRS
 * GxDevice
-* BatteryProtect
 * LynxSmartBMS
 * MultiRS
 * VeBus

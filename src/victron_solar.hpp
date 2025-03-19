@@ -61,7 +61,7 @@ class VictronSolarCharger : public VictronDevice {
     int16_t batteryCurrent = br.readSigned(16);
     uint16_t yieldToday = br.readUnsigned(16);
     uint16_t pvPower = br.readUnsigned(16);
-    uint16_t loadCurrent = br.readUnsigned(16);
+    uint16_t loadCurrent = br.readUnsigned(9);
 
     _batteryVoltage = (batteryVoltage & 0x7FFF) != 0x7FFF
                           ? static_cast<float>(batteryVoltage & 0x7FFF) / 100

@@ -123,6 +123,7 @@ class VictronShunt : public VictronDevice {
     VictronDevice::toJson(doc);
 
     doc["alarm"] = getAlarm();
+    doc["alarm_message"] = deviceAlarmReasonToString(getAlarm());
 
     if (!isnan(getBatteryVoltage()))
       doc["battery_voltage"] =

@@ -32,181 +32,220 @@ SOFTWARE.
 #include <victron.hpp>
 
 String VictronDevice::deviceStateToString(uint8_t state) {
-  switch ((VictronDeviceState)state) {
-    case VictronDeviceState::Off:
+  switch (state) {
+    case VictronDeviceState::State::Off:
       return "Off";
-    case VictronDeviceState::LowPower:
+    case VictronDeviceState::State::LowPower:
       return "Low Power";
-    case VictronDeviceState::Fault:
+    case VictronDeviceState::State::Fault:
       return "Fault";
-    case VictronDeviceState::Bulk:
+    case VictronDeviceState::State::Bulk:
       return "Bulk";
-    case VictronDeviceState::Absorption:
+    case VictronDeviceState::State::Absorption:
       return "Absorption";
-    case VictronDeviceState::Float:
+    case VictronDeviceState::State::Float:
       return "Float";
-    case VictronDeviceState::Storage:
+    case VictronDeviceState::State::Storage:
       return "Storage";
-    case VictronDeviceState::EqualizeManual:
+    case VictronDeviceState::State::EqualizeManual:
       return "Equalize Manual";
-    case VictronDeviceState::Inverting:
+    case VictronDeviceState::State::Inverting:
       return "Inverting";
-    case VictronDeviceState::PowerSupply:
+    case VictronDeviceState::State::PowerSupply:
       return "Power Supply";
-    case VictronDeviceState::StartingUp:
+    case VictronDeviceState::State::StartingUp:
       return "Starting Up";
-    case VictronDeviceState::RepeatedAbsorption:
+    case VictronDeviceState::State::RepeatedAbsorption:
       return "Repeated Absorption";
-    case VictronDeviceState::Recondition:
+    case VictronDeviceState::State::Recondition:
       return "Recondition";
-    case VictronDeviceState::BatterySafe:
+    case VictronDeviceState::State::BatterySafe:
       return "Battery Safe";
-    case VictronDeviceState::ExternalControl:
+    case VictronDeviceState::State::Active:
+      return "Active";
+    case VictronDeviceState::State::ExternalControl:
       return "External Control";
   }
 
-  return "Unknown";
+  return "";
+}
+
+String VictronDevice::deviceAlarmReasonToString(uint16_t alarm) {
+  switch (alarm) {
+    case VictronAlarmReason::AlarmReason::NoAlarm:
+      return "No alarm";
+    case VictronAlarmReason::AlarmReason::LowVoltage:
+      return "Low voltage";
+    case VictronAlarmReason::AlarmReason::HighVoltage:
+      return "High voltage";
+    case VictronAlarmReason::AlarmReason::LowSoc:
+      return "Low SOC";
+    case VictronAlarmReason::AlarmReason::LowStarterVoltage:
+      return "Low starter voltage";
+    case VictronAlarmReason::AlarmReason::HighStarterVoltage:
+      return "High starter voltage";
+    case VictronAlarmReason::AlarmReason::LowTemperature:
+      return "Low temperature";
+    case VictronAlarmReason::AlarmReason::HighTemperature:
+      return "High temperature";
+    case VictronAlarmReason::AlarmReason::MidVoltage:
+      return "Mid voltage";
+    case VictronAlarmReason::AlarmReason::Overload:
+      return "Overload";
+    case VictronAlarmReason::AlarmReason::DcRipple:
+      return "DC ripple";
+    case VictronAlarmReason::AlarmReason::LowVACOut:
+      return "Low VAC out";
+    case VictronAlarmReason::AlarmReason::HighVACOut:
+      return "High VAC out";
+    case VictronAlarmReason::AlarmReason::ShortCircuit:
+      return "Short circuit";
+    case VictronAlarmReason::AlarmReason::BmsLockout:
+      return "BMS lockout";
+  }
+
+  return "";
 }
 
 String VictronDevice::deviceChargerErrorToString(uint8_t error) {
-  switch ((VictronChargerError)error) {
-    case VictronChargerError::NoError:
+  switch (error) {
+    case VictronChargerError::ChargerError::NoError:
       return "0 - No error";
-    case VictronChargerError::TemperatureBatteryHigh:
+    case VictronChargerError::ChargerError::TemperatureBatteryHigh:
       return "1 - Battery temperature too high";
-    case VictronChargerError::VoltageHigh:
+    case VictronChargerError::ChargerError::VoltageHigh:
       return "2 - Battery voltage too high";
-    case VictronChargerError::RemoteTemperatureA:
+    case VictronChargerError::ChargerError::RemoteTemperatureA:
       return "3 - Remote temperature sensor failure (auto-reset)";
-    case VictronChargerError::RemoteTemperatureB:
+    case VictronChargerError::ChargerError::RemoteTemperatureB:
       return "4 - Remote temperature sensor failure (auto-reset)";
-    case VictronChargerError::RemoteTemperatureC:
+    case VictronChargerError::ChargerError::RemoteTemperatureC:
       return "5 - Remote temperature sensor failure (not auto-reset)";
-    case VictronChargerError::RemoteBatteryA:
+    case VictronChargerError::ChargerError::RemoteBatteryA:
       return "6 - Remote battery voltage sense failure";
-    case VictronChargerError::RemoteBatteryB:
+    case VictronChargerError::ChargerError::RemoteBatteryB:
       return "7 - Remote battery voltage sense failure";
-    case VictronChargerError::RemoteBatteryC:
+    case VictronChargerError::ChargerError::RemoteBatteryC:
       return "8 - Remote battery voltage sense failure";
-    case VictronChargerError::HighRipple:
+    case VictronChargerError::ChargerError::HighRipple:
       return "11 - Battery high ripple voltage";
-    case VictronChargerError::TemperatureBatteryLow:
+    case VictronChargerError::ChargerError::TemperatureBatteryLow:
       return "14 - Battery temperature too low";
-    case VictronChargerError::TemperatureCharger:
+    case VictronChargerError::ChargerError::TemperatureCharger:
       return "17 - Charger temperature too high";
-    case VictronChargerError::OverCurrent:
+    case VictronChargerError::ChargerError::OverCurrent:
       return "18 - Charger over current";
-    case VictronChargerError::BulkTime:
+    case VictronChargerError::ChargerError::BulkTime:
       return "20 - Bulk time limit exceeded";
-    case VictronChargerError::CurrentSensor:
+    case VictronChargerError::ChargerError::CurrentSensor:
       return "21 - Current sensor issue (sensor bias/sensor broken)";
-    case VictronChargerError::InternalTemperatureA:
+    case VictronChargerError::ChargerError::InternalTemperatureA:
       return "22 - Internal temperature sensor failure";
-    case VictronChargerError::InternalTemperatureB:
+    case VictronChargerError::ChargerError::InternalTemperatureB:
       return "23 - Internal temperature sensor failure";
-    case VictronChargerError::Fan:
+    case VictronChargerError::ChargerError::Fan:
       return "24 - Fan failure";
-    case VictronChargerError::Overheated:
+    case VictronChargerError::ChargerError::Overheated:
       return "26 - Terminals overheated";
-    case VictronChargerError::ShortCircuit:
+    case VictronChargerError::ChargerError::ShortCircuit:
       return "27 - Charger short circuit";
-    case VictronChargerError::ConverterIssue:
+    case VictronChargerError::ChargerError::ConverterIssue:
       return "28 - Power stage issue Converter issue (dual converter models "
              "only)";
-    case VictronChargerError::OverCharge:
+    case VictronChargerError::ChargerError::OverCharge:
       return "29 - Over-Charge protection";
-    case VictronChargerError::InputVoltage:
+    case VictronChargerError::ChargerError::InputVoltage:
       return "33 - Input voltage too high (solar panel) PV over-voltage";
-    case VictronChargerError::InputCurrent:
+    case VictronChargerError::ChargerError::InputCurrent:
       return "34 - Input current too high (solar panel) PV over-current";
-    case VictronChargerError::InputPower:
+    case VictronChargerError::ChargerError::InputPower:
       return "35 - PV over-power";
-    case VictronChargerError::InputShutdownVoltage:
+    case VictronChargerError::ChargerError::InputShutdownVoltage:
       return "38 - Input shutdown (due to excessive battery voltage)";
-    case VictronChargerError::InputShutdownCurrent:
+    case VictronChargerError::ChargerError::InputShutdownCurrent:
       return "39 - Input shutdown (due to current flow during off mode)";
-    case VictronChargerError::InputShutdownFailure:
+    case VictronChargerError::ChargerError::InputShutdownFailure:
       return "40 - PV Input failed to shutdown";
-    case VictronChargerError::InverterShutdown41:
+    case VictronChargerError::ChargerError::InverterShutdown41:
       return "41 - Inverter shutdown (PV isolation)";
-    case VictronChargerError::InverterShutdown42:
+    case VictronChargerError::ChargerError::InverterShutdown42:
       return "42 - Inverter shutdown (PV isolation)";
-    case VictronChargerError::InverterShutdown43:
+    case VictronChargerError::ChargerError::InverterShutdown43:
       return "43 - Inverter shutdown (Ground Fault)";
-    case VictronChargerError::InverterOverload:
+    case VictronChargerError::ChargerError::InverterOverload:
       return "50 - Inverter overload";
-    case VictronChargerError::InverterTemperature:
+    case VictronChargerError::ChargerError::InverterTemperature:
       return "51 - Inverter temperature too high";
-    case VictronChargerError::InverterPeakCurrent:
+    case VictronChargerError::ChargerError::InverterPeakCurrent:
       return "52 - Inverter peak current";
-    case VictronChargerError::InverterOutputVoltageA:
+    case VictronChargerError::ChargerError::InverterOutputVoltageA:
       return "53 - Inverter output voltage";
-    case VictronChargerError::InverterOutputVoltageB:
+    case VictronChargerError::ChargerError::InverterOutputVoltageB:
       return "54 - Inverter output voltage";
-    case VictronChargerError::InverterSelfTestA:
+    case VictronChargerError::ChargerError::InverterSelfTestA:
       return "55 - Inverter self test failed";
-    case VictronChargerError::InverterSelfTestB:
+    case VictronChargerError::ChargerError::InverterSelfTestB:
       return "56 - Inverter self test failed";
-    case VictronChargerError::InverterAC:
+    case VictronChargerError::ChargerError::InverterAC:
       return "57 - Inverter ac voltage on output";
-    case VictronChargerError::InverterSelfTestC:
+    case VictronChargerError::ChargerError::InverterSelfTestC:
       return "58 - Inverter self test failed";
-    case VictronChargerError::Communication:
+    case VictronChargerError::ChargerError::Communication:
       return "65 - Communication warning Lost communication with one of "
              "devices";
-    case VictronChargerError::Synchronisation:
+    case VictronChargerError::ChargerError::Synchronisation:
       return "66 - Incompatible device Synchronised charging device "
              "configuration issue";
-    case VictronChargerError::Bms:
+    case VictronChargerError::ChargerError::Bms:
       return "67 - BMS Connection lost";
-    case VictronChargerError::NetworkA:
+    case VictronChargerError::ChargerError::NetworkA:
       return "68 - Network misconfigured";
-    case VictronChargerError::NetworkB:
+    case VictronChargerError::ChargerError::NetworkB:
       return "69 - Network misconfigured";
-    case VictronChargerError::NetworkC:
+    case VictronChargerError::ChargerError::NetworkC:
       return "70 - Network misconfigured";
-    case VictronChargerError::NetworkD:
+    case VictronChargerError::ChargerError::NetworkD:
       return "71 - Network misconfigured";
-    case VictronChargerError::PvInputShutdown80:
+    case VictronChargerError::ChargerError::PvInputShutdown80:
       return "80 - PV Input shutdown";
-    case VictronChargerError::PvInputShutdown81:
+    case VictronChargerError::ChargerError::PvInputShutdown81:
       return "81 - PV Input shutdown";
-    case VictronChargerError::PvInputShutdown82:
+    case VictronChargerError::ChargerError::PvInputShutdown82:
       return "82 - PV Input shutdown";
-    case VictronChargerError::PvInputShutdown83:
+    case VictronChargerError::ChargerError::PvInputShutdown83:
       return "83 - PV Input shutdown";
-    case VictronChargerError::PvInputShutdown84:
+    case VictronChargerError::ChargerError::PvInputShutdown84:
       return "84 - PV Input shutdown";
-    case VictronChargerError::PvInputShutdown85:
+    case VictronChargerError::ChargerError::PvInputShutdown85:
       return "85 - PV Input shutdown";
-    case VictronChargerError::PvInputShutdown86:
+    case VictronChargerError::ChargerError::PvInputShutdown86:
       return "86 - PV Input shutdown";
-    case VictronChargerError::PvInputShutdown87:
+    case VictronChargerError::ChargerError::PvInputShutdown87:
       return "87 - PV Input shutdown";
-    case VictronChargerError::CpuTemperature:
+    case VictronChargerError::ChargerError::CpuTemperature:
       return "114 - CPU temperature too high";
-    case VictronChargerError::CalibrationLost:
+    case VictronChargerError::ChargerError::CalibrationLost:
       return "116 - Factory calibration data lost";
-    case VictronChargerError::Firmware:
+    case VictronChargerError::ChargerError::Firmware:
       return "117 - Invalid/incompatible firmware";
-    case VictronChargerError::Settings:
+    case VictronChargerError::ChargerError::Settings:
       return "119 - Settings data lost";
-    case VictronChargerError::TesterFail:
+    case VictronChargerError::ChargerError::TesterFail:
       return "121 - Tester fail";
-    case VictronChargerError::InternalDcVoltageA:
+    case VictronChargerError::ChargerError::InternalDcVoltageA:
       return "200 - Internal DC voltage error";
-    case VictronChargerError::InternalDcVoltageB:
+    case VictronChargerError::ChargerError::InternalDcVoltageB:
       return "201 - Internal DC voltage error";
-    case VictronChargerError::SelfTest:
+    case VictronChargerError::ChargerError::SelfTest:
       return "202 - PV residual current sensor self-test failure Internal "
              "GFCI sensor error";
-    case VictronChargerError::InternalSupplyA:
+    case VictronChargerError::ChargerError::InternalSupplyA:
       return "203 - Internal supply voltage error";
-    case VictronChargerError::InternalSupplyB:
+    case VictronChargerError::ChargerError::InternalSupplyB:
       return "205 - Internal supply voltage error";
-    case VictronChargerError::InternalSupplyC:
+    case VictronChargerError::ChargerError::InternalSupplyC:
       return "212 - Internal supply voltage error";
-    case VictronChargerError::InternalSupplyD:
+    case VictronChargerError::ChargerError::InternalSupplyD:
       return "215 - Internal supply voltage error";
   }
 
@@ -230,9 +269,6 @@ String VictronDevice::offReasonToString(uint32_t offReason) {
   }
   if (offReason & 0x00000010) {
     s += "Protection active. ";
-  }
-  if (offReason & 0x00000001) {
-    s += "No input power. ";
   }
   if (offReason & 0x00000020) {
     s += "Pay as you go out of credit. ";

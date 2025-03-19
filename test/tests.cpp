@@ -58,6 +58,7 @@ void setup() {
   // TestRunner::exclude("inverter_*");
   // TestRunner::exclude("ac_*");
   // TestRunner::exclude("solar_*");
+  // TestRunner::exclude("battprot_*");
 }
 
 void loop() {

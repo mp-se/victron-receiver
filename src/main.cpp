@@ -33,6 +33,7 @@ SOFTWARE.
 #include <looptimer.hpp>
 #include <main.hpp>
 #include <pushtarget.hpp>
+#include <resources.hpp>
 #include <serialws.hpp>
 #include <uptime.hpp>
 #include <utils.hpp>
@@ -245,6 +246,16 @@ void controller() {
       }
     }
   }
+
+  // Send some data connected to the device itself
+  JsonDocument doc2;
+
+  doc2[PARAM_APP_VER] = CFG_APPVER;
+  doc2[PARAM_APP_BUILD] = CFG_GITREV;
+  doc2[PARAM_PUSH_RESEND_TIME] = myConfig.getPushResendTime();
+
+  JsonObject obj2 = doc2.as<JsonObject>();
+  push.sendAll("victron_receiver", myConfig.getMDNS(), obj2);
 }
 
 void renderDisplayHeader() {

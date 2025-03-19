@@ -6,6 +6,12 @@ class BitReader:
         self._data = data
         self._index = 0
 
+    def get_index(self) -> int:
+        return self._index
+
+    def set_index(self, index: int):
+        self._index = index
+
     def read_bit(self) -> int:
         bit = (self._data[self._index >> 3] >> (self._index & 7)) & 1
         self._index += 1
@@ -50,7 +56,7 @@ yield_today = reader.read_unsigned_int(16) / 10
 # Current power from solar in 1W increments
 solar_power = reader.read_unsigned_int(16)
 # External device load in 0.1A increments
-external_device_load = reader.read_unsigned_int(9) /10
+external_device_load = reader.read_unsigned_int(9) / 10
 
 print("State:", charge_state)
 print("Error:", charger_error)
@@ -59,6 +65,40 @@ print("Batt A:", battery_charging_current)
 print("Yield:", yield_today)
 print("PV:", solar_power)
 print("Load:", external_device_load)
+
+# 19.14 V is often 16, 15, 14, 12, 13 bits
+# 20 C or 60 is often 16 or 7 bits (0x7f is NA)
+
+# extra1 = reader.read_unsigned_int(7)
+# idx = reader.get_index()
+# extra2 = reader.read_unsigned_int(7)
+# reader.set_index(idx)
+# extra3 = reader.read_unsigned_int(7)
+# reader.set_index(idx)
+# extra4 = reader.read_unsigned_int(7)
+# reader.set_index(idx)
+# extra5 = reader.read_unsigned_int(13)
+# reader.set_index(idx)
+# extra6 = reader.read_unsigned_int(12)
+
+# print("Extra", extra1, hex(extra1))
+# print("Extra", extra2, hex(extra2))
+# print("Extra", extra3, hex(extra3))
+# print("Extra", extra4, hex(extra4))
+# print("Extra", extra5, hex(extra5))
+# print("Extra", extra6, hex(extra6))
+
+# reader.set_index(idx)
+# extra1 = reader.read_unsigned_int(16)
+# extra2 = reader.read_unsigned_int(16)
+# extra3 = reader.read_unsigned_int(16)
+# extra4 = reader.read_unsigned_int(16)
+# print("Extra", extra1, hex(extra1))
+# print("Extra", extra2, hex(extra2))
+# print("Extra", extra3, hex(extra3))
+# print("Extra", extra4, hex(extra4))
+# print()
+
 
 # Reading data related to: AC Charger
 # -------------------------------------------------------------------------------------------

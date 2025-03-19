@@ -24,6 +24,7 @@ SOFTWARE.
 #include <MQTT.h>
 
 #include <config.hpp>
+#include <cstdio>
 #include <helper.hpp>
 #include <main.hpp>
 #include <pushtarget.hpp>

@@ -58,7 +58,6 @@ class BitReader {
 
     for (int i = 0; i < noBits; i++) {
       value |= readBit() << i;
-      ;
     }
 
     return value;

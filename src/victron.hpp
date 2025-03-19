@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2024 Magnus
+Copyright (c) 2024-2025 Magnus
 
 Based on code/ideas from these projects:
 https://github.com/hoberman/Victron_BLE_Advertising_example
@@ -33,8 +33,9 @@ SOFTWARE.
 #define SRC_VICTRON_HPP_
 
 #include <victron_ac.hpp>             // AC Charger
-#include <victron_battmon.hpp>        // Smart BatteryMon (Subset of data)
+#include <victron_battmon.hpp>        // Smart Battery Monitor variant
 #include <victron_battmon_shunt.hpp>  // BatteryMon (Complete)
+#include <victron_battprotect.hpp>    // Smart BatteryProtect
 #include <victron_common.hpp>
 #include <victron_dcdc.hpp>   // DC-DC Charger
 #include <victron_solar.hpp>  // Solar Charger

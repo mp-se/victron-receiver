@@ -9,6 +9,8 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 # Changes
 
+* 0.6.0 - Switched webserver to allow for admin password and encrypted connection using SSL. 
+
 * 0.5.0 - Added support for Battery Protect and Update UI dependecies
 
 * 0.4.0 - Revert to Arduino 2.x for stability reasons. Changed packet parsing to simplify decoding and updated dependecies.
@@ -132,6 +134,48 @@ The naming of the sensors using the REST API is as follows. Units will be added 
 ```
 
 When using the REST API each attribute will be a standalone sensor value and not grouped into entities.
+
+# How to create a self signed certificate that is accepted
+
+SSL is enabled by uploading a server.key and server.crt file to the device. Without these files the device will start without SSL enabled.
+
+1. Download and install openssl
+
+2. Run the following commands
+
+```bash
+# Generate the device key
+openssl genpkey -out server.key -algorithm RSA -pkeyopt rsa_keygen_bits:2048
+
+# Create a signing request
+openssl req -new -key server.key -out server.csr
+
+# Sign the request
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+
+# Optional, validate the certificate
+openssl x509 -in server.crt -noout -issuer -subject
+```
+
+3. Upload the `server.key` and `server.crt` to the device and restart it (Option under the tools section). It should the start the webserver in SSL mode.
+
+## MacOS
+
+4. Open `KeyChain Access` application and use `File -> Import Items` to import the `server.crt`file. 
+5. Find the certificate and set trust to `Always Trust` for the `SSL` option.
+6. The certificate should now be trused by your browser.
+
+## Windows
+
+4. Open `certmgr.msc` from the commandline
+5. Navigate to `Trusted Root Certificate Authorities -> Certificates` and use `Import` to import the `server.crt`file Follow the wizard.
+6. The certificate should now be trused by your browser.
+
+# How to reset admin password
+
+The admin password can be reset by starting the device in wifi setup mode (create access point), connecting to that network and open the web interface. Using this approach the admin password will not be used. 
+
+You can enter wifi setup mode by doing a few resets before the device is fully started.
 
 # Thanks
 

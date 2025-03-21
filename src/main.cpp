@@ -34,7 +34,7 @@ SOFTWARE.
 #include <main.hpp>
 #include <pushtarget.hpp>
 #include <resources.hpp>
-#include <serialws.hpp>
+#include <serialws2.hpp>
 #include <uptime.hpp>
 #include <utils.hpp>
 #include <webserver.hpp>

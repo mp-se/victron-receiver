@@ -90,6 +90,7 @@ esp_err_t VictronReceiverWebServer::webHandleFactoryDefaults(
   response.send();
   delay(500);
   ESP_RESET();
+  return ESP_OK;
 }
 
 esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request) {
@@ -101,6 +102,7 @@ esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request) {
     Log.notice(F("WEB : Rebooting using fallback..." CR));
     delay(500);
     ESP_RESET();
+    return ESP_OK;
   }
 
   PsychicJsonResponse response(request);

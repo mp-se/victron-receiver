@@ -5,6 +5,7 @@ on:
   push:
     branches: 
       - dev
+      - ssl
 
 jobs:
   pio-build:

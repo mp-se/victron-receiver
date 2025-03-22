@@ -67,11 +67,11 @@ class VictronBatteryProtect : public VictronDevice {
 
     _offReason = br.readUnsigned(32);
 
-    _inputVoltage = (inputVoltage & 0x7FFF) != 0x7FFF
+    _inputVoltage = (inputVoltage) != 0x7FFF
                         ? static_cast<float>(inputVoltage) / 100
                         : NAN;  // 0.01 A increments
 
-    _outputVoltage = (outputVoltage & 0xFFFF) != 0xFFFF
+    _outputVoltage = (outputVoltage) != 0xFFFF
                          ? static_cast<float>(outputVoltage) / 100
                          : NAN;  // 0.01 A increments
 

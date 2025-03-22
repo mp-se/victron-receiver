@@ -63,12 +63,12 @@ class VictronInverter : public VictronDevice {
     int16_t acVoltage = br.readSigned(16);
     uint16_t acCurrent = br.readUnsigned(16);
 
-    _batteryVoltage = (batteryVoltage & 0x7FFF) != 0x7FFF
-                          ? static_cast<float>(batteryVoltage & 0x7FFF) / 100
+    _batteryVoltage = (batteryVoltage) != 0x7FFF
+                          ? static_cast<float>(batteryVoltage) / 100
                           : NAN;  // 10 mV increments
     _acPower = acPower != 0xFFFF ? static_cast<float>(acPower) : NAN;
-    _acVoltage = (acVoltage & 0x7FFF) != 0x7FFF
-                     ? static_cast<float>(acVoltage & 0x7FFF) / 100
+    _acVoltage = (acVoltage) != 0x7FFF
+                     ? static_cast<float>(acVoltage) / 100
                      : NAN;  // 10 mV increments
     _acCurrent = (acCurrent & 0x7FF) != 0x7FF
                      ? static_cast<float>(acCurrent & 0x7FF) / 10

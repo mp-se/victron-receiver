@@ -27,7 +27,7 @@ SOFTWARE.
 #include <testdata.hpp>
 #include <victron_solar.hpp>
 
-/*test(solar_test1) {
+test(solar_test1) {
   VictronTestData testData = {
       "Solar Charger",
       0xA042,
@@ -100,7 +100,7 @@ test(solar_test3) {
   assertEqual(isnan(v.getLoadCurrent()), true);
   data = v.getPvPower() * 100;
   assertEqual(data, 26500);
-}*/
+}
 
 test(solar_test4) {
   VictronTestData testData = {"Solar Charger",
@@ -124,6 +124,31 @@ test(solar_test4) {
   assertEqual(isnan(v.getLoadCurrent()), false);
   data = v.getPvPower() * 100;
   assertEqual(data, 0);
+}
+
+test(solar_test5) {
+  VictronTestData testData = {"Solar Charger",
+    0xA075,
+                              SolarCharger,
+                              {0x03,0x00,0xF3,0x04,0xFE,0xFF,0x04,0x00,0x02,0x00,0x04,0xFE,0xFF,0xFF,0xFF,0xFF,0x5E,0x56,0x00,0x00,0x00
+                              }};
+  VictronSolarCharger v(&testData.decrypted[0], testData.model);
+  uint16_t data;
+
+  assertEqual(v.getDeviceName(), "Solar Charger");
+  assertEqual(v.getModelNo(), 0xA075);
+  assertEqual(v.getError(), 0);
+  assertEqual(v.getState(), 3);
+  data = v.getBatteryVoltage() * 100;
+  assertEqual(data, 1267);
+  data = v.getBatteryCurrent() * 100;
+  assertEqual(data, 65516);
+  data = v.getYieldToday() * 100;
+  assertEqual(data, 4);
+  data = v.getLoadCurrent() * 10;
+  assertEqual(data, 4);
+  data = v.getPvPower() * 100;
+  assertEqual(data, 200);
 }
 
 // EOF

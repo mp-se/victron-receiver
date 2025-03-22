@@ -65,8 +65,8 @@ class VictronMultiRS : public VictronDevice {
     uint16_t pvPower = br.readUnsigned(16);
     uint16_t yieldToday = br.readUnsigned(16);
 
-    _batteryCurrent = (batteryCurrent & 0x7FFF) != 0x7FFF
-                          ? static_cast<float>(batteryCurrent & 0x7FFF) / 10
+    _batteryCurrent = (batteryCurrent) != 0x7FFF
+                          ? static_cast<float>(batteryCurrent) / 10
                           : NAN;  // 0.1 A increments
     _batteryVoltage = (batteryVoltage & 0x7FFF) != 0x7FFF
                           ? static_cast<float>(batteryVoltage & 0x7FFF) / 100

@@ -36,6 +36,7 @@ test(shunt_test1) {
                                         0x00, 0x00, 0x00}};
   VictronShunt v(&testData.decrypted[0], testData.model);
   uint16_t data;
+  int16_t data2;
 
   assertEqual(v.getDeviceName(), "Shunt");
   assertEqual(v.getModelNo(), 0xA389);
@@ -44,14 +45,14 @@ test(shunt_test1) {
   assertEqual(v.getRemaningMins(), 0);
   data = v.getSoc() * 10;
   assertEqual(data, 996);
-  data = -v.getBatteryCurrent() * 1000;
-  assertEqual(data, 0);
+  data2 = v.getBatteryCurrent() * 1000;
+  assertEqual(data2, 0);
   data = v.getBatteryVoltage() * 100;
   assertEqual(data, 1420);
   data = v.getAux() * 100;
   assertEqual(data, 1308);
-  data = -v.getConsumedAh() * 10;
-  assertEqual(data, 11);
+  data2 = v.getConsumedAh() * 10;
+  assertEqual(data2, 11);
 }
 
 test(shunt_test2) {
@@ -60,6 +61,7 @@ test(shunt_test2) {
       "Shunt", 0xA389, BatteryMonitor, {0xDB,0x00,0x0A,0x05,0x00,0x00,0xEF,0x04,0x20,0xBF,0xFF,0x85,0x03,0x60,0xE2,0x40,0x64,0x04,0x00,0x00,0x00}};
   VictronShunt v(&testData.decrypted[0], testData.model);
   uint16_t data;
+  int16_t data2;
 
   // Expected results, Consumed = -90.4, Soc = 55%, Current 4.12
 
@@ -71,14 +73,42 @@ test(shunt_test2) {
 
   data = v.getSoc() * 10;
   assertEqual(data, 550);
-  data = -v.getBatteryCurrent() * 1000;
-  assertEqual(data, 4096);
+  data2 = v.getBatteryCurrent() * 1000;
+  assertEqual(data2, -4152);
   data = v.getBatteryVoltage() * 100;
   assertEqual(data, 1290);
   data = v.getAux() * 100;
   assertEqual(data, 1263);
-  data = -v.getConsumedAh() * 10;
-  assertEqual(data, 901);
+  data2 = v.getConsumedAh() * 10;
+  assertEqual(data2, 901);
+}
+
+test(shunt_test3) {
+  VictronTestData testData = {
+      "Shunt", 0xA389, BatteryMonitor, {0x38, 0x09, 0x1B, 0x05, 0x00, 0x00,
+        0x01, 0x05, 0xCC, 0xCB, 0xFF, 0x08,
+        0x00, 0x50, 0xFE, 0x00, 0x68, 0xE5,
+        0x00, 0x00, 0x00}};
+  VictronShunt v(&testData.decrypted[0], testData.model);
+  uint16_t data;
+  int16_t data2;
+  
+  assertEqual(v.getDeviceName(), "Shunt");
+  assertEqual(v.getModelNo(), 0xA389);
+  assertEqual(v.getAlarm(), 0);
+  assertEqual(v.getAuxMode(), 0);
+  assertEqual(v.getRemaningMins(), 2360);
+
+  data = v.getSoc() * 10;
+  assertEqual(data, 997);
+  data2 = v.getBatteryCurrent() * 1000;
+  assertEqual(data2, -3341);
+  data2 = v.getBatteryVoltage() * 100;
+  assertEqual(data2, 1307);
+  data = v.getAux() * 100;
+  assertEqual(data, 1281);
+  data2 = v.getConsumedAh() * 10;
+  assertEqual(data2, 8);
 }
 
 // EOF

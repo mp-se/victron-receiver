@@ -65,11 +65,15 @@ class BitReader {
 
   int32_t readSigned(uint8_t noBits) {
     uint32_t value = readUnsigned(noBits);
-    return (value & (1 << (noBits - 1))) ? value | 0x80000000 : value;
+    return convert(value, noBits);
   }
 
   int32_t convert(uint32_t value, uint8_t noBits) {
-    return (value & (1 << (noBits - 1))) ? value | 0x80000000 : value;
+    if (noBits > 0 && noBits < 32) {
+      uint32_t mask = 1 << (noBits - 1);
+      value = (value ^ mask) - mask;
+    }
+    return static_cast<int32_t>(value);
   }
 };
 

@@ -69,8 +69,8 @@ class VictronShunt : public VictronDevice {
     uint16_t soc = br.readUnsigned(10);
 
     _remaningMins = remainingMins != 0xFFFF ? remainingMins : 0;
-    _batteryVoltage = (batteryVoltage & 0x7FFF) != 0x7FFF
-                          ? static_cast<float>(batteryVoltage & 0x7FFF) / 100
+    _batteryVoltage = (batteryVoltage) != 0x7FFF
+                          ? static_cast<float>(batteryVoltage) / 100
                           : NAN;  // 10 mV increments
 
     _auxMode =
@@ -93,11 +93,11 @@ class VictronShunt : public VictronDevice {
         break;
     }
 
-    _batteryCurrent = batteryCurrent != 0x3FFFFF
+    _batteryCurrent = batteryCurrent != 0x3FFFFF 
                           ? static_cast<float>(batteryCurrent) / 1000
                           : NAN;
     _consumedAh =
-        consumedAh != 0xFFFFF ? -static_cast<float>(consumedAh) / 10 : NAN;
+        consumedAh != 0xFFFFF ? static_cast<float>(consumedAh) / 10 : NAN;
     _soc =
         soc != 0x3FF ? static_cast<float>(soc) / 10 : NAN;  // 0.1% increments
 

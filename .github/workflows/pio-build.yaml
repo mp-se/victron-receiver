@@ -18,8 +18,8 @@ jobs:
         run: |
           echo "Checkout UI"
           git clone https://github.com/mp-se/victron-receiver-ui victron-receiver-ui 
-          cp victron-receiver-ui/dist/assets/style.css.gz html/app.css.gz
-          cp victron-receiver-ui/dist/assets/index.js.gz html/app.js.gz
+          # cp victron-receiver-ui/dist/assets/style.css.gz html/app.css.gz
+          # cp victron-receiver-ui/dist/assets/index.js.gz html/app.js.gz
 
       - name: Setup PlatformIO
         uses: n-vr/setup-platformio-action@v1.0.1    

@@ -38,24 +38,24 @@ SOFTWARE.
 VictronReceiverWebServer::VictronReceiverWebServer(WebConfigInterface *config)
     : BaseWebServer(config) {}
 
-void VictronReceiverWebServer::webHandleConfigRead(
-    AsyncWebServerRequest *request) {
+    esp_err_t VictronReceiverWebServer::webHandleConfigRead(
+    PsychicRequest *request) {
   if (!isAuthenticated(request)) {
-    return;
+    return ESP_FAIL;
   }
 
   Log.notice(F("WEB : webServer callback for /api/config(read)." CR));
-  AsyncJsonResponse *response = new AsyncJsonResponse(false);
-  JsonObject obj = response->getRoot().as<JsonObject>();
+  PsychicJsonResponse response(request);
+  JsonObject obj = response.getRoot().as<JsonObject>();
+
   myConfig.createJson(obj);
-  response->setLength();
-  request->send(response);
+  return response.send();
 }
 
-void VictronReceiverWebServer::webHandleConfigWrite(
-    AsyncWebServerRequest *request, JsonVariant &json) {
+esp_err_t VictronReceiverWebServer::webHandleConfigWrite(
+    PsychicRequest *request, JsonVariant &json) {
   if (!isAuthenticated(request)) {
-    return;
+    return ESP_FAIL;
   }
 
   Log.notice(F("WEB : webServer callback for /api/config(write)." CR));
@@ -64,18 +64,17 @@ void VictronReceiverWebServer::webHandleConfigWrite(
   obj.clear();
   myConfig.saveFile();
 
-  AsyncJsonResponse *response = new AsyncJsonResponse(false);
-  obj = response->getRoot().as<JsonObject>();
+  PsychicJsonResponse response(request);
+  obj = response.getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Configuration updated";
-  response->setLength();
-  request->send(response);
+  return response.send();
 }
 
-void VictronReceiverWebServer::webHandleFactoryDefaults(
-    AsyncWebServerRequest *request) {
+esp_err_t VictronReceiverWebServer::webHandleFactoryDefaults(
+    PsychicRequest *request) {
   if (!isAuthenticated(request)) {
-    return;
+    return ESP_FAIL;
   }
 
   Log.notice(F("WEB : webServer callback for /api/factory." CR));
@@ -84,17 +83,17 @@ void VictronReceiverWebServer::webHandleFactoryDefaults(
   LittleFS.end();
   Log.notice(F("WEB : Deleted files in filesystem, rebooting." CR));
 
-  AsyncJsonResponse *response = new AsyncJsonResponse(false);
-  JsonObject obj = response->getRoot().as<JsonObject>();
+  PsychicJsonResponse response(request);
+  JsonObject obj = response.getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Factory reset completed, rebooting";
-  response->setLength();
-  request->send(response);
+  response.send();
   delay(500);
   ESP_RESET();
+  return ESP_OK;
 }
 
-void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
+esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request) {
   Log.notice(F("WEB : webServer callback for /api/status(get)." CR));
 
   // Fallback since sometimes the loop() does not always run after firmware
@@ -103,10 +102,11 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : Rebooting using fallback..." CR));
     delay(500);
     ESP_RESET();
+    return ESP_OK;
   }
 
-  AsyncJsonResponse *response = new AsyncJsonResponse(false);
-  JsonObject obj = response->getRoot().as<JsonObject>();
+  PsychicJsonResponse response(request);
+  JsonObject obj = response.getRoot().as<JsonObject>();
 
   obj[PARAM_ID] = myConfig.getID();
   obj[PARAM_TEMP_FORMAT] = String(myConfig.getTempFormat());
@@ -162,8 +162,7 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
   }
 #endif
 
-  response->setLength();
-  request->send(response);
+  return response.send();
 }
 
 bool VictronReceiverWebServer::setupWebServer() {
@@ -177,21 +176,17 @@ bool VictronReceiverWebServer::setupWebServer() {
       F("WEB : Setting up handlers for victron receiver web server." CR));
 
   _server->on("/api/config", HTTP_GET,
-              std::bind(&VictronReceiverWebServer::webHandleConfigRead, this,
+    (PsychicHttpRequestCallback)std::bind(&VictronReceiverWebServer::webHandleConfigRead, this,
                         std::placeholders::_1));
-  AsyncCallbackJsonWebHandler *handler;
-  handler = new AsyncCallbackJsonWebHandler(
-      "/api/config",
-      std::bind(&VictronReceiverWebServer::webHandleConfigWrite, this,
+    _server->on("/api/config", HTTP_POST,
+      (PsychicJsonRequestCallback)std::bind(&VictronReceiverWebServer::webHandleConfigWrite, this,
                 std::placeholders::_1, std::placeholders::_2));
-  _server->addHandler(handler);
   _server->on("/api/factory", HTTP_GET,
-              std::bind(&VictronReceiverWebServer::webHandleFactoryDefaults,
+    (PsychicHttpRequestCallback)std::bind(&VictronReceiverWebServer::webHandleFactoryDefaults,
                         this, std::placeholders::_1));
   _server->on("/api/status", HTTP_GET,
-              std::bind(&VictronReceiverWebServer::webHandleStatus, this,
+    (PsychicHttpRequestCallback)std::bind(&VictronReceiverWebServer::webHandleStatus, this,
                         std::placeholders::_1));
-  _server->addHandler(handler);
 
   Log.notice(F("WEB : Web server started." CR));
   return true;

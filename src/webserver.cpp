@@ -35,7 +35,7 @@ SOFTWARE.
 #include <uptime.hpp>
 #include <webserver.hpp>
 
-VictronReceiverWebServer::VictronReceiverWebServer(WebConfig *config)
+VictronReceiverWebServer::VictronReceiverWebServer(WebConfigInterface *config)
     : BaseWebServer(config) {}
 
 void VictronReceiverWebServer::webHandleConfigRead(

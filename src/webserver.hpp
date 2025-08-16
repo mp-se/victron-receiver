@@ -35,7 +35,7 @@ class VictronReceiverWebServer : public BaseWebServer {
   void webHandleFactoryDefaults(AsyncWebServerRequest *request);
 
  public:
-  explicit VictronReceiverWebServer(WebConfig *config);
+  explicit VictronReceiverWebServer(WebConfigInterface *config);
 
   bool setupWebServer();
   void loop();

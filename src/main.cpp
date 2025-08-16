@@ -40,7 +40,6 @@ SOFTWARE.
 #include <webserver.hpp>
 #include <wificonnection.hpp>
 
-constexpr auto CFG_APPNAME = "victron";
 constexpr auto CFG_FILENAME = "/victron.json";
 constexpr auto CFG_AP_SSID = "Victron";
 constexpr auto CFG_AP_PASS = "instant1";
@@ -206,7 +205,7 @@ void loop() {
     logUpdated = false;
   }
 
-  if (mainLoop.hasExipred()) {
+  if (mainLoop.hasExpired()) {
     mainLoop.reset();
     renderDisplayFooter();
   }
@@ -328,10 +327,10 @@ void checkForImprovWifi() {
   LoopTimer update(500);
 
   // Run for 10 seconds
-  while (!improveTimeout.hasExipred() || improvWiFi.isConfigInitiated()) {
+  while (!improveTimeout.hasExpired() || improvWiFi.isConfigInitiated()) {
     if (improvWiFi.isConfigCompleted()) return;
 
-    if (update.hasExipred()) {
+    if (update.hasExpired()) {
       update.reset();
 
       char buf[80] = "";

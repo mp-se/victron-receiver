@@ -55,7 +55,7 @@ void renderDisplayFooter();
 void renderDisplayLogs();
 void checkForImprovWifi();
 
-SerialDebug mySerial(115200L, false);
+SerialDebug mySerial;
 VictronReceiverConfig myConfig(CFG_APPNAME, CFG_FILENAME);
 WifiConnection myWifi(&myConfig, CFG_AP_SSID, CFG_AP_PASS, CFG_APPNAME,
                       USER_SSID, USER_PASS);
@@ -78,10 +78,12 @@ bool logUpdated = true;
 
 void setup() {
   // delay(4000);
+
   Log.notice(F("Main: Started setup for %s." CR), myConfig.getID());
   printBuildOptions();
   detectChipRevision();
 
+  
   Log.notice(F("Main: Initialize display." CR));
   myDisplay.setup();
   myDisplay.setFont(FontSize::FONT_12);
@@ -334,20 +336,18 @@ void checkForImprovWifi() {
       update.reset();
 
       char buf[80] = "";
-
-      if (!improvWiFi.isConfigInitiated())
-        int time =
-            IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000);
+      int32_t time = IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000);
       Log.notice(F("Main: Waiting for remote WIFI setup, waiting for %d." CR),
                  time);
       snprintf(buf, sizeof(buf), "Waiting for %d s", time);
-
       myDisplay.printLineCentered(6, buf);
     }
 
     improvWiFi.loop();
     delay(1);
   }
+
+  myDisplay.printLineCentered(6, "");
 }
 
 // EOF

@@ -34,7 +34,11 @@ SOFTWARE.
 #include <main.hpp>
 #include <pushtarget.hpp>
 #include <resources.hpp>
+#if defined(ESPFWK_PSYCHIC_HTTP)
 #include <serialws2.hpp>
+#else
+#include <serialws.hpp>
+#endif
 #include <uptime.hpp>
 #include <utils.hpp>
 #include <webserver.hpp>

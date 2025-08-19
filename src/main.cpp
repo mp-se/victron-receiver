@@ -340,10 +340,14 @@ void checkForImprovWifi() {
       update.reset();
 
       char buf[80] = "";
-      int32_t time = IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000);
-      Log.notice(F("Main: Waiting for remote WIFI setup, waiting for %d." CR),
-                 time);
-      snprintf(buf, sizeof(buf), "Waiting for %d s", time);
+
+      if(!improvWiFi.isConfigInitiated()) {
+        int32_t time = IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000);
+        Log.notice(F("Main: Waiting for remote WIFI setup, waiting for %d." CR),
+                  time);
+        snprintf(buf, sizeof(buf), "Waiting for %d s", time);
+      } 
+
       myDisplay.printLineCentered(6, buf);
     }
 

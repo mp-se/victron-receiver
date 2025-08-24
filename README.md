@@ -9,6 +9,8 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 # Changes
 
+* 0.6.0 - Added option to enable SSL on webserver with password protection. Changed flashlayout to use the full 16 Mb memory in preparation for new touch screen UI
+
 * 0.5.0 - Added support for Battery Protect and Update UI dependecies
 
 * 0.4.0 - Revert to Arduino 2.x for stability reasons. Changed packet parsing to simplify decoding and updated dependecies.

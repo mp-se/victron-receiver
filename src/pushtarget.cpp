@@ -80,7 +80,7 @@ void VictronReceiverPush::sendAll(String name, String mac, JsonObject& doc) {
               "\"device_class\":\"current\",\"unit_of_measurement\":\"A\",";
         } else if (key.indexOf("power") >= 0) {
           payload +=
-              "\"device_class\":\"current\",\"unit_of_measurement\":\"W\",";
+              "\"device_class\":\"power\",\"unit_of_measurement\":\"W\",";
         }
 
         snprintf(&buf[0], sizeof(buf), "\"unique_id\":\"%s_%s\",", mac.c_str(),

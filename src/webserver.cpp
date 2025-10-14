@@ -40,7 +40,7 @@ SOFTWARE.
 VictronReceiverWebServer::VictronReceiverWebServer(WebConfigInterface *config)
     : BaseWebServer(config) {}
 
-    void VictronReceiverWebServer::webHandleConfigRead(
+void VictronReceiverWebServer::webHandleConfigRead(
     AsyncWebServerRequest *request) {
   if (!isAuthenticated(request)) {
     return;
@@ -51,7 +51,7 @@ VictronReceiverWebServer::VictronReceiverWebServer(WebConfigInterface *config)
   JsonObject obj = response->getRoot().as<JsonObject>();
   myConfig.createJson(obj);
   response->setLength();
-  request->send(response); 
+  request->send(response);
 }
 
 void VictronReceiverWebServer::webHandleConfigWrite(
@@ -71,7 +71,7 @@ void VictronReceiverWebServer::webHandleConfigWrite(
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Configuration updated";
   response->setLength();
-  request->send(response); 
+  request->send(response);
 }
 
 void VictronReceiverWebServer::webHandleFactoryDefaults(
@@ -91,7 +91,7 @@ void VictronReceiverWebServer::webHandleFactoryDefaults(
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Factory reset completed, rebooting";
   response->setLength();
-  request->send(response); 
+  request->send(response);
   delay(500);
   ESP_RESET();
 }
@@ -179,19 +179,20 @@ bool VictronReceiverWebServer::setupWebServer() {
       F("WEB : Setting up handlers for victron receiver web server." CR));
 
   _server->on("/api/config", HTTP_GET,
-    std::bind(&VictronReceiverWebServer::webHandleConfigRead, this,
+              std::bind(&VictronReceiverWebServer::webHandleConfigRead, this,
                         std::placeholders::_1));
 
   AsyncCallbackJsonWebHandler *handler;
   handler = new AsyncCallbackJsonWebHandler(
-      "/api/config", std::bind(&VictronReceiverWebServer::webHandleConfigWrite, this,
-                               std::placeholders::_1, std::placeholders::_2));
+      "/api/config",
+      std::bind(&VictronReceiverWebServer::webHandleConfigWrite, this,
+                std::placeholders::_1, std::placeholders::_2));
   _server->addHandler(handler);
   _server->on("/api/factory", HTTP_GET,
-    std::bind(&VictronReceiverWebServer::webHandleFactoryDefaults,
+              std::bind(&VictronReceiverWebServer::webHandleFactoryDefaults,
                         this, std::placeholders::_1));
   _server->on("/api/status", HTTP_GET,
-    std::bind(&VictronReceiverWebServer::webHandleStatus, this,
+              std::bind(&VictronReceiverWebServer::webHandleStatus, this,
                         std::placeholders::_1));
 
   Log.notice(F("WEB : Web server started." CR));
@@ -200,6 +201,6 @@ bool VictronReceiverWebServer::setupWebServer() {
 
 void VictronReceiverWebServer::loop() { BaseWebServer::loop(); }
 
-#endif // !ESPFWK_PSYCHIC_HTTP
+#endif  // !ESPFWK_PSYCHIC_HTTP
 
 // EOF

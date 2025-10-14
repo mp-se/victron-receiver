@@ -93,7 +93,7 @@ class VictronShunt : public VictronDevice {
         break;
     }
 
-    _batteryCurrent = batteryCurrent != 0x3FFFFF 
+    _batteryCurrent = batteryCurrent != 0x3FFFFF
                           ? static_cast<float>(batteryCurrent) / 1000
                           : NAN;
     _consumedAh =

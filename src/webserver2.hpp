@@ -31,10 +31,10 @@ SOFTWARE.
 
 class VictronReceiverWebServer : public BaseWebServer {
  private:
- esp_err_t webHandleStatus(PsychicRequest *request);
- esp_err_t webHandleConfigRead(PsychicRequest *request);
- esp_err_t webHandleConfigWrite(PsychicRequest *request, JsonVariant &json);
- esp_err_t webHandleFactoryDefaults(PsychicRequest *request);
+  esp_err_t webHandleStatus(PsychicRequest *request);
+  esp_err_t webHandleConfigRead(PsychicRequest *request);
+  esp_err_t webHandleConfigWrite(PsychicRequest *request, JsonVariant &json);
+  esp_err_t webHandleFactoryDefaults(PsychicRequest *request);
 
  public:
   explicit VictronReceiverWebServer(WebConfigInterface *config);
@@ -46,7 +46,7 @@ class VictronReceiverWebServer : public BaseWebServer {
 // Global instance created
 extern VictronReceiverWebServer myWebServer;
 
-#endif // ESPFWK_PSYCHIC_HTTP
+#endif  // ESPFWK_PSYCHIC_HTTP
 
 #endif  // SRC_WEBSERVER_HPP_
 

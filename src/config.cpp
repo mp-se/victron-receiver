@@ -28,7 +28,7 @@ SOFTWARE.
 #include <resources.hpp>
 
 VictronReceiverConfig::VictronReceiverConfig(String baseMDNS, String fileName)
-  : BaseConfig(baseMDNS, fileName) {}
+    : BaseConfig(baseMDNS, fileName) {}
 
 void VictronReceiverConfig::createJson(JsonObject& doc) const {
   // Call base class functions

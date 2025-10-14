@@ -35,10 +35,10 @@ SOFTWARE.
 
 class VictronReceiverWebServer : public BaseWebServer {
  private:
- void webHandleStatus(AsyncWebServerRequest *request);
- void webHandleConfigRead(AsyncWebServerRequest *request);
- void webHandleConfigWrite(AsyncWebServerRequest *request, JsonVariant &json);
- void webHandleFactoryDefaults(AsyncWebServerRequest *request);
+  void webHandleStatus(AsyncWebServerRequest *request);
+  void webHandleConfigRead(AsyncWebServerRequest *request);
+  void webHandleConfigWrite(AsyncWebServerRequest *request, JsonVariant &json);
+  void webHandleFactoryDefaults(AsyncWebServerRequest *request);
 
  public:
   explicit VictronReceiverWebServer(WebConfigInterface *config);
@@ -50,7 +50,7 @@ class VictronReceiverWebServer : public BaseWebServer {
 // Global instance created
 extern VictronReceiverWebServer myWebServer;
 
-#endif // ESPFWK_PSYCHIC_HTTP
+#endif  // ESPFWK_PSYCHIC_HTTP
 
 #endif  // SRC_WEBSERVER_HPP_
 

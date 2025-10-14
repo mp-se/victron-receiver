@@ -40,7 +40,7 @@ SOFTWARE.
 VictronReceiverWebServer::VictronReceiverWebServer(WebConfigInterface *config)
     : BaseWebServer(config) {}
 
-    esp_err_t VictronReceiverWebServer::webHandleConfigRead(
+esp_err_t VictronReceiverWebServer::webHandleConfigRead(
     PsychicRequest *request) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
@@ -178,17 +178,21 @@ bool VictronReceiverWebServer::setupWebServer() {
       F("WEB : Setting up handlers for victron receiver web server." CR));
 
   _server->on("/api/config", HTTP_GET,
-    (PsychicHttpRequestCallback)std::bind(&VictronReceiverWebServer::webHandleConfigRead, this,
-                        std::placeholders::_1));
-    _server->on("/api/config", HTTP_POST,
-      (PsychicJsonRequestCallback)std::bind(&VictronReceiverWebServer::webHandleConfigWrite, this,
-                std::placeholders::_1, std::placeholders::_2));
+              (PsychicHttpRequestCallback)std::bind(
+                  &VictronReceiverWebServer::webHandleConfigRead, this,
+                  std::placeholders::_1));
+  _server->on("/api/config", HTTP_POST,
+              (PsychicJsonRequestCallback)std::bind(
+                  &VictronReceiverWebServer::webHandleConfigWrite, this,
+                  std::placeholders::_1, std::placeholders::_2));
   _server->on("/api/factory", HTTP_GET,
-    (PsychicHttpRequestCallback)std::bind(&VictronReceiverWebServer::webHandleFactoryDefaults,
-                        this, std::placeholders::_1));
+              (PsychicHttpRequestCallback)std::bind(
+                  &VictronReceiverWebServer::webHandleFactoryDefaults, this,
+                  std::placeholders::_1));
   _server->on("/api/status", HTTP_GET,
-    (PsychicHttpRequestCallback)std::bind(&VictronReceiverWebServer::webHandleStatus, this,
-                        std::placeholders::_1));
+              (PsychicHttpRequestCallback)std::bind(
+                  &VictronReceiverWebServer::webHandleStatus, this,
+                  std::placeholders::_1));
 
   Log.notice(F("WEB : Web server started." CR));
   return true;
@@ -196,6 +200,6 @@ bool VictronReceiverWebServer::setupWebServer() {
 
 void VictronReceiverWebServer::loop() { BaseWebServer::loop(); }
 
-#endif // ESPFWK_PSYCHIC_HTTP
+#endif  // ESPFWK_PSYCHIC_HTTP
 
 // EOF

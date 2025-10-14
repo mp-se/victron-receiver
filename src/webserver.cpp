@@ -168,7 +168,7 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
   request->send(response);
 }
 
-bool VictronReceiverWebServer::setupWebServer() {
+bool VictronReceiverWebServer::setupWebServer(bool skipSSL) {
   Log.notice(F("WEB : Configuring web server." CR));
 
   BaseWebServer::setupWebServer();

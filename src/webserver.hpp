@@ -43,7 +43,7 @@ class VictronReceiverWebServer : public BaseWebServer {
  public:
   explicit VictronReceiverWebServer(WebConfigInterface *config);
 
-  bool setupWebServer();
+  bool setupWebServer(bool skipSSL = false);
   void loop();
 };
 

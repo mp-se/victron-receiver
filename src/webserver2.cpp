@@ -167,10 +167,10 @@ esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request) {
   return response.send();
 }
 
-bool VictronReceiverWebServer::setupWebServer() {
+bool VictronReceiverWebServer::setupWebServer(bool skipSSL) {
   Log.notice(F("WEB : Configuring web server." CR));
 
-  BaseWebServer::setupWebServer();
+  BaseWebServer::setupWebServer(skipSSL);
   MDNS.addService("victron-receiver", "tcp", 80);
 
   // Static content

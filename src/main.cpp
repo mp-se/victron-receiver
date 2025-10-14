@@ -87,7 +87,6 @@ void setup() {
   printBuildOptions();
   detectChipRevision();
 
-  
   Log.notice(F("Main: Initialize display." CR));
   myDisplay.setup();
   myDisplay.setFont(FontSize::FONT_12);
@@ -151,8 +150,7 @@ void setup() {
 
         case RunMode::wifiSetupMode:
           Log.notice(F("Main: Initializing the web server." CR));
-          myWebServer.setupWebServer();  // Takes less than 4ms, so skip
-                                         // this measurement
+          myWebServer.setupWebServer(runMode == RunMode::wifiSetupMode); // Skip SSL when in wifi setup mode
           mySerialWebSocket.begin(myWebServer.getWebServer(), &Serial);
           mySerial.begin(&mySerialWebSocket);
       } else {
@@ -341,12 +339,13 @@ void checkForImprovWifi() {
 
       char buf[80] = "";
 
-      if(!improvWiFi.isConfigInitiated()) {
-        int32_t time = IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000);
+      if (!improvWiFi.isConfigInitiated()) {
+        int32_t time =
+            IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000);
         Log.notice(F("Main: Waiting for remote WIFI setup, waiting for %d." CR),
-                  time);
+                   time);
         snprintf(buf, sizeof(buf), "Waiting for %d s", time);
-      } 
+      }
 
       myDisplay.printLineCentered(6, buf);
     }

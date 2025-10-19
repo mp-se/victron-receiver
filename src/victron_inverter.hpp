@@ -67,9 +67,8 @@ class VictronInverter : public VictronDevice {
                           ? static_cast<float>(batteryVoltage) / 100
                           : NAN;  // 10 mV increments
     _acPower = acPower != 0xFFFF ? static_cast<float>(acPower) : NAN;
-    _acVoltage = (acVoltage) != 0x7FFF
-                     ? static_cast<float>(acVoltage) / 100
-                     : NAN;  // 10 mV increments
+    _acVoltage = (acVoltage) != 0x7FFF ? static_cast<float>(acVoltage) / 100
+                                       : NAN;  // 10 mV increments
     _acCurrent = (acCurrent & 0x7FF) != 0x7FF
                      ? static_cast<float>(acCurrent & 0x7FF) / 10
                      : NAN;

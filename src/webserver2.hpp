@@ -21,29 +21,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_WEBSERVER_HPP_
-#define SRC_WEBSERVER_HPP_
+#ifndef SRC_WEBSERVER2_HPP_
+#define SRC_WEBSERVER2_HPP_
 
 #if defined(ESPFWK_PSYCHIC_HTTP)
 
-#include <webserver2.hpp>
-
-#else
-
-#include <basewebserver.hpp>
+#include <basewebserver2.hpp>
 #include <blescanner.hpp>
 
 class VictronReceiverWebServer : public BaseWebServer {
  private:
-  void webHandleStatus(AsyncWebServerRequest *request);
-  void webHandleConfigRead(AsyncWebServerRequest *request);
-  void webHandleConfigWrite(AsyncWebServerRequest *request, JsonVariant &json);
-  void webHandleFactoryDefaults(AsyncWebServerRequest *request);
+  esp_err_t webHandleStatus(PsychicRequest *request);
+  esp_err_t webHandleConfigRead(PsychicRequest *request);
+  esp_err_t webHandleConfigWrite(PsychicRequest *request, JsonVariant &json);
+  esp_err_t webHandleFactoryDefaults(PsychicRequest *request);
 
  public:
   explicit VictronReceiverWebServer(WebConfigInterface *config);
 
-  bool setupWebServer(bool skipSSL = false);
+  bool setupWebServer(bool skipSSL);
   void loop();
 };
 

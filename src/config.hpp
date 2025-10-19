@@ -48,31 +48,31 @@ class VictronReceiverConfig : public BaseConfig {
  public:
   VictronReceiverConfig(String baseMDNS, String fileName);
 
-  const char* getTimezone() { return _timezone.c_str(); }
+  const char* getTimezone() const { return _timezone.c_str(); }
   void setTimezone(String s) {
     _timezone = s;
     _saveNeeded = true;
   }
 
-  int getBleScanTime() { return _bleScanTime; }
+  int getBleScanTime() const { return _bleScanTime; }
   void setBleScanTime(int v) {
     _bleScanTime = v;
     _saveNeeded = true;
   }
 
-  int getPushResendTime() { return _pushResendTime; }
+  int getPushResendTime() const { return _pushResendTime; }
   void setPushResendTime(int t) {
     _pushResendTime = t;
     _saveNeeded = true;
   }
 
-  bool getBleActiveScan() { return _bleActiveScan; }
+  bool getBleActiveScan() const { return _bleActiveScan; }
   void setBleActiveScan(bool b) {
     _bleActiveScan = b;
     _saveNeeded = true;
   }
 
-  VictronConfig getVictronConfig(int idx) {
+  VictronConfig getVictronConfig(int idx) const {
     if (idx >= MAX_VICTRON_DEVICES) return VictronConfig();
 
     return _victron[idx];
@@ -92,8 +92,8 @@ class VictronReceiverConfig : public BaseConfig {
   }
 
   // IO functions
-  void createJson(JsonObject& doc);
-  void parseJson(JsonObject& doc);
+  void createJson(JsonObject& doc) const override;
+  void parseJson(JsonObject& doc) override;
 };
 
 extern VictronReceiverConfig myConfig;

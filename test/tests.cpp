@@ -23,15 +23,10 @@ SOFTWARE.
  */
 #include <AUnit.h>
 #include <Arduino.h>
-
 #include <config.hpp>
-#include <display.hpp>
 #include <helper.hpp>
 #include <log.hpp>
 #include <main.hpp>
-#include <serialws.hpp>
-#include <webserver.hpp>
-#include <wificonnection.hpp>
 
 using aunit::Printer;
 using aunit::TestRunner;
@@ -39,10 +34,6 @@ using aunit::Verbosity;
 
 SerialDebug mySerial;
 VictronReceiverConfig myConfig("", "");
-WifiConnection myWifi(&myConfig, "", "", "", "", "");
-VictronReceiverWebServer myWebServer(&myConfig);
-SerialWebSocket mySerialWebSocket;
-Display myDisplay;
 RunMode runMode = RunMode::receiverMode;
 
 void setup() {

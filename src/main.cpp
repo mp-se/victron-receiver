@@ -34,13 +34,16 @@ SOFTWARE.
 #include <main.hpp>
 #include <pushtarget.hpp>
 #include <resources.hpp>
+#if defined(ESPFWK_PSYCHIC_HTTP)
+#include <serialws2.hpp>
+#else
 #include <serialws.hpp>
+#endif
 #include <uptime.hpp>
 #include <utils.hpp>
 #include <webserver.hpp>
 #include <wificonnection.hpp>
 
-constexpr auto CFG_APPNAME = "victron";
 constexpr auto CFG_FILENAME = "/victron.json";
 constexpr auto CFG_AP_SSID = "Victron";
 constexpr auto CFG_AP_PASS = "instant1";
@@ -56,7 +59,7 @@ void renderDisplayFooter();
 void renderDisplayLogs();
 void checkForImprovWifi();
 
-SerialDebug mySerial(115200L, false);
+SerialDebug mySerial;
 VictronReceiverConfig myConfig(CFG_APPNAME, CFG_FILENAME);
 WifiConnection myWifi(&myConfig, CFG_AP_SSID, CFG_AP_PASS, CFG_APPNAME,
                       USER_SSID, USER_PASS);
@@ -79,6 +82,7 @@ bool logUpdated = true;
 
 void setup() {
   // delay(4000);
+
   Log.notice(F("Main: Started setup for %s." CR), myConfig.getID());
   printBuildOptions();
   detectChipRevision();
@@ -146,8 +150,7 @@ void setup() {
 
         case RunMode::wifiSetupMode:
           Log.notice(F("Main: Initializing the web server." CR));
-          myWebServer.setupWebServer();  // Takes less than 4ms, so skip
-                                         // this measurement
+          myWebServer.setupWebServer(runMode == RunMode::wifiSetupMode); // Skip SSL when in wifi setup mode
           mySerialWebSocket.begin(myWebServer.getWebServer(), &Serial);
           mySerial.begin(&mySerialWebSocket);
       } else {
@@ -206,7 +209,7 @@ void loop() {
     logUpdated = false;
   }
 
-  if (mainLoop.hasExipred()) {
+  if (mainLoop.hasExpired()) {
     mainLoop.reset();
     renderDisplayFooter();
   }
@@ -328,20 +331,21 @@ void checkForImprovWifi() {
   LoopTimer update(500);
 
   // Run for 10 seconds
-  while (!improveTimeout.hasExipred() || improvWiFi.isConfigInitiated()) {
+  while (!improveTimeout.hasExpired() || improvWiFi.isConfigInitiated()) {
     if (improvWiFi.isConfigCompleted()) return;
 
-    if (update.hasExipred()) {
+    if (update.hasExpired()) {
       update.reset();
 
       char buf[80] = "";
 
-      if (!improvWiFi.isConfigInitiated())
-        int time =
+      if (!improvWiFi.isConfigInitiated()) {
+        int32_t time =
             IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000);
-      Log.notice(F("Main: Waiting for remote WIFI setup, waiting for %d." CR),
-                 time);
-      snprintf(buf, sizeof(buf), "Waiting for %d s", time);
+        Log.notice(F("Main: Waiting for remote WIFI setup, waiting for %d." CR),
+                   time);
+        snprintf(buf, sizeof(buf), "Waiting for %d s", time);
+      }
 
       myDisplay.printLineCentered(6, buf);
     }
@@ -349,6 +353,8 @@ void checkForImprovWifi() {
     improvWiFi.loop();
     delay(1);
   }
+
+  myDisplay.printLineCentered(6, "");
 }
 
 // EOF

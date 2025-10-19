@@ -17,16 +17,17 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 * 0.3.0 - Upgrade to latest libraries and Arduino 3.0.7, Added configuration backup feature.
 
-* 0.2.5 - Version that correcly decode the first few devices (AC Charger, DCDC Charger, Battery Monitor, Smart Shunt & Solar Charger) with Home Assistant API integration (MQTT + REST API). 
+* 0.2.5 - Version that correcly decode the first few devices (AC Charger, DCDC Charger, Battery Monitor, Smart Shunt & Solar Charger) with Home Assistant API integration (MQTT + REST API).
 
 # Features
 
-* Collect data from Victron Devices that supports the Instant Readout option. 
+* Collect data from Victron Devices that supports the Instant Readout option.
 * Identify victron devices and add the mac adress to the configuration automatically.
 * Web interface for easy configuration.
-* MQTT integration with Home Assistant for all identified values. 
-* REST API integration with Home Assistant for all identified values. 
-* Firmware update and Serial Logging via web interface. 
+* MQTT integration with Home Assistant for all identified values.
+* REST API integration with Home Assistant for all identified values.
+* Firmware update and Serial Logging via web interface.
+* Support for encrypted communication (SSL) and admin password.
 
 # Support
 
@@ -62,17 +63,19 @@ The following types can be supported if I can receive some test data.
 * VeBus
 * DcEnergyMeter
 
-To get test data, register the device and add the encrytption key so data can be extrated. Then use the copy button in the we UI to copy data to the clipboard. When copying make a note of the values shown in the Victron App so that I can compare those with my code. Open an issue in github and provide the captured data as well as what the actual readings is in the app so I can validate the result.
+To get test data, register the device and add the encrytption key so data can be extrated. Then use the copy button in the we UI to copy data to the clipboard. When copying make a note of the values shown in the Victron App so that I can compare those with my code. Open an issue in github and provide the captured data as well as what the actual readings is in the app so I can validate the result. If you can provide data from the device in various stages that is very valuable for decoding and testing.
 
 # Hardware
 
-Currently I'm using the following development board for running my instance but on request I can add support for more. A display is optional so basically you only need an ESP32s3 or ESP32c3 board with BLE support. 
+Currently I'm using the following development board for running my instance but on request I can add support for more. A display is optional so basically you only need an ESP32s3 or ESP32c3 board with BLE support.
 
-* Waveshare ESP32 S3 with TFT (https://www.waveshare.com/product/mcu-tools/development-boards/esp32/esp32-s3-touch-lcd-2.8.htm)
+* Waveshare ESP32 S3 with TFT (firmware32s3w_tft.bin) (https://www.waveshare.com/product/mcu-tools/development-boards/esp32/esp32-s3-touch-lcd-2.8.htm)
 
 Other options are:
-* Lolin ESP32 PRO with Lolin TFT
-* Lolin ESP32 S3 PRO with Lolin TFT
+* Lolin ESP32 PRO with Lolin TFT (firmware32_tft.bin)
+* Lolin ESP32 S3 PRO with Lolin TFT (firmware32s3_tft.bin)
+* Lolin EP32 C3 without TFT (firmware32c3.bin)
+* Lolin EP32 S3 without TFT (firmware32s3.bin)
 
 # Flashing
 
@@ -134,6 +137,54 @@ The naming of the sensors using the REST API is as follows. Units will be added 
 ```
 
 When using the REST API each attribute will be a standalone sensor value and not grouped into entities.
+
+# Seurity
+
+From v0.6 there is now the possibility to use encrypted communication towards the device which also enable the admin password feature.
+
+Enabling SSL is done by uploading a server.key (private key) and server.crt (certificate) to the device and reboot. When SSL is enabled you 
+will be prompted for an admin password when accessing the device, if you have not set that just press login. See below for the process of creating the needed
+keys and certificates. 
+
+The admin password can be reset by starting the device in wifi setup mode (create access point), connecting to that network and open the web interface. Using this approach the admin password will not be used. 
+
+You can enter wifi setup mode by doing a few resets before the device is fully started.
+
+## How to create a self signed certificate that is accepted
+
+SSL is enabled by uploading a server.key and server.crt file to the device. Without these files the device will start without SSL enabled.
+
+1. Download and install openssl
+
+2. Run the following commands
+
+```bash
+# Generate the device key
+openssl genpkey -out server.key -algorithm RSA -pkeyopt rsa_keygen_bits:2048
+
+# Create a signing request
+openssl req -new -key server.key -out server.csr
+
+# Sign the request
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+
+# Optional, validate the certificate
+openssl x509 -in server.crt -noout -issuer -subject
+```
+
+3. Upload the `server.key` and `server.crt` to the device and restart it (Option under the tools section). It should the start the webserver in SSL mode.
+
+### MacOS
+
+4. Open `KeyChain Access` application and use `File -> Import Items` to import the `server.crt`file. 
+5. Find the certificate and set trust to `Always Trust` for the `SSL` option.
+6. The certificate should now be trused by your browser.
+
+### Windows
+
+4. Open `certmgr.msc` from the commandline
+5. Navigate to `Trusted Root Certificate Authorities -> Certificates` and use `Import` to import the `server.crt`file Follow the wizard.
+6. The certificate should now be trused by your browser.
 
 # Thanks
 

@@ -5,6 +5,7 @@ on:
   push:
     branches: 
       - dev
+      - ssl
 
 jobs:
   pio-build:
@@ -18,8 +19,8 @@ jobs:
         run: |
           echo "Checkout UI"
           git clone https://github.com/mp-se/victron-receiver-ui victron-receiver-ui 
-          # cp victron-receiver-ui/dist/assets/style.css.gz html/app.css.gz
-          # cp victron-receiver-ui/dist/assets/index.js.gz html/app.js.gz
+          cp victron-receiver-ui/dist/assets/style.css.gz html/app.css.gz
+          cp victron-receiver-ui/dist/assets/index.js.gz html/app.js.gz
 
       - name: Setup PlatformIO
         uses: n-vr/setup-platformio-action@v1.0.1    
@@ -27,7 +28,8 @@ jobs:
       - name: PlatformIO Run
         uses: karniv00l/platformio-run-action@v1
         with:
-          environments: "victron-s3-waveshare-tft,victron-lolin-tft,victron-s3-lolin-tft,victron-c3-lolin,victron-s3-lolin"
+          environments: "victron-s3-waveshare-tft,victron-lolin-tft,victron-s3-lolin-tft"
+          # environments: "victron-s3-waveshare-tft,victron-lolin-tft,victron-s3-lolin-tft,victron-c3-lolin,victron-s3-lolin"
           jobs: 6
           silent: false
           verbose: true

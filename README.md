@@ -9,7 +9,7 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 # Changes
 
-* 0.6.0 - Switched webserver to allow for admin password and encrypted connection using SSL.
+* 0.6.0 - Switched webserver to allow for admin password and encrypted connection using SSL and authentication token. Updated UI to use a common framework and optimized build size. 
 
 * 0.5.0 - Added support for Battery Protect and Update UI dependecies
 

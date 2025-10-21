@@ -9,7 +9,7 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 # Changes
 
-* 0.6.0 - Added option to enable SSL on webserver with password protection. Changed flashlayout to use the full 16 Mb memory in preparation for new touch screen UI
+* 0.6.0 - Added option to enable SSL on webserver with password protection. Changed flashlayout to use the full 16 Mb memory in preparation for new touch screen UI. 
 
 * 0.5.0 - Added support for Battery Protect and Update UI dependecies
 
@@ -27,7 +27,8 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 * MQTT integration with Home Assistant for all identified values.
 * REST API integration with Home Assistant for all identified values.
 * Firmware update and Serial Logging via web interface.
-* Support for encrypted communication (SSL) and admin password.
+* Support for encrypted communication (SSL) and admin password (Not supported on the c3/s3 mini)
+* TFT display support (Not supported on the c3/s3 mini)
 
 # Support
 

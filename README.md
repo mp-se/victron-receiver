@@ -9,15 +9,34 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 # Changes
 
-* 0.6.0 - Added option to enable SSL on webserver with password protection. Changed flashlayout to use the full 16 Mb memory in preparation for new touch screen UI. 
+## v0.7.0
 
-* 0.5.0 - Added support for Battery Protect and Update UI dependecies
+* Updated dependecies
+* Upgraded to PsycicWebServer v2
+* (Bug) When device reboots and token is reset authentication is now done again to avoid failed api calls.
 
-* 0.4.0 - Revert to Arduino 2.x for stability reasons. Changed packet parsing to simplify decoding and updated dependecies.
+## v0.6.0
 
-* 0.3.0 - Upgrade to latest libraries and Arduino 3.0.7, Added configuration backup feature.
+* Added option to enable SSL on webserver with password protection. 
+* Changed flashlayout to use the full 16 Mb memory in preparation for new touch screen UI. 
 
-* 0.2.5 - Version that correcly decode the first few devices (AC Charger, DCDC Charger, Battery Monitor, Smart Shunt & Solar Charger) with Home Assistant API integration (MQTT + REST API).
+## v0.5.0
+
+* Added support for Battery Protect and Update UI dependecies
+
+## v0.4.0
+
+* Revert to Arduino 2.x for stability reasons. 
+* Changed packet parsing to simplify decoding and updated dependecies.
+
+## v0.3.0
+
+* Upgrade to latest libraries and Arduino 3.0.7.
+* Added configuration backup feature.
+
+## v0.2.5
+
+* Version that correcly decode the first few devices (AC Charger, DCDC Charger, Battery Monitor, Smart Shunt & Solar Charger) with Home Assistant API integration (MQTT + REST API).
 
 # Features
 

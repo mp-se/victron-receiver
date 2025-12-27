@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <ImprovWiFi.h>
+#include <ImprovWiFi/ImprovWiFi.h>
 
 #include <blescanner.hpp>
 #include <config.hpp>
@@ -150,8 +150,7 @@ void setup() {
 
         case RunMode::wifiSetupMode:
           Log.notice(F("Main: Initializing the web server." CR));
-          myWebServer.setupWebServer(runMode == RunMode::wifiSetupMode); // Skip SSL when in wifi setup mode
-          mySerialWebSocket.begin(myWebServer.getWebServer(), &Serial);
+          myWebServer.setupWebServer(runMode == RunMode::wifiSetupMode, &mySerialWebSocket, &Serial);
           mySerial.begin(&mySerialWebSocket);
       } else {
         Log.error(F("Main: Failed to connect with WIFI." CR));
@@ -270,14 +269,8 @@ void renderDisplayFooter() {
 
   switch (runMode) {
     case RunMode::receiverMode:
-      if (strlen(myConfig.getWifiDirectSSID())) {
-        snprintf(&info[0], sizeof(info), "%s - %s",
-                 WiFi.localIP().toString().c_str(),
-                 myConfig.getWifiDirectSSID());
-      } else {
-        snprintf(&info[0], sizeof(info), "%s, rssi %d",
-                 WiFi.localIP().toString().c_str(), WiFi.RSSI());
-      }
+      snprintf(&info[0], sizeof(info), "%s, rssi %d%s",
+                WiFi.localIP().toString().c_str(), WiFi.RSSI(), myWebServer.isSslEnabled() ? ", SSL" : "");
       break;
 
     case RunMode::wifiSetupMode:

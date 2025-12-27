@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2024 Magnus
+Copyright (c) 2024-2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,21 +41,24 @@ VictronReceiverWebServer::VictronReceiverWebServer(WebConfigInterface *config)
     : BaseWebServer(config) {}
 
 esp_err_t VictronReceiverWebServer::webHandleConfigRead(
-    PsychicRequest *request) {
+    PsychicRequest *request, PsychicResponse *response) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
 
   Log.notice(F("WEB : webServer callback for /api/config(read)." CR));
-  PsychicJsonResponse response(request);
-  JsonObject obj = response.getRoot().as<JsonObject>();
+  JsonDocument doc;
+  JsonObject obj = doc.to<JsonObject>();
 
   myConfig.createJson(obj);
-  return response.send();
+
+  String jsonStr;
+  serializeJson(doc, jsonStr);
+  return response->send(200, "application/json", jsonStr.c_str());
 }
 
 esp_err_t VictronReceiverWebServer::webHandleConfigWrite(
-    PsychicRequest *request, JsonVariant &json) {
+    PsychicRequest *request, PsychicResponse *response, JsonVariant &json) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
@@ -66,15 +69,18 @@ esp_err_t VictronReceiverWebServer::webHandleConfigWrite(
   obj.clear();
   myConfig.saveFile();
 
-  PsychicJsonResponse response(request);
-  obj = response.getRoot().as<JsonObject>();
+  JsonDocument doc;
+  obj = doc.to<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Configuration updated";
-  return response.send();
+
+  String jsonStr;
+  serializeJson(doc, jsonStr);
+  return response->send(200, "application/json", jsonStr.c_str());
 }
 
 esp_err_t VictronReceiverWebServer::webHandleFactoryDefaults(
-    PsychicRequest *request) {
+    PsychicRequest *request, PsychicResponse *response) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
@@ -85,17 +91,22 @@ esp_err_t VictronReceiverWebServer::webHandleFactoryDefaults(
   LittleFS.end();
   Log.notice(F("WEB : Deleted files in filesystem, rebooting." CR));
 
-  PsychicJsonResponse response(request);
-  JsonObject obj = response.getRoot().as<JsonObject>();
+  JsonDocument doc;
+  JsonObject obj = doc.to<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Factory reset completed, rebooting";
-  response.send();
+
+  String jsonStr;
+  serializeJson(doc, jsonStr);
+  response->send(200, "application/json", jsonStr.c_str());
+
   delay(500);
   ESP_RESET();
   return ESP_OK;
 }
 
-esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request) {
+esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request,
+                                                     PsychicResponse *response) {
   Log.notice(F("WEB : webServer callback for /api/status(get)." CR));
 
   // Fallback since sometimes the loop() does not always run after firmware
@@ -107,8 +118,8 @@ esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request) {
     return ESP_OK;
   }
 
-  PsychicJsonResponse response(request);
-  JsonObject obj = response.getRoot().as<JsonObject>();
+  JsonDocument doc;
+  JsonObject obj = doc.to<JsonObject>();
 
   obj[PARAM_ID] = myConfig.getID();
   obj[PARAM_TEMP_FORMAT] = String(myConfig.getTempFormat());
@@ -164,13 +175,16 @@ esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request) {
   }
 #endif
 
-  return response.send();
+  String jsonStr;
+  serializeJson(doc, jsonStr);
+  return response->send(200, "application/json", jsonStr.c_str());
 }
 
-bool VictronReceiverWebServer::setupWebServer(bool skipSSL) {
+bool VictronReceiverWebServer::setupWebServer(bool skipSSL, SerialWebSocket* serialWs, Print* secondary) {
   Log.notice(F("WEB : Configuring web server." CR));
 
-  BaseWebServer::setupWebServer(skipSSL);
+  // skipSSL = true;  // For debugging without SSL
+  BaseWebServer::setupWebServer(skipSSL, serialWs, secondary);
   MDNS.addService("victron-receiver", "tcp", 80);
 
   // Static content
@@ -180,19 +194,19 @@ bool VictronReceiverWebServer::setupWebServer(bool skipSSL) {
   _server->on("/api/config", HTTP_GET,
               (PsychicHttpRequestCallback)std::bind(
                   &VictronReceiverWebServer::webHandleConfigRead, this,
-                  std::placeholders::_1));
+                  std::placeholders::_1, std::placeholders::_2));
   _server->on("/api/config", HTTP_POST,
               (PsychicJsonRequestCallback)std::bind(
                   &VictronReceiverWebServer::webHandleConfigWrite, this,
-                  std::placeholders::_1, std::placeholders::_2));
+                  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
   _server->on("/api/factory", HTTP_GET,
               (PsychicHttpRequestCallback)std::bind(
                   &VictronReceiverWebServer::webHandleFactoryDefaults, this,
-                  std::placeholders::_1));
+                  std::placeholders::_1, std::placeholders::_2));
   _server->on("/api/status", HTTP_GET,
               (PsychicHttpRequestCallback)std::bind(
                   &VictronReceiverWebServer::webHandleStatus, this,
-                  std::placeholders::_1));
+                  std::placeholders::_1, std::placeholders::_2));
 
   Log.notice(F("WEB : Web server started." CR));
   return true;

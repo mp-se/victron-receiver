@@ -28,13 +28,22 @@ jobs:
       - name: PlatformIO Run
         uses: karniv00l/platformio-run-action@v1
         with:
-          environments: "victron-s3-waveshare-tft,victron-lolin-tft,victron-s3-lolin-tft"
-          # environments: "victron-s3-waveshare-tft,victron-lolin-tft,victron-s3-lolin-tft,victron-c3-lolin,victron-s3-lolin"
-          jobs: 6
+          # environments: "victron-s3-waveshare-tft,victron-lolin-tft,victron-s3-lolin-tft,victron-c3-mini,victron-s3-mini"
+          environments: "victron-s3-waveshare-tft,victron-s3-lolin-tft,victron-c3-mini,victron-s3-mini"
+          jobs: 1
           silent: false
           verbose: true
           disable-auto-clean: false
-    
+
+      - name: PlatformIO Run (2)
+        uses: karniv00l/platformio-run-action@v1
+        with:
+          environments: "victron-lolin-tft"
+          jobs: 1
+          silent: false
+          verbose: true
+          disable-auto-clean: false
+
       - uses: EndBug/add-and-commit@v9 # You can change this to use a specific version. https://github.com/marketplace/actions/add-commit
         with:
           add: 'bin html'

@@ -21,8 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <ImprovWiFi.h>
-
 #include <blescanner.hpp>
 #include <config.hpp>
 #include <cstdio>
@@ -57,7 +55,6 @@ void controller();
 void renderDisplayHeader();
 void renderDisplayFooter();
 void renderDisplayLogs();
-void checkForImprovWifi();
 
 SerialDebug mySerial;
 VictronReceiverConfig myConfig(CFG_APPNAME, CFG_FILENAME);
@@ -103,8 +100,6 @@ void setup() {
   if (!myWifi.hasConfig()) {
     Log.notice(F("Main: Waiting for remote WIFI setup." CR));
     myDisplay.printLineCentered(3, "Waiting for remote WIFI setup");
-    checkForImprovWifi();  // Will return once timeout occurs or configuration
-                           // is completed
     myDisplay.printLineCentered(4, "");
     myDisplay.printLineCentered(5, "");
   }
@@ -127,6 +122,7 @@ void setup() {
     case RunMode::wifiSetupMode:
       Log.notice(F("Main: Entering WIFI Setup." CR));
       myDisplay.printLineCentered(3, "Entering WIFI Setup");
+      myWifi.enableImprov(true);
       myWifi.startAP();
       break;
 
@@ -150,8 +146,7 @@ void setup() {
 
         case RunMode::wifiSetupMode:
           Log.notice(F("Main: Initializing the web server." CR));
-          myWebServer.setupWebServer(runMode == RunMode::wifiSetupMode); // Skip SSL when in wifi setup mode
-          mySerialWebSocket.begin(myWebServer.getWebServer(), &Serial);
+          myWebServer.setupWebServer(runMode == RunMode::wifiSetupMode, &mySerialWebSocket, &Serial);
           mySerial.begin(&mySerialWebSocket);
       } else {
         Log.error(F("Main: Failed to connect with WIFI." CR));
@@ -270,14 +265,8 @@ void renderDisplayFooter() {
 
   switch (runMode) {
     case RunMode::receiverMode:
-      if (strlen(myConfig.getWifiDirectSSID())) {
-        snprintf(&info[0], sizeof(info), "%s - %s",
-                 WiFi.localIP().toString().c_str(),
-                 myConfig.getWifiDirectSSID());
-      } else {
-        snprintf(&info[0], sizeof(info), "%s, rssi %d",
-                 WiFi.localIP().toString().c_str(), WiFi.RSSI());
-      }
+      snprintf(&info[0], sizeof(info), "%s, rssi %d%s",
+                WiFi.localIP().toString().c_str(), WiFi.RSSI(), myWebServer.isSslEnabled() ? ", SSL" : "");
       break;
 
     case RunMode::wifiSetupMode:
@@ -294,67 +283,6 @@ void renderDisplayLogs() {
     if (j < 0) j = maxLogEntries - 1;
     myDisplay.printLine(i + 1, &logEntryList[j].s[0]);
   }
-}
-
-// Code for handling wifi setup over serial connection with esp-web-tools
-constexpr auto IMPROVE_TIMEOUT_SECONDS = 30;
-
-LoopTimer improveTimeout(IMPROVE_TIMEOUT_SECONDS * 1000);
-
-void improveSetWifiCredentials(const char *ssid, const char *password) {
-  myConfig.setWifiSSID(ssid, 0);
-  myConfig.setWifiPass(password, 0);
-  myConfig.saveFile();
-}
-
-void improveInfo(const char *info) { myDisplay.printLineCentered(4, info); }
-
-void improveDebug(const char *debug) { myDisplay.printLineCentered(5, debug); }
-
-void checkForImprovWifi() {
-  improveTimeout.reset();
-
-#if defined(ESP32S3)
-  ImprovWiFi improvWiFi(CFG_APPNAME, CFG_APPVER, "ESP32S3", myConfig.getMDNS());
-#elif defined(ESP32C3)
-  ImprovWiFi improvWiFi(CFG_APPNAME, CFG_APPVER, "ESP32C3", myConfig.getMDNS());
-#elif defined(ESP32)
-  ImprovWiFi improvWiFi(CFG_APPNAME, CFG_APPVER, "ESP32", myConfig.getMDNS());
-#else
-#error "Undefined target"
-#endif
-
-  improvWiFi.setWiFiCallback(improveSetWifiCredentials);
-  improvWiFi.setInfoCallback(improveInfo);
-  // improvWiFi.setDebugCallback(improveDebug);
-
-  LoopTimer update(500);
-
-  // Run for 10 seconds
-  while (!improveTimeout.hasExpired() || improvWiFi.isConfigInitiated()) {
-    if (improvWiFi.isConfigCompleted()) return;
-
-    if (update.hasExpired()) {
-      update.reset();
-
-      char buf[80] = "";
-
-      if (!improvWiFi.isConfigInitiated()) {
-        int32_t time =
-            IMPROVE_TIMEOUT_SECONDS - (improveTimeout.getTimePassed() / 1000);
-        Log.notice(F("Main: Waiting for remote WIFI setup, waiting for %d." CR),
-                   time);
-        snprintf(buf, sizeof(buf), "Waiting for %d s", time);
-      }
-
-      myDisplay.printLineCentered(6, buf);
-    }
-
-    improvWiFi.loop();
-    delay(1);
-  }
-
-  myDisplay.printLineCentered(6, "");
 }
 
 // EOF

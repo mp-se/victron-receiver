@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2024 Magnus
+Copyright (c) 2024-2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,15 +31,15 @@ SOFTWARE.
 
 class VictronReceiverWebServer : public BaseWebServer {
  private:
-  esp_err_t webHandleStatus(PsychicRequest *request);
-  esp_err_t webHandleConfigRead(PsychicRequest *request);
-  esp_err_t webHandleConfigWrite(PsychicRequest *request, JsonVariant &json);
-  esp_err_t webHandleFactoryDefaults(PsychicRequest *request);
+  esp_err_t webHandleStatus(PsychicRequest *request, PsychicResponse *response);
+  esp_err_t webHandleConfigRead(PsychicRequest *request, PsychicResponse *response);
+  esp_err_t webHandleConfigWrite(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
+  esp_err_t webHandleFactoryDefaults(PsychicRequest *request, PsychicResponse *response);
 
  public:
   explicit VictronReceiverWebServer(WebConfigInterface *config);
 
-  bool setupWebServer(bool skipSSL);
+  bool setupWebServer(bool skipSSL = false, SerialWebSocket* serialWs = nullptr, Print* secondary = nullptr);
   void loop();
 };
 

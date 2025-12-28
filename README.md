@@ -2,6 +2,10 @@
 ![release](https://img.shields.io/github/v/release/mp-se/victron-receiver?label=latest%20release)
 ![issues](https://img.shields.io/github/issues/mp-se/victron-receiver)
 ![pr](https://img.shields.io/github/issues-pr/mp-se/victron-receiver)
+![dev_build](https://img.shields.io/github/actions/workflow/status/mp-se/victron-receiver/pio-build.yaml?branch=dev)
+![License](https://img.shields.io/github/license/mp-se/victron-receiver)
+![GitHub Stars](https://img.shields.io/github/stars/mp-se/victron-receiver)
+![Last Commit](https://img.shields.io/github/last-commit/mp-se/victron-receiver)
 
 # Overview
 
@@ -9,15 +13,34 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 # Changes
 
-* 0.6.0 - Added option to enable SSL on webserver with password protection. Changed flashlayout to use the full 16 Mb memory in preparation for new touch screen UI
+## v0.7.0
 
-* 0.5.0 - Added support for Battery Protect and Update UI dependecies
+* Updated dependecies.
+* Upgraded to PsycicWebServer v2 which should improve performance.
+* (Bug) When device reboots and token is reset authentication is now done again to avoid failed api calls.
 
-* 0.4.0 - Revert to Arduino 2.x for stability reasons. Changed packet parsing to simplify decoding and updated dependecies.
+## v0.6.0
 
-* 0.3.0 - Upgrade to latest libraries and Arduino 3.0.7, Added configuration backup feature.
+* Added option to enable SSL on webserver with password protection.
+* Changed flashlayout to use the full 16 Mb memory in preparation for new touch screen UI.
 
-* 0.2.5 - Version that correcly decode the first few devices (AC Charger, DCDC Charger, Battery Monitor, Smart Shunt & Solar Charger) with Home Assistant API integration (MQTT + REST API).
+## v0.5.0
+
+* Added support for Battery Protect and Update UI dependecies
+
+## v0.4.0
+
+* Revert to Arduino 2.x for stability reasons.
+* Changed packet parsing to simplify decoding and updated dependecies.
+
+## v0.3.0
+
+* Upgrade to latest libraries and Arduino 3.0.7.
+* Added configuration backup feature.
+
+## v0.2.5
+
+* Version that correcly decode the first few devices (AC Charger, DCDC Charger, Battery Monitor, Smart Shunt & Solar Charger) with Home Assistant API integration (MQTT + REST API).
 
 # Features
 
@@ -27,7 +50,8 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 * MQTT integration with Home Assistant for all identified values.
 * REST API integration with Home Assistant for all identified values.
 * Firmware update and Serial Logging via web interface.
-* Support for encrypted communication (SSL) and admin password.
+* Support for encrypted communication (SSL) and admin password (Not supported on the c3/s3 mini)
+* TFT display support (Not supported on the c3/s3 mini)
 
 # Support
 

@@ -44,8 +44,8 @@ void BleDeviceCallbacks::onResult(
 #else
 void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
 #endif
-  Log.info(F("BLE : Callback for device %s." CR),
-           advertisedDevice->getAddress().toString().c_str());
+  // Log.info(F("BLE : Callback for device %s." CR),
+  //          advertisedDevice->getAddress().toString().c_str());
 
   // See if we have manufacturer data and then look to see if it's coming from a
   // Victron device.

@@ -39,7 +39,8 @@ void Display::setup() {
 
   _tft->init();
   _tft->setSwapBytes(true);
-  _tft->setRotation(1);  // TODO: Allow rotation to be set in configuration
+  _tft->setRotation(
+      1);  // TODO(mpse): Allow rotation to be set in configuration
   clear();
   setFont(FontSize::FONT_9);
 #endif

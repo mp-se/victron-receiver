@@ -13,6 +13,10 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 # Changes
 
+## v0.8.0
+
+* Added support for Exide BLE batteries.
+
 ## v0.7.0
 
 * Updated dependecies.

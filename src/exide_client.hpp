@@ -43,9 +43,8 @@ class ExideClient {
   void setRssiThreshold(int rssi);
 
  private:
-  // const uint32_t _minPollInterval = 10UL * 60UL * 1000UL;  // 10 minutes in
-  // ms
-  const uint32_t _minPollInterval = 1UL * 30UL * 1000UL;  // 30 seconds in ms
+  const uint32_t _minPollInterval = 10UL * 60UL * 1000UL;  // 10 minutes
+//   const uint32_t _minPollInterval = 1UL * 30UL * 1000UL;  // 30 seconds\
 
   // Device state machine for sequential processing
   enum class State {

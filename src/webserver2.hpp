@@ -32,14 +32,18 @@ SOFTWARE.
 class VictronReceiverWebServer : public BaseWebServer {
  private:
   esp_err_t webHandleStatus(PsychicRequest *request, PsychicResponse *response);
-  esp_err_t webHandleConfigRead(PsychicRequest *request, PsychicResponse *response);
-  esp_err_t webHandleConfigWrite(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
-  esp_err_t webHandleFactoryDefaults(PsychicRequest *request, PsychicResponse *response);
+  esp_err_t webHandleConfigRead(PsychicRequest *request,
+                                PsychicResponse *response);
+  esp_err_t webHandleConfigWrite(PsychicRequest *request,
+                                 PsychicResponse *response, JsonVariant &json);
+  esp_err_t webHandleFactoryDefaults(PsychicRequest *request,
+                                     PsychicResponse *response);
 
  public:
   explicit VictronReceiverWebServer(WebConfigInterface *config);
 
-  bool setupWebServer(bool skipSSL = false, SerialWebSocket* serialWs = nullptr, Print* secondary = nullptr);
+  bool setupWebServer(bool skipSSL = false, SerialWebSocket *serialWs = nullptr,
+                      Print *secondary = nullptr);
   void loop();
 };
 
@@ -48,6 +52,6 @@ extern VictronReceiverWebServer myWebServer;
 
 #endif  // ESPFWK_PSYCHIC_HTTP
 
-#endif  // SRC_WEBSERVER_HPP_
+#endif  // SRC_WEBSERVER2_HPP_
 
 // EOF

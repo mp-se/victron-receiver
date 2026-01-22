@@ -38,11 +38,11 @@ jobs:
       - name: PlatformIO Run (2)
         uses: karniv00l/platformio-run-action@v1
         with:
-          environments: "victron-lolin-tft"
-          jobs: 1
-          silent: false
-          verbose: true
-          disable-auto-clean: false
+            environments: "victron-lolin-tft"
+            jobs: 1
+            silent: false
+            verbose: true
+            disable-auto-clean: false
 
       - uses: EndBug/add-and-commit@v9 # You can change this to use a specific version. https://github.com/marketplace/actions/add-commit
         with:

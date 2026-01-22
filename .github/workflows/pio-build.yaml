@@ -22,6 +22,11 @@ jobs:
           cp victron-receiver-ui/dist/assets/style.css.gz html/app.css.gz
           cp victron-receiver-ui/dist/assets/index.js.gz html/app.js.gz
 
+      - name: Setup Python (for PlatformIO)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
       - name: Setup PlatformIO
         uses: n-vr/setup-platformio-action@v1.0.1    
 
@@ -31,7 +36,7 @@ jobs:
       - name: Install Arduino espressif32 platform (Arduino 3.x)
         run: |
           echo "Installing Arduino espressif32 platform (Arduino core 3.x)"
-          pio platform install https://github.com/pioarduino/platform-espressif32/releases/download/55.03.36/platform-espressif32.zip
+          pio pkg install https://github.com/pioarduino/platform-espressif32/releases/download/55.03.36/platform-espressif32.zip
           pio update
 
       - name: PlatformIO Run

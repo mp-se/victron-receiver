@@ -5,7 +5,6 @@ on:
   push:
     branches: 
       - dev
-      - ssl
 
 jobs:
   pio-build:
@@ -36,13 +35,12 @@ jobs:
       - name: Install Arduino espressif32 platform (Arduino 3.x)
         run: |
           echo "Installing Arduino espressif32 platform (Arduino core 3.x)"
-          pio pkg install https://github.com/pioarduino/platform-espressif32/releases/download/55.03.36/platform-espressif32.zip
+          pio platform install https://github.com/pioarduino/platform-espressif32/releases/download/55.03.36/platform-espressif32.zip
           pio update
 
       - name: PlatformIO Run
         uses: karniv00l/platformio-run-action@v1
         with:
-          # environments: "victron-s3-waveshare-tft,victron-lolin-tft,victron-s3-lolin-tft,victron-c3-mini,victron-s3-mini"
           environments: "victron-s3-waveshare-tft,victron-s3-lolin-tft,victron-c3-mini,victron-s3-mini"
           jobs: 1
           silent: false
@@ -58,7 +56,7 @@ jobs:
           verbose: true
           disable-auto-clean: false
 
-      - uses: EndBug/add-and-commit@v9 # You can change this to use a specific version. https://github.com/marketplace/actions/add-commit
+      - uses: EndBug/add-and-commit@v9
         with:
           add: 'bin html'
           author_name: GitHub Action

@@ -26,11 +26,15 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Setup PlatformIO
-        uses: n-vr/setup-platformio-action@v1.0.1    
+      - name: Install PlatformIO (via pip with Python 3.12)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -U platformio
 
-      - name: Check PlatformIO
-        run: pio --version
+      - name: Check PlatformIO and Python
+        run: |
+          python --version
+          pio --version
 
       - name: Install Arduino espressif32 platform (Arduino 3.x)
         run: |
@@ -38,23 +42,13 @@ jobs:
           pio platform install https://github.com/pioarduino/platform-espressif32/releases/download/55.03.36/platform-espressif32.zip
           pio update
 
-      - name: PlatformIO Run
-        uses: karniv00l/platformio-run-action@v1
-        with:
-          environments: "victron-s3-waveshare-tft,victron-s3-lolin-tft,victron-c3-mini,victron-s3-mini"
-          jobs: 1
-          silent: false
-          verbose: true
-          disable-auto-clean: false
+      - name: PlatformIO Build (batch)
+        run: |
+          pio run -e victron-s3-waveshare-tft,victron-s3-lolin-tft,victron-c3-mini,victron-s3-mini -j 1 -v
 
-      - name: PlatformIO Run (2)
-        uses: karniv00l/platformio-run-action@v1
-        with:
-          environments: "victron-lolin-tft"
-          jobs: 1
-          silent: false
-          verbose: true
-          disable-auto-clean: false
+      - name: PlatformIO Build (lolin)
+        run: |
+          pio run -e victron-lolin-tft -j 1 -v
 
       - uses: EndBug/add-and-commit@v9
         with:

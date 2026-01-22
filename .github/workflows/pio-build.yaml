@@ -42,11 +42,23 @@ jobs:
           pio platform install https://github.com/pioarduino/platform-espressif32/releases/download/55.03.36/platform-espressif32.zip
           pio update
 
-      - name: PlatformIO Build (batch)
+      - name: PlatformIO Build (s3-waveshare-tft)
         run: |
-          pio run -e victron-s3-waveshare-tft,victron-s3-lolin-tft,victron-c3-mini,victron-s3-mini -j 1 -v
+          pio run -e victron-s3-waveshare-tft -j 1 -v
 
-      - name: PlatformIO Build (lolin)
+      - name: PlatformIO Build (s3-lolin-tft)
+        run: |
+          pio run -e victron-s3-lolin-tft -j 1 -v
+
+      - name: PlatformIO Build (c3-mini)
+        run: |
+          pio run -e victron-c3-mini -j 1 -v
+
+      - name: PlatformIO Build (s3-mini)
+        run: |
+          pio run -e victron-s3-mini -j 1 -v
+
+      - name: PlatformIO Build (lolin-tft)
         run: |
           pio run -e victron-lolin-tft -j 1 -v
 

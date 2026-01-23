@@ -377,8 +377,7 @@ void ExideClient::storeData(ExideDevice& dev,
   JsonDocument doc;
   JsonObject obj = doc.to<JsonObject>();
   String mac = dev.address.toString().c_str();
-  String EXIDE_BATTERY_NAME =
-      "Exide Battery " + mac.substring(mac.length() - 3);
+  String EXIDE_BATTERY_NAME = "ExideBattery";
 
   doc["name"] = EXIDE_BATTERY_NAME;
   doc["battery_voltage"] = serialized(String(parsed.voltage, 2));
@@ -393,7 +392,8 @@ void ExideClient::storeData(ExideDevice& dev,
   if (parsed.cellCount > 0) {
     JsonArray cellVoltagesArray = doc["cellVoltages"].to<JsonArray>();
     for (int i = 0; i < parsed.cellCount; ++i) {
-      cellVoltagesArray.add(serialized(String(parsed.cellVoltages[i] * 0.001f, 3)));
+      cellVoltagesArray.add(
+          serialized(String(parsed.cellVoltages[i] * 0.001f, 3)));
     }
   }
 

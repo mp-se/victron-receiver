@@ -106,7 +106,7 @@ class VictronBatteryProtect : public VictronDevice {
     if (getOutputState() != 0xFF) {
       doc["output_state"] = getOutputState();
       // doc["output_state_message"] = deviceStateToString(getOutputState()); //
-      // TODO: Find what values this can be
+      // TODO(mpse): Find what values this can be
     }
 
     if (getError() != 0xFF) {

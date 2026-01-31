@@ -37,6 +37,7 @@ SOFTWARE.
 #else
 #include <serialws.hpp>
 #endif
+#include <exide_client.hpp>
 #include <uptime.hpp>
 #include <utils.hpp>
 #include <webserver.hpp>
@@ -63,6 +64,7 @@ WifiConnection myWifi(&myConfig, CFG_AP_SSID, CFG_AP_PASS, CFG_APPNAME,
 VictronReceiverWebServer myWebServer(&myConfig);
 SerialWebSocket mySerialWebSocket;
 Display myDisplay;
+ExideClient myExideClient;
 
 // Define constats for this program
 uint32_t loopMillis = 0;
@@ -72,8 +74,8 @@ struct LogEntry {
   char s[60] = "";
 };
 
-const auto maxLogEntries = 9;
-LogEntry logEntryList[maxLogEntries];
+#define MAX_LOG_ENTRIES 9
+LogEntry logEntryList[MAX_LOG_ENTRIES];
 int logIndex = 0;
 bool logUpdated = true;
 
@@ -146,7 +148,8 @@ void setup() {
 
         case RunMode::wifiSetupMode:
           Log.notice(F("Main: Initializing the web server." CR));
-          myWebServer.setupWebServer(runMode == RunMode::wifiSetupMode, &mySerialWebSocket, &Serial);
+          myWebServer.setupWebServer(runMode == RunMode::wifiSetupMode,
+                                     &mySerialWebSocket, &Serial);
           mySerial.begin(&mySerialWebSocket);
       } else {
         Log.error(F("Main: Failed to connect with WIFI." CR));
@@ -162,9 +165,9 @@ void setup() {
 
   if (runMode == RunMode::receiverMode) {
     Log.notice(F("Main: Initialize ble scanner." CR));
-    bleScanner.setScanTime(myConfig.getBleScanTime());
-    bleScanner.setAllowActiveScan(myConfig.getBleActiveScan());
-    bleScanner.init();
+    myBleScanner.setScanTime(myConfig.getBleScanTime());
+    myBleScanner.setAllowActiveScan(myConfig.getBleActiveScan());
+    myBleScanner.init();
   }
 
   Log.notice(F("Main: Startup completed." CR));
@@ -185,6 +188,7 @@ void loop() {
 
   myWebServer.loop();
   myWifi.loop();
+  myExideClient.loop();
 
   switch (runMode) {
     case RunMode::receiverMode:
@@ -215,19 +219,19 @@ void addLogEntry(tm timeinfo, String name) {
            "%02d:%02d:%02d %s", timeinfo.tm_hour, timeinfo.tm_min,
            timeinfo.tm_sec, name.c_str());
 
-  if (++logIndex >= maxLogEntries) logIndex = 0;
+  if (++logIndex >= MAX_LOG_ENTRIES) logIndex = 0;
   logUpdated = true;
 }
 
 void controller() {
-  bleScanner.scan();
-  bleScanner.waitForScan();
+  myBleScanner.scan();
+  myBleScanner.waitForScan();
 
   VictronReceiverPush push(&myConfig);
 
   // Process gravitymon from BLE
   for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
-    VictronBleData &vbd = bleScanner.getVictronBleData(i);
+    BleData &vbd = myBleScanner.getBleData(i);
 
     if (vbd.getUpdated() && (vbd.getPushAge() > myConfig.getPushResendTime())) {
       addLogEntry(vbd.getTimeUpdated(), vbd.getName());
@@ -266,7 +270,8 @@ void renderDisplayFooter() {
   switch (runMode) {
     case RunMode::receiverMode:
       snprintf(&info[0], sizeof(info), "%s, rssi %d%s",
-                WiFi.localIP().toString().c_str(), WiFi.RSSI(), myWebServer.isSslEnabled() ? ", SSL" : "");
+               WiFi.localIP().toString().c_str(), WiFi.RSSI(),
+               myWebServer.isSslEnabled() ? ", SSL" : "");
       break;
 
     case RunMode::wifiSetupMode:
@@ -278,9 +283,9 @@ void renderDisplayFooter() {
 }
 
 void renderDisplayLogs() {
-  for (int i = 0, j = logIndex; i < maxLogEntries; i++) {
+  for (int i = 0, j = logIndex; i < MAX_LOG_ENTRIES; i++) {
     j--;
-    if (j < 0) j = maxLogEntries - 1;
+    if (j < 0) j = MAX_LOG_ENTRIES - 1;
     myDisplay.printLine(i + 1, &logEntryList[j].s[0]);
   }
 }

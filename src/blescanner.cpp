@@ -33,10 +33,11 @@ SOFTWARE.
 
 #include <blescanner.hpp>
 #include <config.hpp>
+#include <exide_client.hpp>
 #include <string>
 #include <utils.hpp>
 
-BleScanner bleScanner;
+BleScanner myBleScanner;
 
 #if defined(USE_NIMBLE2)
 void BleDeviceCallbacks::onResult(
@@ -51,6 +52,9 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
   // Victron device.
   if (advertisedDevice->haveManufacturerData() == true) {
     std::string manufacturer = advertisedDevice->getManufacturerData();
+
+    // See if we can process Exide devices first
+    myExideClient.processAdvertisedDevice(advertisedDevice);
 
     // Now let's setup a pointer to a struct to get to the data more cleanly.
     const VictronManufacturerData* vicData =
@@ -191,9 +195,9 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
       } break;
     }
 
-    int i = bleScanner.findVictronBleData(cfg.mac);
+    int i = myBleScanner.findBleData(cfg.mac);
     if (i >= 0) {
-      VictronBleData& vbd = bleScanner.getVictronBleData(i);
+      BleData& vbd = myBleScanner.getBleData(i);
       vbd.setMacAdress(cfg.mac);
       vbd.setName(cfg.name);
       String j;

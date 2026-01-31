@@ -51,7 +51,7 @@ class BleDeviceCallbacks : public NimBLEAdvertisedDeviceCallbacks {
 };
 #endif
 
-class VictronBleData {
+class BleData {
  private:
   bool _updated = false;
   struct tm _timeinfoUpdated;
@@ -99,22 +99,22 @@ class BleScanner {
   void setScanTime(int scanTime) { _scanTime = scanTime; }
   void setAllowActiveScan(bool activeScan) { _activeScan = activeScan; }
 
-  int findVictronBleData(String mac) {
+  int findBleData(String mac) {
     for (int i = 0; i < MAX_VICTRON_DEVICES; i++)
       if (_victron[i].getMacAdress() == mac || _victron[i].getMacAdress() == "")
         return i;
     return -1;
   }
-  VictronBleData& getVictronBleData(int idx) { return _victron[idx]; }
+  BleData& getBleData(int idx) { return _victron[idx]; }
 
  private:
   int _scanTime = 5;
   bool _activeScan = false;
   BLEScan* _bleScan = nullptr;
   BleDeviceCallbacks* _deviceCallbacks = nullptr;
-  VictronBleData _victron[MAX_VICTRON_DEVICES];
+  BleData _victron[MAX_VICTRON_DEVICES];
 };
 
-extern BleScanner bleScanner;
+extern BleScanner myBleScanner;
 
 #endif  // SRC_BLESCANNER_HPP_

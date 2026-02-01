@@ -39,17 +39,9 @@ SOFTWARE.
 #include <NimBLEScan.h>
 #include <NimBLEUtils.h>
 
-#define USE_NIMBLE2
-
-#if defined(USE_NIMBLE2)
 class BleDeviceCallbacks : public NimBLEScanCallbacks {
   void onResult(const NimBLEAdvertisedDevice* advertisedDevice) override;
 };
-#else
-class BleDeviceCallbacks : public NimBLEAdvertisedDeviceCallbacks {
-  void onResult(NimBLEAdvertisedDevice* advertisedDevice) override;
-};
-#endif
 
 class BleData {
  private:
@@ -71,7 +63,6 @@ class BleData {
   }
 
   void setPushed() {
-    _updated = false;
     _timePushed = millis();
   }
 
@@ -94,15 +85,18 @@ class BleScanner {
   void deInit();
 
   bool scan();
-  bool waitForScan();
+  void stop();
+  bool isScanning();
 
   void setScanTime(int scanTime) { _scanTime = scanTime; }
   void setAllowActiveScan(bool activeScan) { _activeScan = activeScan; }
 
   int findBleData(String mac) {
-    for (int i = 0; i < MAX_VICTRON_DEVICES; i++)
-      if (_victron[i].getMacAdress() == mac || _victron[i].getMacAdress() == "")
+    for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
+      if (_victron[i].getMacAdress().equalsIgnoreCase(mac) ||
+          _victron[i].getMacAdress() == "")
         return i;
+    }
     return -1;
   }
   BleData& getBleData(int idx) { return _victron[idx]; }

@@ -181,10 +181,10 @@ void setup() {
 }
 
 LoopTimer mainLoop(2000);
+LoopTimer pushLoop(30000);
 
 void loop() {
   myUptime.calculate();
-  controller();
 
   myWebServer.loop();
   myWifi.loop();
@@ -192,11 +192,16 @@ void loop() {
 
   switch (runMode) {
     case RunMode::receiverMode:
+      myBleScanner.scan();
       if (!myWifi.isConnected()) {
         Log.warning(F("Loop: Wifi was disconnected, trying to reconnect." CR));
         myWifi.connect();
       }
-      controller();
+
+      if (pushLoop.hasExpired()) {
+        pushLoop.reset();
+        controller();
+      }
       break;
 
     case RunMode::wifiSetupMode:
@@ -224,9 +229,6 @@ void addLogEntry(tm timeinfo, String name) {
 }
 
 void controller() {
-  myBleScanner.scan();
-  myBleScanner.waitForScan();
-
   VictronReceiverPush push(&myConfig);
 
   // Process gravitymon from BLE

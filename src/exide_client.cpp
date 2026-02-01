@@ -63,6 +63,8 @@ void ExideClient::processAdvertisedDevice(
   } else {
     it->second.lastSeen = millis();
     it->second.lastRssi = advertisedDevice->getRSSI();
+    Log.notice(F("EXID: Updated last seen for Exide device: %s RSSI=%d" CR),
+               addr.toString().c_str(), advertisedDevice->getRSSI());
   }
 }
 
@@ -77,19 +79,39 @@ void ExideClient::loop() {
   ExideDevice* candidate = nullptr;
   uint32_t newest = 0;
   uint32_t now = millis();
+
+  // Check if any device is currently busy (connecting, discovering, etc.)
+  bool isBusy = false;
   for (auto& kv : devices) {
-    ExideDevice& d = kv.second;
-    // Only consider for connection if enough time has passed since last poll
-    if (d.state == State::Idle && isEligible(d) && d.lastSeen > newest) {
-      if (now - d.lastPolledMs >= _minPollInterval) {
-        newest = d.lastSeen;
-        candidate = &d;
-      } else {
-        // Log.notice(F("EXID: Skipping %s, polled too recently (%lu ms ago)"
-        // CR),
-        //             d.address.toString().c_str(), now - d.lastPolledMs);
+    if (kv.second.state != State::Idle && kv.second.state != State::Backoff) {
+      isBusy = true;
+      break;
+    }
+  }
+
+  if (!isBusy) {
+    for (auto& kv : devices) {
+      ExideDevice& d = kv.second;
+      // Only consider for connection if enough time has passed since last poll
+      // (d.lastPolledMs == 0 means never polled, so trigger immediately on discovery)
+      if (d.state == State::Idle && isEligible(d) && d.lastSeen > newest) {
+        if (d.lastPolledMs == 0 || (now - d.lastPolledMs >= _minPollInterval)) {
+          newest = d.lastSeen;
+          candidate = &d;
+        }
       }
     }
+  }
+
+  if (candidate) {
+    Log.notice(F("EXID: Attempting connection to %s" CR),
+               candidate->address.toString().c_str());
+    connectToDevice(*candidate);
+  }
+
+  // Process sub-states for active or backoff devices
+  for (auto& kv : devices) {
+    ExideDevice& d = kv.second;
     // If a device is Active check if we should disconnect after active duration
     if (d.state == State::Active) {
       if (millis() - d.activeSince > _activeDurationMs) {
@@ -114,8 +136,8 @@ void ExideClient::loop() {
   }
 
   if (candidate) {
-    // Log.notice(F("EXID: Attempting connection to %s" CR),
-    //             candidate->address.toString().c_str());
+    Log.notice(F("EXID: Attempting connection to %s" CR),
+                candidate->address.toString().c_str());
     connectToDevice(*candidate);
   }
 }

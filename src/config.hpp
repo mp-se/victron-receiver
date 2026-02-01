@@ -27,7 +27,7 @@ SOFTWARE.
 #include <baseconfig.hpp>
 #include <utils.hpp>
 
-constexpr auto MAX_VICTRON_DEVICES = 8;
+constexpr auto MAX_VICTRON_DEVICES = 12;
 
 struct VictronConfig {
   String name;  // Own name of device

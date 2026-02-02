@@ -33,24 +33,28 @@ SOFTWARE.
 
 #include <blescanner.hpp>
 #include <config.hpp>
+#include <exide_client.hpp>
 #include <string>
 #include <utils.hpp>
 
-BleScanner bleScanner;
+BleScanner myBleScanner;
 
-#if defined(USE_NIMBLE2)
 void BleDeviceCallbacks::onResult(
     const NimBLEAdvertisedDevice* advertisedDevice) {
-#else
-void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
-#endif
   // Log.info(F("BLE : Callback for device %s." CR),
   //          advertisedDevice->getAddress().toString().c_str());
+
+  // See if we can process Exide devices first
+  myExideClient.processAdvertisedDevice(advertisedDevice);
 
   // See if we have manufacturer data and then look to see if it's coming from a
   // Victron device.
   if (advertisedDevice->haveManufacturerData() == true) {
     std::string manufacturer = advertisedDevice->getManufacturerData();
+
+    if (manufacturer.length() < 10) {
+      return;
+    }
 
     // Now let's setup a pointer to a struct to get to the data more cleanly.
     const VictronManufacturerData* vicData =
@@ -63,6 +67,16 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
 
     VictronConfig cfg = myConfig.findVictronConfig(
         advertisedDevice->getAddress().toString().c_str());
+
+    // Check if we already have a data entry for this device and if it was updated recently.
+    // If so, we skip processing to save CPU/battery.
+    int i = myBleScanner.findBleData(cfg.mac);
+    if (i >= 0) {
+      BleData& vbd = myBleScanner.getBleData(i);
+      if (vbd.getMacAdress() != "" && vbd.getUpdateAge() < 30) {
+        return;
+      }
+    }
 
     // Convert the string to an array that we can use to decrypt the data
     uint8_t key[16];
@@ -105,9 +119,9 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
     // Check if the first byte in the encryption key matches the received data,
     // simple validation to check if we have the right key
     if (vicData->encryptKeyMatch != key[0]) {
-      Log.warning(F("BLE : The stored encryption key does not match the device "
-                    "%x vs %x" CR),
-                  key[0], vicData->encryptKeyMatch);
+      // Log.warning(F("BLE : The stored encryption key does not match the device "
+      //               "%x vs %x" CR),
+      //             key[0], vicData->encryptKeyMatch);
       return;
     }
 
@@ -191,15 +205,15 @@ void BleDeviceCallbacks::onResult(NimBLEAdvertisedDevice* advertisedDevice) {
       } break;
     }
 
-    int i = bleScanner.findVictronBleData(cfg.mac);
-    if (i >= 0) {
-      VictronBleData& vbd = bleScanner.getVictronBleData(i);
+    int j = myBleScanner.findBleData(cfg.mac);
+    if (j >= 0) {
+      BleData& vbd = myBleScanner.getBleData(j);
       vbd.setMacAdress(cfg.mac);
       vbd.setName(cfg.name);
-      String j;
-      j.reserve(1000);
-      serializeJson(doc, j);
-      vbd.setJson(j);
+      String k;
+      k.reserve(1000);
+      serializeJson(doc, k);
+      vbd.setJson(k);
       vbd.setUpdated();
     }
   }
@@ -210,12 +224,9 @@ BleScanner::BleScanner() { _deviceCallbacks = new BleDeviceCallbacks(); }
 void BleScanner::init() {
   NimBLEDevice::init("");
   _bleScan = NimBLEDevice::getScan();
-#if defined(USE_NIMBLE2)
   _bleScan->setScanCallbacks(_deviceCallbacks);
-#else
-  _bleScan->setAdvertisedDeviceCallbacks(_deviceCallbacks);
-#endif
   _bleScan->setMaxResults(0);
+  _bleScan->setDuplicateFilter(false);
   _bleScan->setActiveScan(_activeScan);
   _bleScan->setInterval(97);
   _bleScan->setWindow(37);
@@ -228,39 +239,31 @@ bool BleScanner::scan() {
 
   if (_bleScan->isScanning()) return true;
 
-  for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
-    _victron[i].clearUpdate();
-  }
-
-  Log.notice(F("BLE : Starting %s scan." CR),
+  Log.notice(F("BLE : Starting %s background scan." CR),
              _activeScan ? "ACTIVE" : "PASSIVE");
   _bleScan->setActiveScan(_activeScan);
 
-#if defined(USE_NIMBLE2)
-  NimBLEScanResults foundDevices =
-      _bleScan->getResults(_scanTime * 1000, false);
-  Log.notice(F("BLE : Scanning completed, found %d results." CR),
-             foundDevices.getCount());
-  _bleScan->clearResults();
-  return true;
-#else
-  _bleScan->clearResults();
-  return _bleScan->start(_scanTime, nullptr, true);
-#endif
-}
-
-bool BleScanner::waitForScan() {
-#if defined(USE_NIMBLE2)
-  return true;
-#else
-  if (!_bleScan) return false;
-
-  while (_bleScan->isScanning()) {
-    delay(100);
+  // In NimBLE-Arduino 2.x, start(0) is used for continuous background scanning.
+  // The signature is start(uint32_t duration, bool isContinue = false, bool restart = true)
+  if (!_bleScan->start(0, false)) {
+    Log.error(F("BLE : Failed to start scan." CR));
+    return false;
   }
 
   return true;
-#endif
+}
+
+void BleScanner::stop() {
+  if (_bleScan) {
+    _bleScan->stop();
+  }
+}
+
+bool BleScanner::isScanning() {
+  if (_bleScan) {
+    return _bleScan->isScanning();
+  }
+  return false;
 }
 
 // EOF

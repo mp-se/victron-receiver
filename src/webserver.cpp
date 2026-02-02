@@ -141,7 +141,7 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
   int j = 0;
 
   for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
-    VictronBleData vbd = bleScanner.getVictronBleData(i);
+    BleData vbd = myBleScanner.getBleData(i);
     if (vbd.getMacAdress() != "") {
       devices[j][PARAM_NAME] = vbd.getName();
       devices[j][PARAM_DATA] = vbd.getJson();

@@ -5,7 +5,6 @@ on:
   push:
     branches: 
       - dev
-      - ssl
 
 jobs:
   pio-build:
@@ -22,29 +21,48 @@ jobs:
           cp victron-receiver-ui/dist/assets/style.css.gz html/app.css.gz
           cp victron-receiver-ui/dist/assets/index.js.gz html/app.js.gz
 
-      - name: Setup PlatformIO
-        uses: n-vr/setup-platformio-action@v1.0.1    
-
-      - name: PlatformIO Run
-        uses: karniv00l/platformio-run-action@v1
+      - name: Setup Python (for PlatformIO)
+        uses: actions/setup-python@v4
         with:
-          # environments: "victron-s3-waveshare-tft,victron-lolin-tft,victron-s3-lolin-tft,victron-c3-mini,victron-s3-mini"
-          environments: "victron-s3-waveshare-tft,victron-s3-lolin-tft,victron-c3-mini,victron-s3-mini"
-          jobs: 1
-          silent: false
-          verbose: true
-          disable-auto-clean: false
+          python-version: '3.12'
 
-      - name: PlatformIO Run (2)
-        uses: karniv00l/platformio-run-action@v1
-        with:
-          environments: "victron-lolin-tft"
-          jobs: 1
-          silent: false
-          verbose: true
-          disable-auto-clean: false
+      - name: Install PlatformIO (via pip with Python 3.12)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -U platformio
 
-      - uses: EndBug/add-and-commit@v9 # You can change this to use a specific version. https://github.com/marketplace/actions/add-commit
+      - name: Check PlatformIO and Python
+        run: |
+          python --version
+          pio --version
+
+      - name: Install Arduino espressif32 platform (Arduino 3.x)
+        run: |
+          echo "Installing Arduino espressif32 platform (Arduino core 3.x)"
+          pio platform install https://github.com/pioarduino/platform-espressif32/releases/download/55.03.36/platform-espressif32.zip
+          pio update
+
+      - name: PlatformIO Build (s3-waveshare-tft)
+        run: |
+          pio run -e victron-s3-waveshare-tft -j 1 -v
+
+      - name: PlatformIO Build (s3-lolin-tft)
+        run: |
+          pio run -e victron-s3-lolin-tft -j 1 -v
+
+      - name: PlatformIO Build (c3-mini)
+        run: |
+          pio run -e victron-c3-mini -j 1 -v
+
+      - name: PlatformIO Build (s3-mini)
+        run: |
+          pio run -e victron-s3-mini -j 1 -v
+
+      - name: PlatformIO Build (lolin-tft)
+        run: |
+          pio run -e victron-lolin-tft -j 1 -v
+
+      - uses: EndBug/add-and-commit@v9
         with:
           add: 'bin html'
           author_name: GitHub Action

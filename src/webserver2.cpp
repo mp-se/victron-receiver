@@ -106,7 +106,7 @@ esp_err_t VictronReceiverWebServer::webHandleFactoryDefaults(
 }
 
 esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request,
-                                                     PsychicResponse *response) {
+                                                    PsychicResponse *response) {
   Log.notice(F("WEB : webServer callback for /api/status(get)." CR));
 
   // Fallback since sometimes the loop() does not always run after firmware
@@ -152,7 +152,7 @@ esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request,
   int j = 0;
 
   for (int i = 0; i < MAX_VICTRON_DEVICES; i++) {
-    VictronBleData vbd = bleScanner.getVictronBleData(i);
+    BleData vbd = myBleScanner.getBleData(i);
     if (vbd.getMacAdress() != "") {
       devices[j][PARAM_NAME] = vbd.getName();
       devices[j][PARAM_DATA] = vbd.getJson();
@@ -180,7 +180,9 @@ esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request,
   return response->send(200, "application/json", jsonStr.c_str());
 }
 
-bool VictronReceiverWebServer::setupWebServer(bool skipSSL, SerialWebSocket* serialWs, Print* secondary) {
+bool VictronReceiverWebServer::setupWebServer(bool skipSSL,
+                                              SerialWebSocket *serialWs,
+                                              Print *secondary) {
   Log.notice(F("WEB : Configuring web server." CR));
 
   // skipSSL = true;  // For debugging without SSL
@@ -195,10 +197,11 @@ bool VictronReceiverWebServer::setupWebServer(bool skipSSL, SerialWebSocket* ser
               (PsychicHttpRequestCallback)std::bind(
                   &VictronReceiverWebServer::webHandleConfigRead, this,
                   std::placeholders::_1, std::placeholders::_2));
-  _server->on("/api/config", HTTP_POST,
-              (PsychicJsonRequestCallback)std::bind(
-                  &VictronReceiverWebServer::webHandleConfigWrite, this,
-                  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+  _server->on(
+      "/api/config", HTTP_POST,
+      (PsychicJsonRequestCallback)std::bind(
+          &VictronReceiverWebServer::webHandleConfigWrite, this,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
   _server->on("/api/factory", HTTP_GET,
               (PsychicHttpRequestCallback)std::bind(
                   &VictronReceiverWebServer::webHandleFactoryDefaults, this,

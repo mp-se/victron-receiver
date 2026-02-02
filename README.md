@@ -16,7 +16,7 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 ## v0.8.1
 
 * Fixed issues with BLE stack being swamped when many devices was detected.
-* Exide devices are now connected when first found instead of after 10 min timeout
+* Exide devices are now checked when first found instead of after 10 min timeout
 
 ## v0.8.0
 

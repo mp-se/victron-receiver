@@ -9,7 +9,7 @@
 
 # Overview
 
-This is a project for reading Victron Instant Readouts over Bluetooth and pushing this into Home Assistant using an ESP32 board, WiFi and MQTT / Home Assistant REST API.
+This is a project for reading **Victron Instant Readouts** and **Exide BLE** over Bluetooth and pushing this into Home Assistant using an ESP32 board, WiFi and MQTT / Home Assistant REST API.  
 
 # Changes
 

@@ -3,7 +3,7 @@
 ![issues](https://img.shields.io/github/issues/mp-se/victron-receiver)
 ![pr](https://img.shields.io/github/issues-pr/mp-se/victron-receiver)
 ![dev_build](https://img.shields.io/github/actions/workflow/status/mp-se/victron-receiver/pio-build.yaml?branch=dev)
-![License](https://img.shields.io/github/license/mp-se/victron-receiver)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![GitHub Stars](https://img.shields.io/github/stars/mp-se/victron-receiver)
 ![Last Commit](https://img.shields.io/github/last-commit/mp-se/victron-receiver)
 

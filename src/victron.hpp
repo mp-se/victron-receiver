@@ -23,12 +23,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #ifndef SRC_VICTRON_HPP_
 #define SRC_VICTRON_HPP_
 
+#include <victron_common.hpp>
 #include <victron_ac.hpp>             // AC Charger
 #include <victron_battmon.hpp>        // Smart Battery Monitor variant
 #include <victron_battmon_shunt.hpp>  // BatteryMon (Complete)
 #include <victron_battprotect.hpp>    // Smart BatteryProtect
-#include <victron_common.hpp>
-#include <victron_dcdc.hpp>   // DC-DC Charger
-#include <victron_solar.hpp>  // Solar Charger
+#include <victron_dcdc.hpp>           // DC-DC Charger
+#include <victron_solar.hpp>          // Solar Charger
+#include <victron_inverter.hpp>       // Inverter
 
 #endif  // SRC_VICTRON_HPP_

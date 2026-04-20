@@ -166,6 +166,11 @@ void BleDeviceCallbacks::onResult(
         }
       } break;
 
+      case VictronDeviceType::Inverter: {
+        VictronInverter vin(&decrypted[0], vicData->model);
+        vin.toJson(obj);
+      } break;
+
       case VictronDeviceType::DcDcConverter: {
         VictronDcDcCharger vdc(&decrypted[0], vicData->model);
         vdc.toJson(obj);

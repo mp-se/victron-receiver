@@ -13,6 +13,12 @@ This is a project for reading Victron Instant Readouts over Bluetooth and pushin
 
 # Changes
 
+## v0.8.2
+
+* Enabled Inverter parsing and updated the UI to show that. 
+* Added device types 0xA3F0, 0xA3F1
+* Switched license to GNU v3
+
 ## v0.8.1
 
 * Fixed issues with BLE stack being swamped when many devices was detected.

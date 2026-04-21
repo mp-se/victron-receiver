@@ -94,10 +94,13 @@ Currently there is support for the following Victron Devices mainly since these 
     - Need help to validate data during charge cycle.
 * Smart Battery Protect
     - Tested and working
+* Inverter
+    - Tested and working
+* Orion XS
+    - Tested and working
 
 The following types can be supported if I can receive some test data.
 
-* Inverter
 * SmartLithium
 * InverterRS
 * GxDevice

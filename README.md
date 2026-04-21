@@ -13,6 +13,10 @@ This is a project for reading **Victron Instant Readouts** and **Exide BLE** ove
 
 # Changes
 
+## v0.8.3
+
+* Added support for Orion XS devices 
+
 ## v0.8.2
 
 * Enabled Inverter parsing and updated the UI to show that. 

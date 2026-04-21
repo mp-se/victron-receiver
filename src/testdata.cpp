@@ -30,7 +30,7 @@ VictronTestData testData[] = {
                                     0xD6, 0x59, 0x00, 0xFC, 0x40, 0x72, 0x6F,
                                     0x05, 0x40, 0x7B, 0xE2, 0x00, 0x00, 0x00}},
 
-    {"DC-DC Charger", 0xA3F0, DcDcConverter, {0x04, 0x00, 0xA1, 0x05, 0x06, 0x00, 0x46,
+    {"Orion XS", 0xA3F0, OrionXS, {0x04, 0x00, 0xA1, 0x05, 0x06, 0x00, 0x46,
                                               0x06, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00,
                                               0x00, 0x00, 0xED, 0x45, 0x00, 0x00, 0x00}},
 
@@ -106,6 +106,11 @@ VictronBleSimulationData createDeviceFromTestData(int idx) {
   case VictronDeviceType::Inverter: {
     VictronInverter vin(&testData[idx].decrypted[0], testData[idx].model);
     vin.toJson(obj);
+  } break;
+
+  case VictronDeviceType::OrionXS: {
+    VictronOrionXS vox(&testData[idx].decrypted[0], testData[idx].model);
+    vox.toJson(obj);
   } break;
 
   default: {

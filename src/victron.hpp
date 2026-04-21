@@ -31,5 +31,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <victron_dcdc.hpp>           // DC-DC Charger
 #include <victron_solar.hpp>          // Solar Charger
 #include <victron_inverter.hpp>       // Inverter
+#include <victron_orionxs.hpp>        // OrionXS
 
 #endif  // SRC_VICTRON_HPP_

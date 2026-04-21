@@ -171,6 +171,11 @@ void BleDeviceCallbacks::onResult(
         vin.toJson(obj);
       } break;
 
+      case VictronDeviceType::OrionXS: {
+        VictronOrionXS vox(&decrypted[0], vicData->model);
+        vox.toJson(obj);
+      } break;
+
       case VictronDeviceType::DcDcConverter: {
         VictronDcDcCharger vdc(&decrypted[0], vicData->model);
         vdc.toJson(obj);

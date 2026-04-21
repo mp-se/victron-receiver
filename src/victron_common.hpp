@@ -44,7 +44,8 @@ enum VictronDeviceType {
   LynxSmartBMS = 0x0a,
   MultiRS = 0x0b,
   VeBus = 0x0c,
-  DcEnergyMeter = 0x0d
+  DcEnergyMeter = 0x0d,
+  OrionXS = 0x0f
 };
 
 namespace VictronDeviceState {

@@ -19,7 +19,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SRC_BLESCANNER_HPP_
 #define SRC_BLESCANNER_HPP_
 
@@ -60,9 +59,7 @@ class BleData {
     getLocalTime(&_timeinfoUpdated);
   }
 
-  void setPushed() {
-    _timePushed = millis();
-  }
+  void setPushed() { _timePushed = millis(); }
 
   String& getName() { return _name; }
   void setName(String& n) { _name = n; }

@@ -19,7 +19,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include <Arduino.h>
 
 #include <blescanner.hpp>
@@ -91,7 +90,8 @@ void ExideClient::loop() {
     for (auto& kv : devices) {
       ExideDevice& d = kv.second;
       // Only consider for connection if enough time has passed since last poll
-      // (d.lastPolledMs == 0 means never polled, so trigger immediately on discovery)
+      // (d.lastPolledMs == 0 means never polled, so trigger immediately on
+      // discovery)
       if (d.state == State::Idle && isEligible(d) && d.lastSeen > newest) {
         if (d.lastPolledMs == 0 || (now - d.lastPolledMs >= _minPollInterval)) {
           newest = d.lastSeen;
@@ -135,7 +135,7 @@ void ExideClient::loop() {
 
   if (candidate) {
     Log.notice(F("EXID: Attempting connection to %s" CR),
-                candidate->address.toString().c_str());
+               candidate->address.toString().c_str());
     connectToDevice(*candidate);
   }
 }

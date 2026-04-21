@@ -35,17 +35,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <uptime.hpp>
 #include <webserver.hpp>
 
-VictronReceiverWebServer::VictronReceiverWebServer(WebConfigInterface *config)
+VictronReceiverWebServer::VictronReceiverWebServer(WebConfigInterface* config)
     : BaseWebServer(config) {}
 
 void VictronReceiverWebServer::webHandleConfigRead(
-    AsyncWebServerRequest *request) {
+    AsyncWebServerRequest* request) {
   if (!isAuthenticated(request)) {
     return;
   }
 
   Log.notice(F("WEB : webServer callback for /api/config(read)." CR));
-  AsyncJsonResponse *response = new AsyncJsonResponse(false);
+  AsyncJsonResponse* response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
   myConfig.createJson(obj);
   response->setLength();
@@ -53,7 +53,7 @@ void VictronReceiverWebServer::webHandleConfigRead(
 }
 
 void VictronReceiverWebServer::webHandleConfigWrite(
-    AsyncWebServerRequest *request, JsonVariant &json) {
+    AsyncWebServerRequest* request, JsonVariant& json) {
   if (!isAuthenticated(request)) {
     return;
   }
@@ -64,7 +64,7 @@ void VictronReceiverWebServer::webHandleConfigWrite(
   obj.clear();
   myConfig.saveFile();
 
-  AsyncJsonResponse *response = new AsyncJsonResponse(false);
+  AsyncJsonResponse* response = new AsyncJsonResponse(false);
   obj = response->getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Configuration updated";
@@ -73,7 +73,7 @@ void VictronReceiverWebServer::webHandleConfigWrite(
 }
 
 void VictronReceiverWebServer::webHandleFactoryDefaults(
-    AsyncWebServerRequest *request) {
+    AsyncWebServerRequest* request) {
   if (!isAuthenticated(request)) {
     return;
   }
@@ -84,7 +84,7 @@ void VictronReceiverWebServer::webHandleFactoryDefaults(
   LittleFS.end();
   Log.notice(F("WEB : Deleted files in filesystem, rebooting." CR));
 
-  AsyncJsonResponse *response = new AsyncJsonResponse(false);
+  AsyncJsonResponse* response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Factory reset completed, rebooting";
@@ -94,7 +94,7 @@ void VictronReceiverWebServer::webHandleFactoryDefaults(
   ESP_RESET();
 }
 
-void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
+void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest* request) {
   Log.notice(F("WEB : webServer callback for /api/status(get)." CR));
 
   // Fallback since sometimes the loop() does not always run after firmware
@@ -105,7 +105,7 @@ void VictronReceiverWebServer::webHandleStatus(AsyncWebServerRequest *request) {
     ESP_RESET();
   }
 
-  AsyncJsonResponse *response = new AsyncJsonResponse(false);
+  AsyncJsonResponse* response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
 
   obj[PARAM_ID] = myConfig.getID();
@@ -180,7 +180,7 @@ bool VictronReceiverWebServer::setupWebServer(bool skipSSL) {
               std::bind(&VictronReceiverWebServer::webHandleConfigRead, this,
                         std::placeholders::_1));
 
-  AsyncCallbackJsonWebHandler *handler;
+  AsyncCallbackJsonWebHandler* handler;
   handler = new AsyncCallbackJsonWebHandler(
       "/api/config",
       std::bind(&VictronReceiverWebServer::webHandleConfigWrite, this,

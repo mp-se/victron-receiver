@@ -35,11 +35,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <uptime.hpp>
 #include <webserver2.hpp>
 
-VictronReceiverWebServer::VictronReceiverWebServer(WebConfigInterface *config)
+VictronReceiverWebServer::VictronReceiverWebServer(WebConfigInterface* config)
     : BaseWebServer(config) {}
 
 esp_err_t VictronReceiverWebServer::webHandleConfigRead(
-    PsychicRequest *request, PsychicResponse *response) {
+    PsychicRequest* request, PsychicResponse* response) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
@@ -56,7 +56,7 @@ esp_err_t VictronReceiverWebServer::webHandleConfigRead(
 }
 
 esp_err_t VictronReceiverWebServer::webHandleConfigWrite(
-    PsychicRequest *request, PsychicResponse *response, JsonVariant &json) {
+    PsychicRequest* request, PsychicResponse* response, JsonVariant& json) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
@@ -78,7 +78,7 @@ esp_err_t VictronReceiverWebServer::webHandleConfigWrite(
 }
 
 esp_err_t VictronReceiverWebServer::webHandleFactoryDefaults(
-    PsychicRequest *request, PsychicResponse *response) {
+    PsychicRequest* request, PsychicResponse* response) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
@@ -103,8 +103,8 @@ esp_err_t VictronReceiverWebServer::webHandleFactoryDefaults(
   return ESP_OK;
 }
 
-esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request,
-                                                    PsychicResponse *response) {
+esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest* request,
+                                                    PsychicResponse* response) {
   Log.notice(F("WEB : webServer callback for /api/status(get)." CR));
 
   // Fallback since sometimes the loop() does not always run after firmware
@@ -179,8 +179,8 @@ esp_err_t VictronReceiverWebServer::webHandleStatus(PsychicRequest *request,
 }
 
 bool VictronReceiverWebServer::setupWebServer(bool skipSSL,
-                                              SerialWebSocket *serialWs,
-                                              Print *secondary) {
+                                              SerialWebSocket* serialWs,
+                                              Print* secondary) {
   Log.notice(F("WEB : Configuring web server." CR));
 
   // skipSSL = true;  // For debugging without SSL

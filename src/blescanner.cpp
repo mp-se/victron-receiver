@@ -19,7 +19,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include <aes/esp_aes.h>
 
 #include <blescanner.hpp>
@@ -59,8 +58,8 @@ void BleDeviceCallbacks::onResult(
     VictronConfig cfg = myConfig.findVictronConfig(
         advertisedDevice->getAddress().toString().c_str());
 
-    // Check if we already have a data entry for this device and if it was updated recently.
-    // If so, we skip processing to save CPU/battery.
+    // Check if we already have a data entry for this device and if it was
+    // updated recently. If so, we skip processing to save CPU/battery.
     int i = myBleScanner.findBleData(cfg.mac);
     if (i >= 0) {
       BleData& vbd = myBleScanner.getBleData(i);
@@ -110,7 +109,8 @@ void BleDeviceCallbacks::onResult(
     // Check if the first byte in the encryption key matches the received data,
     // simple validation to check if we have the right key
     if (vicData->encryptKeyMatch != key[0]) {
-      // Log.warning(F("BLE : The stored encryption key does not match the device "
+      // Log.warning(F("BLE : The stored encryption key does not match the
+      // device "
       //               "%x vs %x" CR),
       //             key[0], vicData->encryptKeyMatch);
       return;
@@ -245,7 +245,8 @@ bool BleScanner::scan() {
   _bleScan->setActiveScan(_activeScan);
 
   // In NimBLE-Arduino 2.x, start(0) is used for continuous background scanning.
-  // The signature is start(uint32_t duration, bool isContinue = false, bool restart = true)
+  // The signature is start(uint32_t duration, bool isContinue = false, bool
+  // restart = true)
   if (!_bleScan->start(0, false)) {
     Log.error(F("BLE : Failed to start scan." CR));
     return false;

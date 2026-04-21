@@ -19,7 +19,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SRC_VICTRON_ORIONXS_HPP_
 #define SRC_VICTRON_ORIONXS_HPP_
 
@@ -71,11 +70,12 @@ class VictronOrionXS : public VictronDevice {
                         ? static_cast<float>(inputCurrent) / 10
                         : NAN;  // 0.1 A increments
 
-
-    Log.notice(F("VIC : Victron %s (%x) input=%F V, %F A output=%F V, %F A state=%d "
-                 "error=%d, off=%d" CR),
-               getDeviceName().c_str(), getModelNo(), getInputVoltage(),
-               getInputCurrent(), getOutputVoltage(), getOutputCurrent(),  getState(), getError(), getOffReasons());
+    Log.notice(
+        F("VIC : Victron %s (%x) input=%F V, %F A output=%F V, %F A state=%d "
+          "error=%d, off=%d" CR),
+        getDeviceName().c_str(), getModelNo(), getInputVoltage(),
+        getInputCurrent(), getOutputVoltage(), getOutputCurrent(), getState(),
+        getError(), getOffReasons());
   }
 
   float getInputVoltage() { return _inputVoltage; }
@@ -118,7 +118,7 @@ class VictronOrionXS : public VictronDevice {
 
     if (!isnan(getOutputCurrent()))
       doc["output_current"] =
-          serialized(String(getOutputCurrent(), DECIMALS_CURRENT));          
+          serialized(String(getOutputCurrent(), DECIMALS_CURRENT));
   }
 };
 

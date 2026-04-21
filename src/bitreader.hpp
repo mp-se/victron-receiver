@@ -28,7 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 class BitReader {
  private:
-  const uint8_t *_data;
+  const uint8_t* _data;
   uint8_t _len;
   uint8_t _offset;
 
@@ -43,7 +43,7 @@ class BitReader {
   }
 
  public:
-  BitReader(const uint8_t *data, uint8_t len) {
+  BitReader(const uint8_t* data, uint8_t len) {
     _data = data;
     _len = len;
     _offset = 0;

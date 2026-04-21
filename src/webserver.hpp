@@ -33,13 +33,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 class VictronReceiverWebServer : public BaseWebServer {
  private:
-  void webHandleStatus(AsyncWebServerRequest *request);
-  void webHandleConfigRead(AsyncWebServerRequest *request);
-  void webHandleConfigWrite(AsyncWebServerRequest *request, JsonVariant &json);
-  void webHandleFactoryDefaults(AsyncWebServerRequest *request);
+  void webHandleStatus(AsyncWebServerRequest* request);
+  void webHandleConfigRead(AsyncWebServerRequest* request);
+  void webHandleConfigWrite(AsyncWebServerRequest* request, JsonVariant& json);
+  void webHandleFactoryDefaults(AsyncWebServerRequest* request);
 
  public:
-  explicit VictronReceiverWebServer(WebConfigInterface *config);
+  explicit VictronReceiverWebServer(WebConfigInterface* config);
 
   bool setupWebServer(bool skipSSL = false);
   void loop();

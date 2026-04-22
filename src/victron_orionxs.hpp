@@ -51,10 +51,10 @@ class VictronOrionXS : public VictronDevice {
     _state = br.readUnsigned(8);
     _error = br.readUnsigned(8);
 
-    uint16_t inputVoltage = br.readUnsigned(16);
-    uint16_t inputCurrent = br.readUnsigned(16);
     uint16_t outputVoltage = br.readUnsigned(16);
     uint16_t outputCurrent = br.readUnsigned(16);
+    uint16_t inputVoltage = br.readUnsigned(16);
+    uint16_t inputCurrent = br.readUnsigned(16);
     _offReason = br.readUnsigned(32);
 
     _outputVoltage = outputVoltage != 0X7FFF

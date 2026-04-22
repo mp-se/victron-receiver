@@ -29,19 +29,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 class VictronReceiverWebServer : public BaseWebServer {
  private:
-  esp_err_t webHandleStatus(PsychicRequest *request, PsychicResponse *response);
-  esp_err_t webHandleConfigRead(PsychicRequest *request,
-                                PsychicResponse *response);
-  esp_err_t webHandleConfigWrite(PsychicRequest *request,
-                                 PsychicResponse *response, JsonVariant &json);
-  esp_err_t webHandleFactoryDefaults(PsychicRequest *request,
-                                     PsychicResponse *response);
+  esp_err_t webHandleStatus(PsychicRequest* request, PsychicResponse* response);
+  esp_err_t webHandleConfigRead(PsychicRequest* request,
+                                PsychicResponse* response);
+  esp_err_t webHandleConfigWrite(PsychicRequest* request,
+                                 PsychicResponse* response, JsonVariant& json);
+  esp_err_t webHandleFactoryDefaults(PsychicRequest* request,
+                                     PsychicResponse* response);
 
  public:
-  explicit VictronReceiverWebServer(WebConfigInterface *config);
+  explicit VictronReceiverWebServer(WebConfigInterface* config);
 
-  bool setupWebServer(bool skipSSL = false, SerialWebSocket *serialWs = nullptr,
-                      Print *secondary = nullptr);
+  bool setupWebServer(bool skipSSL = false, SerialWebSocket* serialWs = nullptr,
+                      Print* secondary = nullptr);
   void loop();
 };
 

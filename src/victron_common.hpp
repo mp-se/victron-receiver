@@ -19,7 +19,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SRC_VICTRON_COMMON_HPP_
 #define SRC_VICTRON_COMMON_HPP_
 
@@ -44,7 +43,8 @@ enum VictronDeviceType {
   LynxSmartBMS = 0x0a,
   MultiRS = 0x0b,
   VeBus = 0x0c,
-  DcEnergyMeter = 0x0d
+  DcEnergyMeter = 0x0d,
+  OrionXS = 0x0f
 };
 
 namespace VictronDeviceState {

@@ -13,6 +13,14 @@ This is a project for reading **Victron Instant Readouts** and **Exide BLE** ove
 
 # Changes
 
+## v0.8.4
+
+* Swapped input/output values for Orion XS devices 
+
+## v0.8.3
+
+* Added support for Orion XS devices 
+
 ## v0.8.2
 
 * Enabled Inverter parsing and updated the UI to show that. 
@@ -90,10 +98,13 @@ Currently there is support for the following Victron Devices mainly since these 
     - Need help to validate data during charge cycle.
 * Smart Battery Protect
     - Tested and working
+* Inverter
+    - Tested and working
+* Orion XS
+    - Tested and working
 
 The following types can be supported if I can receive some test data.
 
-* Inverter
 * SmartLithium
 * InverterRS
 * GxDevice
